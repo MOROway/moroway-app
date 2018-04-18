@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base href="../">
+<meta charset="UTF-8">
+<meta name="theme-color" content="#000" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-stringid-content="generalTitleWhatsNewScreen"></title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/x-icon" sizes="32x32" href="favicon.ico">
+
+<!-- Open Source Libraries And Fonts -->
+<!-- Google: Material Design Lite -->
+<script src="src/others/open_source/open_code/google/mdl/material.min.js"></script>
+<link rel="stylesheet" type="text/css" href="src/others/open_source/open_code/google/mdl/material.min.css">
+<!-- Fonts -->
+<link rel="stylesheet" type="text/css" href="src/others/open_source/open_fonts/google/MaterialIcons/font.css">
+<link rel="stylesheet" type="text/css" href="src/others/open_source/open_fonts/google/Roboto/font.css">
+
+<!-- General Scripts -->
+<script src="src/jonathan_herrmann_engel/js/appdata.js"></script>
+<script src="src/jonathan_herrmann_engel/js_platform/appdata.js"></script>
+<script src="src/jonathan_herrmann_engel/js/general.js"></script>
+<script src="src/jonathan_herrmann_engel/js_platform/general.js"></script>
+<!-- WhatsNew Scripts -->
+<script src="src/jonathan_herrmann_engel/js/whatsnew.js"></script>
+<script src="src/jonathan_herrmann_engel/js_platform/whatsnew.js"></script>
+
+<style>
+
+body {
+	text-align: center;
+	background: #111;
+}
+
+article {
+	padding: 2%;
+	margin: 0;
+	border-top: 1px rgba(85,85,85,0.5) solid;
+	border-bottom: 1px rgba(85,85,85,0.5) solid;
+}
+
+.mdl-layout__title {
+	color: floralWhite;
+}
+
+.mdl-card {
+	vertical-align: middle;
+	background: floralWhite;
+	display: inline-block;
+	margin: 1%;
+}
+
+.mdl-card__title-text {
+	color: black;
+	font-weight: 700;
+}
+.mdl-card__supporting-text {
+	color: #5f5f5f;
+}
+
+a {
+	color: #4f4f4f;
+}
+
+h2 {
+	color: floralWhite;
+}
+
+#backOption {
+	color: floralWhite;
+}
+
+#newest:target {
+	border: 5px solid #ef5c9c !important;
+	background: #ffeeee !important;
+	display: inline-block;
+	margin: 2%;
+	transform: scale(1.2, 1.2);
+}
+
+#newest:target:hover {
+	transform: scale(1.3, 1.3);
+}
+
+@media (max-width: 1000px) {
+	
+	#newest:target {
+		transform: scale(1.1, 1.1);
+	}
+	
+	#newest:target:hover {
+		transform: scale(1.2, 1.2);
+	}
+	
+}
+
+</style>
+<!-- Workaround for https://github.com/google/material-design-lite/issues/4140 -->
+<script>  
+window.addEventListener("load",workaround);
+function workaround(){
+  var hash = window.location.hash.replace(/[^a-zA-Z0-9\-\_]/i, "");
+  if(hash){
+   var elem = document.querySelector("#"+hash)
+   if(elem){ 
+     elem.scrollIntoView();
+   }
+  }
+}
+</script>
+</head>
+<body>
+
+
+	<div class="mdl-layout mdl-js-layout">
+	
+	
+		<div style="left: 0%;" id="canvas-notifier" class="mdl-js-snackbar mdl-snackbar">
+			<div class="mdl-snackbar__text"></div>
+			<button class="mdl-snackbar__action" type="button"></button>
+		</div>
+		
+		
+		<header style="background-color: black" class="mdl-layout__header">
+			<div class="mdl-layout__header-row">
+				<span class="mdl-layout__title" data-stringid-content="generalTitleWhatsNewScreen"></span>
+			</div>
+		</header>
+
+		<div class="mdl-layout__content">
+			<main></main>
+			<button id="backOption" class="internal-link mdl-button mdl-js-button mdl-js-ripple-effect" data-stringid-content="generalBack"></button>
+		</div>
+		
+
+		
+	</div>
+
+<!-- initialize -->
+<script>
+	init();
+</script>
+	
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base href="./">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#000" />
+<title data-stringid-content="generalTitle"></title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/x-icon" sizes="32x32" href="favicon.ico">
+<!-- Open Source Libraries And Fonts -->
+<!-- Hubspot: Pace.js -->
+<script src="src/others/open_source/open_code/hubspot/pace.js/pace.min.js"></script>
+<link rel="stylesheet" type="text/css" href="src/others/open_source/open_code/hubspot/pace.js/pace-theme-center-simple.tmpl.css">
+<!-- Google: Material Design Lite -->
+<script src="src/others/open_source/open_code/google/mdl/material.min.js"></script>
+<link rel="stylesheet" type="text/css" href="src/others/open_source/open_code/google/mdl/material.min.css">
+<!-- Fonts -->
+<link rel="stylesheet" type="text/css" href="src/others/open_source/open_fonts/google/MaterialIcons/font.css">
+<link rel="stylesheet" type="text/css" href="src/others/open_source/open_fonts/google/Roboto/font.css">
+
+<!-- General Scripts -->
+<script src="src/jonathan_herrmann_engel/js/appdata.js"></script>
+<script src="src/jonathan_herrmann_engel/js_platform/appdata.js"></script>
+<script src="src/jonathan_herrmann_engel/js/general.js"></script>
+<script src="src/jonathan_herrmann_engel/js_platform/general.js"></script>
+<!-- Animation Scripts -->
+<script src="src/jonathan_herrmann_engel/js/scripting.js"></script>
+<script src="src/jonathan_herrmann_engel/js_platform/scripting.js"></script>
+<style>
+body { 
+	margin: 0%;
+	overflow: hidden;
+	background-color: black;
+}
+
+canvas {
+	opacity: 0;
+	margin: 0%;
+	-webkit-tap-highlight-color: transparent;
+}
+
+#branding {
+	width: 20%;
+	max-width: 400px;
+	opacity: 1;
+	position: absolute;
+	transform: translate(-50%,-50%);
+	left: 50%;
+	top: 50%;
+}
+
+#canvas-options {
+	opacity: 0;
+	transition: opacity 0.8s;
+}
+
+#settingsimport {
+	display: none;
+	position: fixed;
+	background: white;
+	top: 0;
+	right: 0;
+	height: 100vh;
+	width: 450px;
+}
+</style>
+</head>
+
+	<body>
+	
+		<main>
+			<!-- loading animation -->
+			<img id="branding" src="assets/asset_background_train.png" alt="" />
+			
+			<!-- tags for ready app -->
+			<canvas data-stringid-content="appScreenNoCanvas">JavaScript required</canvas>
+			<div style="left: 0%;" id="canvas-notifier" class="mdl-js-snackbar mdl-snackbar">
+				<div class="mdl-snackbar__text"></div>
+				<button class="mdl-snackbar__action" type="button"></button>
+			</div>
+			<div id="canvas-options" style="position: fixed;">
+				<button id="canvas-settings" style="display: none; background-color: #D2781B; color: black;" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored" data-stringid-title="generalTitleSettingsScreen">
+					<i class="material-icons">settings</i>
+				</button>
+				<button id="canvas-help" style="display: none;  background-color: #D2781B; color: black;" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored" data-stringid-title="generalTitleHelpScreen">
+					<i class="material-icons">help</i>
+				</button>
+			</div>
+		</main>
+		
+		<!-- settings sidebar -->
+		<iframe id="settingsimport" src="settings/index.html"></iframe>
+
+		<!-- load strings -->
+		<script>
+			setHTMLStrings();
+		</script>
+		
+	</body>
+</html>

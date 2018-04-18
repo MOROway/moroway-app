@@ -41,6 +41,7 @@ var urlsToCache = [
   'assets/asset17.png',
   'assets/helpasset1_bug_report.png',
   'assets/helpasset2_desc.jpg',
+  'assets/helpasset3_source.jpg',
   'src/jonathan_herrmann_engel/js/appdata.js',
   'src/jonathan_herrmann_engel/js/general.js',
   'src/jonathan_herrmann_engel/js/error.js',

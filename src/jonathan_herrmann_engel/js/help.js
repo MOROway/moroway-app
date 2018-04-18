@@ -8,6 +8,7 @@ window.onload = function(){
 	document.querySelector("#legal-fonts-materialicons-license").addEventListener("click", function(){followLink("src/others/open_source/open_fonts/google/MaterialIcons/LICENSE","_self", LINK_STATE_INTERNAL_LICENSE_FILE);}, false);
 	document.querySelector("#legal-self-code-license").addEventListener("click", function(){followLink("LICENSE","_self", LINK_STATE_INTERNAL_LICENSE_FILE);}, false);
 	document.querySelector("#legal-self-assets-license").addEventListener("click", function(){followLink("LICENSE_ASSETS","_self", LINK_STATE_INTERNAL_LICENSE_FILE);}, false);	
+	document.querySelector("#sourcelink").addEventListener("click", function(){followLink(getServerRedirectLink("source_code"),"_blank", LINK_STATE_NORMAL);}, false);	
 	var elem = document.createElement("p");
 	elem.textContent = formatJSString(getString("helpScreenGeneralWelcomeVersion", "."), APP_DATA.version.major, APP_DATA.version.minor, APP_DATA.version.patch, APP_DATA.version.date.year, (APP_DATA.version.date.month < 10 ? "0" + APP_DATA.version.date.month : APP_DATA.version.date.month), (APP_DATA.version.date.day < 10 ? "0" + APP_DATA.version.date.day : APP_DATA.version.date.day));
 	document.querySelector("#version").appendChild(elem);

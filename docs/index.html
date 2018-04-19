@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 	<head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>MOROway App</title>
 	<style>
 	
-		body {
+		* {
 			background: black;
 			color: white;
 			font-family: sans-serif;
 		}
 		
-		#header {
+		header, article {
 			text-align: center;
 			padding: 15px;
 		}
@@ -24,6 +24,15 @@
 		#header h1 {
 			font-size: 3em;
 		}
+		
+		#links p {
+			font-size: 1.2em;
+			padding: 3px;
+		}
+		
+		#links a {
+			text-decoration: none;
+		}
 	
 	</style>
 </head>
@@ -33,6 +42,12 @@
 			<h1>MOROway App</h1>
 			<img src="pic.jpg" alt="">
 		</header>
+		
+		<article id="links">
+			<p><a href="https://github.com/MOROway/moroway-app">View Code on GitHub</a></p>
+			<p><a href="http://moroway.de/app">Start App</a></p>
+			<p><a href="http://moroway.de/">Visit website</a></p>
+		</article>
 	</main>
 </body>
 </html>

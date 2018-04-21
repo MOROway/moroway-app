@@ -3,11 +3,11 @@ const APP_DATA = {
 	"version": {
 		"major": 5,
 		"minor": 4,
-		"patch": 1,
+		"patch": 2,
 		"date": {
 			"year": 2018,
 			"month": 4,
-			"day": 18
+			"day": 21
 		}
 	}
 }

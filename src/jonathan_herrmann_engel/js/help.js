@@ -1,5 +1,8 @@
-window.onload = function(){
-	document.querySelector("#whats-new").addEventListener("click", function(){followLink("whatsnew/#newest","_self", LINK_STATE_INTERNAL_HTML);}, false);
+window.onload = function(){	
+	var elem = document.createElement("p");
+	elem.textContent = formatJSString(getString("helpScreenGeneralWelcomeVersion", "."), APP_DATA.version.major, APP_DATA.version.minor, APP_DATA.version.patch, APP_DATA.version.date.year, (APP_DATA.version.date.month < 10 ? "0" + APP_DATA.version.date.month : APP_DATA.version.date.month), (APP_DATA.version.date.day < 10 ? "0" + APP_DATA.version.date.day : APP_DATA.version.date.day));
+	document.querySelector("#general-version").appendChild(elem);
+	document.querySelector("#general-whatsnew").addEventListener("click", function(){followLink("whatsnew/#newest","_self", LINK_STATE_INTERNAL_HTML);}, false);
 	document.querySelector("#legal-mdl-copyright").addEventListener("click", function(){followLink("src/others/open_source/open_code/google/mdl/COPYRIGHT","_self", LINK_STATE_INTERNAL_LICENSE_FILE);}, false);
 	document.querySelector("#legal-mdl-license").addEventListener("click", function(){followLink("src/others/open_source/open_code/google/mdl/LICENSE","_self", LINK_STATE_INTERNAL_LICENSE_FILE);}, false);
 	document.querySelector("#legal-pace-license").addEventListener("click", function(){followLink("src/others/open_source/open_code/hubspot/pace.js/LICENSE","_self", LINK_STATE_INTERNAL_LICENSE_FILE);}, false);
@@ -8,14 +11,9 @@ window.onload = function(){
 	document.querySelector("#legal-fonts-materialicons-license").addEventListener("click", function(){followLink("src/others/open_source/open_fonts/google/MaterialIcons/LICENSE","_self", LINK_STATE_INTERNAL_LICENSE_FILE);}, false);
 	document.querySelector("#legal-self-code-license").addEventListener("click", function(){followLink("LICENSE","_self", LINK_STATE_INTERNAL_LICENSE_FILE);}, false);
 	document.querySelector("#legal-self-assets-license").addEventListener("click", function(){followLink("LICENSE_ASSETS","_self", LINK_STATE_INTERNAL_LICENSE_FILE);}, false);	
-	document.querySelector("#sourcelink").addEventListener("click", function(){followLink(getServerRedirectLink("source_code"),"_blank", LINK_STATE_NORMAL);}, false);	
-	var elem = document.createElement("p");
-	elem.textContent = formatJSString(getString("helpScreenGeneralWelcomeVersion", "."), APP_DATA.version.major, APP_DATA.version.minor, APP_DATA.version.patch, APP_DATA.version.date.year, (APP_DATA.version.date.month < 10 ? "0" + APP_DATA.version.date.month : APP_DATA.version.date.month), (APP_DATA.version.date.day < 10 ? "0" + APP_DATA.version.date.day : APP_DATA.version.date.day));
-	document.querySelector("#version").appendChild(elem);
-	document.querySelector("#feedbacksend").addEventListener("click", function(){notify(getString("helpScreenContactFeedbackSendNotification", "."), false, 900, null, null, window.innerHeight); followLink( getServerHTMLLink("feedback") ,"_blank", LINK_STATE_NORMAL);}, false);
-	document.querySelector("#imprintA").addEventListener("click", function(){notify(getString("helpScreenContactBackupLinkNotification", "."), false, 900, null, null, window.innerHeight); followLink( getServerHTMLLink("imprint"),"_blank", LINK_STATE_NORMAL);}, false);
+	document.querySelector("#contact-imprintlink").addEventListener("click", function(){notify(getString("helpScreenContactBackupLinkNotification", "."), false, 900, null, null, window.innerHeight); followLink( getServerHTMLLink("imprint"),"_blank", LINK_STATE_NORMAL);}, false);
 	handleServerJSONValues("imprint", function(res){
-		var imprint = document.querySelector("#imprint");
+		var imprint = document.querySelector("#contact-imprint");
 		imprint.innerHTML = "<b>"+getString("helpScreenContactImprintTitle")+"</b>";
 		Object.keys(res).forEach(function(key){
 			var span = document.createElement("span");
@@ -24,9 +22,12 @@ window.onload = function(){
 			imprint.appendChild(span);
 		});
 	});
-	
-
+	document.querySelector("#contact-feedbacklink").addEventListener("click", function(){notify(getString("helpScreenContactFeedbackSendNotification", "."), false, 900, null, null, window.innerHeight); followLink( getServerHTMLLink("feedback") ,"_blank", LINK_STATE_NORMAL);}, false);
+	document.querySelector("#download-androidlink").addEventListener("click", function(){followLink(getServerRedirectLink("download_android"),"_blank", LINK_STATE_NORMAL);}, false);	
+	document.querySelector("#download-windowslink").addEventListener("click", function(){followLink(getServerRedirectLink("download_windows"),"_blank", LINK_STATE_NORMAL);}, false);	
+	document.querySelector("#download-sourcelink").addEventListener("click", function(){followLink(getServerRedirectLink("source_code"),"_blank", LINK_STATE_NORMAL);}, false);
 }
+
 function init(){
 	
 	settings = getSettings ();

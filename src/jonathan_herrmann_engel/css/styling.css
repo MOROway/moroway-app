@@ -1,0 +1,36 @@
+body { 
+	margin: 0%;
+	overflow: hidden;
+	background-color: black;
+}
+
+canvas {
+	opacity: 0;
+	margin: 0%;
+	-webkit-tap-highlight-color: transparent;
+}
+
+#branding {
+	width: 20%;
+	max-width: 400px;
+	opacity: 1;
+	position: absolute;
+	transform: translate(-50%,-50%);
+	left: 50%;
+	top: 50%;
+}
+
+#canvas-options {
+	opacity: 0;
+	transition: opacity 0.8s;
+}
+
+#settingsimport {
+	display: none;
+	position: fixed;
+	background: white;
+	top: 0;
+	right: 0;
+	height: 100vh;
+	width: 450px;
+}

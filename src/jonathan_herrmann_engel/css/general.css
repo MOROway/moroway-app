@@ -1,0 +1,52 @@
+body {
+	text-align: center;
+	background: #303030;
+}
+
+article {
+	padding: 2%;
+	margin: 0;
+	border-top: 1px rgba(85,85,85,0.5) solid;
+	border-bottom: 1px rgba(85,85,85,0.5) solid;
+}
+
+.mdl-layout__header {
+	background: #101010;
+	color: #CFCFCF;
+}
+
+.mdl-layout__title {
+	color: floralWhite;
+}
+
+.mdl-card {
+	vertical-align: middle;
+	background: #CFCFCF;
+	display: inline-block;
+	margin: 1%;
+}
+
+.mdl-card__title-text {
+	color: #101010;
+	font-weight: 700;
+}
+
+.mdl-card__supporting-text {
+	color: #303030;
+}
+
+.mdl-card__supporting-text h3 {
+	color: #606060;
+}
+
+a {
+	color: #4f4f4f;
+}
+
+h2 {
+	color: #CFCFCF;
+}
+
+#backOption {
+	color: #CFCFCF;
+}

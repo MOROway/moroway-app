@@ -1,13 +1,10 @@
-var updatedSW = 35; //TO BE INCREASED ON EACH NEW VERSION
-
-//load app-data object
-self.importScripts('src/jonathan_herrmann_engel/js/appdata.js?src=sw');
+var updatedSW = 36; //TO BE INCREASED ON EACH NEW VERSION
 
 //generate cache-name from app-version, branch and sw-version
 var locationstr = location.pathname;
 locationstr = locationstr.substr(0,locationstr.length-(locationstr.length-locationstr.lastIndexOf("/")));
 locationstr = locationstr.substr(locationstr.lastIndexOf("/")-locationstr.length+1);
-var CACHE_NAME = "moroway-app-version-" + APP_DATA.version.major + "." + APP_DATA.version.minor + "." + APP_DATA.version.patch + "-" + 	locationstr + "-sw-" + updatedSW;
+var CACHE_NAME = "moroway-app-version-" + locationstr + "-sw-" + updatedSW;
 
 //list of all files related to moroway app
 var urlsToCache = [
@@ -56,6 +53,18 @@ var urlsToCache = [
   'src/jonathan_herrmann_engel/js_platform/scripting.js',
   'src/jonathan_herrmann_engel/js_platform/settings.js',
   'src/jonathan_herrmann_engel/js_platform/whatsnew.js',
+  'src/jonathan_herrmann_engel/css/general.css',
+  'src/jonathan_herrmann_engel/css/error.css',
+  'src/jonathan_herrmann_engel/css/help.css',
+  'src/jonathan_herrmann_engel/css/styling.css',
+  'src/jonathan_herrmann_engel/css/settings.css',
+  'src/jonathan_herrmann_engel/css/whatsnew.css',
+  'src/jonathan_herrmann_engel/css_platform/general.css',
+  'src/jonathan_herrmann_engel/css_platform/error.css',
+  'src/jonathan_herrmann_engel/css_platform/help.css',
+  'src/jonathan_herrmann_engel/css_platform/styling.css',
+  'src/jonathan_herrmann_engel/css_platform/settings.css',
+  'src/jonathan_herrmann_engel/css_platform/whatsnew.css',
   'src/others/open_source/open_code/google/mdl/ABOUT',
   'src/others/open_source/open_code/google/mdl/COPYRIGHT',
   'src/others/open_source/open_code/google/mdl/LICENSE',

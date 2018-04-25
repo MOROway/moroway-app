@@ -1,4 +1,4 @@
-var updatedSW = 34; //TO BE INCREASED ON EACH NEW VERSION
+var updatedSW = 35; //TO BE INCREASED ON EACH NEW VERSION
 
 //load app-data object
 self.importScripts('src/jonathan_herrmann_engel/js/appdata.js?src=sw');

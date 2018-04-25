@@ -1,46 +1,45 @@
 body {
 	text-align: center;
-	background: #303030;
+	background: rgb(48, 48, 48);
 }
 
 article {
 	padding: 2%;
 	margin: 0;
-	border-top: 1px rgba(85,85,85,0.5) solid;
-	border-bottom: 1px rgba(85,85,85,0.5) solid;
+	border-top: 1px rgba(85, 85, 85, 0.5) solid;
+	border-bottom: 1px rgba(85, 85, 85, 0.5) solid;
 }
 
 .mdl-layout__header {
-	background: #101010;
-	color: #CFCFCF;
+	background: rgba(12, 12, 12, 0.75);
 }
 
 .mdl-layout__title {
-	color: floralWhite;
+	color: rgb(207, 207, 207);
 }
 
 .mdl-card {
 	vertical-align: middle;
-	background: #CFCFCF;
+	background: rgb(207, 207, 207);
 	display: inline-block;
 	margin: 1%;
 }
 
 .mdl-card__title-text {
-	color: #101010;
+	color: rgb(16, 16, 16);
 	font-weight: 700;
 }
 
 .mdl-card__supporting-text {
-	color: #303030;
+	color: rgb(48, 48, 48);
 }
 
 .mdl-card__supporting-text h3 {
-	color: #606060;
+	color: rgb(96, 96, 96);
 }
 
 .mdl-snackbar {
-	background: #303030;
+	background: rgb(48, 48, 48);
 	left: 0%;
 	transform: translate(0%, 80px);
 }
@@ -54,18 +53,18 @@ article {
 }
 
 .mdl-button--fab.mdl-button--colored, .mdl-button--fab.mdl-button--colored:hover, .mdl-button--fab.mdl-button--colored:focus, .mdl-button--fab.mdl-button--colored:active {
-	color: #303030;
+	color: rgb(48, 48, 48);
 	background: rgb(210, 120, 27);
 }
 
 a {
-	color: #4f4f4f;
+	color: rgb(79, 79, 79);
 }
 
 h2 {
-	color: #CFCFCF;
+	color: rgb(207, 207, 207);
 }
 
 #backOption {
-	color: #CFCFCF;
+	color: rgb(207, 207, 207);
 }

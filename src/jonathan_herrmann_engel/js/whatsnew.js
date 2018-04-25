@@ -1,9 +1,5 @@
 function init(){
-	
-	setHTMLStrings();	
-	
-	settings = getSettings ();
-	
+		
 	document.querySelector("#backOption").addEventListener("click", function(){try {window.close();}catch(err) {}; followLink("./","_self", LINK_STATE_INTERNAL_HTML);}, false);
 	
 	var i = 0;
@@ -73,11 +69,17 @@ function init(){
 		document.querySelector("main").appendChild(versions[i]);
 		document.querySelector("#" + newestFamily).lastChild.id = "newest";
 	}
+		
+	setHTMLStrings();
+	
 }
+
 window.addEventListener("load", function(){
+	
+	// Workaround for https://github.com/google/material-design-lite/issues/4140 && Required for select current version
 	var hash = window.location.hash.replace(/[^a-zA-Z0-9\-\_]/i, "");
-	if(hash == "newest"){
-		var elem = document.querySelector("#newest");
+	if(hash){
+		var elem = document.querySelector("#"+hash)
 		if(elem){ 
 			elem.scrollIntoView();
 		}

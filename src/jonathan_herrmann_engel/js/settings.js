@@ -1,8 +1,29 @@
 "use strict"
 
+function settingsChange(event, suffix) {
+		var id = event.target.id.substr(0,event.target.id.length-suffix.length); 
+		settings[id] = !settings[id];
+		setSettings();
+		toggleInnerHTML(settings[id], id);
+		notify(getString("settingsScreenApply", "."), false, 900, null, null, window.innerHeight);
+}
+
+function toggleInnerHTML(a,b){
+	 var leftButton = document.querySelector("#"+b).querySelector(".leftButton");
+	 if(a){
+		leftButton.style.backgroundColor = "black";
+		leftButton.style.transition = "2s";
+		leftButton.style.transform = "rotate(360deg)";
+	 } else {
+	    leftButton.style.backgroundColor = "";
+		leftButton.style.transition = "2s";
+		leftButton.style.transform = "rotate(0deg)";		
+	 }
+}
+
 var settings = {};
 
-window.onload = function(){
+window.addEventListener("load", function(){
 	
 	if(typeof(Storage) !== "undefined") {
 		
@@ -43,25 +64,4 @@ window.onload = function(){
 	
 	}
 	
-}
-
-function settingsChange(event, suffix) {
-		var id = event.target.id.substr(0,event.target.id.length-suffix.length); 
-		settings[id] = !settings[id];
-		setSettings();
-		toggleInnerHTML(settings[id], id);
-		notify(getString("settingsScreenApply", "."), false, 900, null, null, window.innerHeight);
-}
-
-function toggleInnerHTML(a,b){
-	 var leftButton = document.querySelector("#"+b).querySelector(".leftButton");
-	 if(a){
-		leftButton.style.backgroundColor = "black";
-		leftButton.style.transition = "2s";
-		leftButton.style.transform = "rotate(360deg)";
-	 } else {
-	    leftButton.style.backgroundColor = "";
-		leftButton.style.transition = "2s";
-		leftButton.style.transform = "rotate(0deg)";		
-	 }
-}
+});

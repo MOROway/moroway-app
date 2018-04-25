@@ -49,20 +49,11 @@ article {
 	transform: translate(0%, 0%);
 }
 
-.mdl-snackbar__action {
-	color: #CFCFCF;
-}
-
-.mdl-snackbar__action:hover, .mdl-snackbar__action:focus, .mdl-snackbar__action:active {
+.mdl-snackbar__action, .mdl-snackbar__action:hover, .mdl-snackbar__action:focus, .mdl-snackbar__action:active {
 	color: rgb(210, 120, 27);
 }
 
-.mdl-button--fab.mdl-button--colored {
-	color: #CFCFCF;
-	background: #303030;
-}
-
-.mdl-button--fab.mdl-button--colored:hover, .mdl-button--fab.mdl-button--colored:focus, .mdl-button--fab.mdl-button--colored:active {
+.mdl-button--fab.mdl-button--colored, .mdl-button--fab.mdl-button--colored:hover, .mdl-button--fab.mdl-button--colored:focus, .mdl-button--fab.mdl-button--colored:active {
 	color: #303030;
 	background: rgb(210, 120, 27);
 }

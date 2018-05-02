@@ -1733,7 +1733,7 @@ function animateObjects() {
                 });
             });
         }
-        if(hardware.mouse.isHold && !inPath && (clickTimeOut === null || clickTimeOut === undefined)){
+        if(hardware.mouse.isHold && !inPath && (clickTimeOut === null || clickTimeOut === undefined) && classicUI.switches.display){
             Object.keys(switches).forEach(function(key) {
                 Object.keys(switches[key]).forEach(function(side) {
                     context.save();

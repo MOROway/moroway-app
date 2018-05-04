@@ -68,9 +68,9 @@ function onMouseOut(event) {
     hardware.mouse.cursor = "none";
 }
 function onMouseWheel(event) {
-	hardware.mouse.wheelScrolls = true; 
+    hardware.mouse.wheelScrolls = true; 
     hardware.mouse.isHold = false; 
-	hardware.mouse.wheelX = event.pageX*client.devicePixelRatio;
+    hardware.mouse.wheelX = event.pageX*client.devicePixelRatio;
     hardware.mouse.wheelY = event.pageY*client.devicePixelRatio;
     hardware.mouse.wheelScrollX = event.deltaX;
     hardware.mouse.wheelScrollY = event.deltaY;
@@ -1568,18 +1568,18 @@ function animateObjects() {
             if(typeof movingTimeOut !== "undefined"){
                 clearTimeout(movingTimeOut);
             }
-			if((hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls) || hardware.mouse.isHold) {
-				if(hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls) {
-					trainParams.selected += hardware.mouse.wheelScrollY < 0 ? 1 : -1;
-				} else {
-					trainParams.selected++;
-					hardware.mouse.isHold = false;
-				}
+            if((hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls) || hardware.mouse.isHold) {
+                if(hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls) {
+                    trainParams.selected += hardware.mouse.wheelScrollY < 0 ? 1 : -1;
+                } else {
+                    trainParams.selected++;
+                    hardware.mouse.isHold = false;
+                }
                 if(trainParams.selected >= trains.length) {
                     trainParams.selected=0;
                 } else if (trainParams.selected < 0) {
-					trainParams.selected = trains.length-1;
-				}
+                    trainParams.selected = trains.length-1;
+                }
                 if (!settings.alwaysShowSelectedTrain) {
                     notify (formatJSString(getString("appScreenTrainSelected", "."), getString(["appScreenTrainNames",trainParams.selected])), true, 1250,null, null, client.y);
                 }
@@ -1661,46 +1661,46 @@ function animateObjects() {
                     }
                 } else if((hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls && !(hardware.mouse.wheelY > y && hardware.mouse.wheelX < x )) || (!(hardware.mouse.moveY > y && hardware.mouse.moveX < x ))) {
                     var minAngle = 10;
-					var cAngle;
-					if(hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls && !(hardware.mouse.wheelY > y && hardware.mouse.wheelX < x)) {
-						var angle = classicUI.transformer.input.angle * (hardware.mouse.wheelScrollY < 0 ? 1.1 : 0.9);
-						classicUI.transformer.input.angle = angle >= 0 ? angle <= classicUI.transformer.input.maxAngle ? angle : classicUI.transformer.input.maxAngle : 0;
-					} else {
-						var angle;
-						if (hardware.mouse.moveY>y){
-							angle = Math.PI + Math.abs(Math.atan(((hardware.mouse.moveY-y)/(hardware.mouse.moveX-x))));
-						} else if (hardware.mouse.moveY<y && hardware.mouse.moveX > x){
-							angle = Math.PI - Math.abs(Math.atan(((hardware.mouse.moveY-y)/(hardware.mouse.moveX-x))));  
-						} else {
-							angle = Math.abs(Math.atan(((hardware.mouse.moveY-y)/(hardware.mouse.moveX-x))));
-						}  
-						if(hardware.mouse.isHold){
-							classicUI.transformer.input.angle = angle >= 0 ? angle <= classicUI.transformer.input.maxAngle ? angle : classicUI.transformer.input.maxAngle : 0;
-						}
-					}
-					cAngle = classicUI.transformer.input.angle/classicUI.transformer.input.maxAngle*100;
-					cAngle = cAngle < minAngle ? 0 : cAngle;
-					if (hardware.mouse.wheelScrollY < 0 && hardware.mouse.wheelScrolls && !(hardware.mouse.wheelY > y && hardware.mouse.wheelX < x) && cAngle === 0) {
-						cAngle = minAngle;
-						classicUI.transformer.input.angle = cAngle/100*classicUI.transformer.input.maxAngle;
-					}
-					if(cAngle >= minAngle && trains[trainParams.selected].accelerationSpeed > 0 && trains[trainParams.selected].speedInPercent != cAngle) {
-						trains[trainParams.selected].accelerationSpeedCustom = (trains[trainParams.selected].currentSpeedInPercent)/cAngle;
-					}
-					if(cAngle >= minAngle) {
-						trains[trainParams.selected].speedInPercent = cAngle;
-					} else {
-						hardware.mouse.isHold = false;
-					}
-					if(cAngle < minAngle && trains[trainParams.selected].accelerationSpeed > 0){ 
-						trains[trainParams.selected].accelerationSpeed *= -1;    
-						notify (formatJSString(getString("appScreenObjectStops", "."), getString(["appScreenTrainNames",trainParams.selected])),false, 500,null, null, client.y);
-					} else if(cAngle >= minAngle && !trains[trainParams.selected].move) {
-						trains[trainParams.selected].move = true;
-						notify (formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenTrainNames",trainParams.selected])),false, 500,null, null, client.y);
-					} else if (cAngle >= minAngle && trains[trainParams.selected].accelerationSpeed < 0) {
-						trains[trainParams.selected].accelerationSpeed *=-1;
-					}
+                    var cAngle;
+                    if(hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls && !(hardware.mouse.wheelY > y && hardware.mouse.wheelX < x)) {
+                        var angle = classicUI.transformer.input.angle * (hardware.mouse.wheelScrollY < 0 ? 1.1 : 0.9);
+                        classicUI.transformer.input.angle = angle >= 0 ? angle <= classicUI.transformer.input.maxAngle ? angle : classicUI.transformer.input.maxAngle : 0;
+                    } else {
+                        var angle;
+                        if (hardware.mouse.moveY>y){
+                            angle = Math.PI + Math.abs(Math.atan(((hardware.mouse.moveY-y)/(hardware.mouse.moveX-x))));
+                        } else if (hardware.mouse.moveY<y && hardware.mouse.moveX > x){
+                            angle = Math.PI - Math.abs(Math.atan(((hardware.mouse.moveY-y)/(hardware.mouse.moveX-x))));  
+                        } else {
+                            angle = Math.abs(Math.atan(((hardware.mouse.moveY-y)/(hardware.mouse.moveX-x))));
+                        }  
+                        if(hardware.mouse.isHold){
+                            classicUI.transformer.input.angle = angle >= 0 ? angle <= classicUI.transformer.input.maxAngle ? angle : classicUI.transformer.input.maxAngle : 0;
+                        }
+                    }
+                    cAngle = classicUI.transformer.input.angle/classicUI.transformer.input.maxAngle*100;
+                    cAngle = cAngle < minAngle ? 0 : cAngle;
+                    if (hardware.mouse.wheelScrollY < 0 && hardware.mouse.wheelScrolls && !(hardware.mouse.wheelY > y && hardware.mouse.wheelX < x) && cAngle === 0) {
+                        cAngle = minAngle;
+                        classicUI.transformer.input.angle = cAngle/100*classicUI.transformer.input.maxAngle;
+                    }
+                    if(cAngle >= minAngle && trains[trainParams.selected].accelerationSpeed > 0 && trains[trainParams.selected].speedInPercent != cAngle) {
+                        trains[trainParams.selected].accelerationSpeedCustom = (trains[trainParams.selected].currentSpeedInPercent)/cAngle;
+                    }
+                    if(cAngle >= minAngle) {
+                        trains[trainParams.selected].speedInPercent = cAngle;
+                    } else {
+                        hardware.mouse.isHold = false;
+                    }
+                    if(cAngle < minAngle && trains[trainParams.selected].accelerationSpeed > 0){ 
+                        trains[trainParams.selected].accelerationSpeed *= -1;    
+                        notify (formatJSString(getString("appScreenObjectStops", "."), getString(["appScreenTrainNames",trainParams.selected])),false, 500,null, null, client.y);
+                    } else if(cAngle >= minAngle && !trains[trainParams.selected].move) {
+                        trains[trainParams.selected].move = true;
+                        notify (formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenTrainNames",trainParams.selected])),false, 500,null, null, client.y);
+                    } else if (cAngle >= minAngle && trains[trainParams.selected].accelerationSpeed < 0) {
+                        trains[trainParams.selected].accelerationSpeed *=-1;
+                    }
                 } else {
                     hardware.mouse.isHold = false;
                 }
@@ -1741,7 +1741,7 @@ function animateObjects() {
             context.restore();
         }  
     }
-	
+    
     /////SWITCHES/////
     classicUI.switches.display = (settings.showSwitches) ? true: false;
     var showDuration = 11;
@@ -1892,7 +1892,7 @@ function animateObjects() {
         context.fill();
         context.restore();
     }
-	hardware.mouse.wheelScrolls = false;
+    hardware.mouse.wheelScrolls = false;
     
     /////REPAINT/////
     window.requestAnimationFrame(animateObjects);

@@ -1302,8 +1302,8 @@ function animateObjects() {
         placeClassicUIElements();
         
         if(typeof placeOptions == "function") {
-			placeOptions("resize");
-		}
+            placeOptions("resize");
+        }
         resized = false;
         
     }
@@ -1436,25 +1436,25 @@ function animateObjects() {
         animateCars(i);
     }
 
-    /////KONAMI/Animals/////	
-	if(konamistate < 0) {
-		var animalPos = [{x: background.x+background.width*0.88, y: background.y+background.height*0.58},{x: background.x+background.width*0.055, y: background.y+background.height*0.07}];
-		var animals = [];
-		var animal = 0;
-		while (getString(["appScreenKonamiAnimals",animal]) != "undefined" && animal < animalPos.length) {
-			animals[animal] = getString(["appScreenKonamiAnimals",animal]);
-			animal++;
-		}
-		animals.forEach(function(animal,i){
-			context.save();
-			context.translate(animalPos[i].x, animalPos[i].y);	
-			context.font = measureFontSize(animal, "sans-serif",100,background.width*0.001, 5,background.width*0.012, 0);
-			context.fillStyle = "white";
-			context.textAlign = "center";
-			context.fillText(animal, 0, 0);
-			context.restore();
-		});
-	}
+    /////KONAMI/Animals/////    
+    if(konamistate < 0) {
+        var animalPos = [{x: background.x+background.width*0.88, y: background.y+background.height*0.58},{x: background.x+background.width*0.055, y: background.y+background.height*0.07}];
+        var animals = [];
+        var animal = 0;
+        while (getString(["appScreenKonamiAnimals",animal]) != "undefined" && animal < animalPos.length) {
+            animals[animal] = getString(["appScreenKonamiAnimals",animal]);
+            animal++;
+        }
+        animals.forEach(function(animal,i){
+            context.save();
+            context.translate(animalPos[i].x, animalPos[i].y);    
+            context.font = measureFontSize(animal, "sans-serif",100,background.width*0.001, 5,background.width*0.012, 0);
+            context.fillStyle = "white";
+            context.textAlign = "center";
+            context.fillText(animal, 0, 0);
+            context.restore();
+        });
+    }
 
     
     /////BACKGROUND/Layer-2/////
@@ -1644,7 +1644,7 @@ function animateObjects() {
                             notify(formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenTrainNames",trainParams.selected])),false, 500,null, null, client.y);
                         }
                     }
-                } else if(!(hardware.mouse.moveY>y&& hardware.mouse.moveX < x ) ) {
+                } else if(!(hardware.mouse.moveY > y && hardware.mouse.moveX < x ) ) {
                     var angle;
                     if (hardware.mouse.moveY>y){
                         angle = Math.PI + Math.abs(Math.atan(((hardware.mouse.moveY-y)/(hardware.mouse.moveX-x))));
@@ -1654,8 +1654,7 @@ function animateObjects() {
                         angle = Math.abs(Math.atan(((hardware.mouse.moveY-y)/(hardware.mouse.moveX-x))));
                     }  
                     if(hardware.mouse.isHold){
-                        hardware.mouse.isHold = false;
-                        classicUI.transformer.input.angle = angle >= 0 ? angle <= classicUI.transformer.input.maxAngle ? angle : classicUI.transformer.input.maxAngle :0;
+                        classicUI.transformer.input.angle = angle >= 0 ? angle <= classicUI.transformer.input.maxAngle ? angle : classicUI.transformer.input.maxAngle : 0;
                         var minAngle = 10;
                         var cAngle = classicUI.transformer.input.angle/classicUI.transformer.input.maxAngle*100;
                         cAngle = cAngle < minAngle ? 0 : cAngle;
@@ -1664,11 +1663,13 @@ function animateObjects() {
                         }
                         if(cAngle >= minAngle) {
                             trains[trainParams.selected].speedInPercent = cAngle;
-                        }
+                        } else {
+							hardware.mouse.isHold = false;
+						}
                         if(cAngle < minAngle && trains[trainParams.selected].accelerationSpeed > 0){ 
                             trains[trainParams.selected].accelerationSpeed *= -1;    
                             notify (formatJSString(getString("appScreenObjectStops", "."), getString(["appScreenTrainNames",trainParams.selected])),false, 500,null, null, client.y);
-                        } else if(!trains[trainParams.selected].move) {
+                        } else if(cAngle >= minAngle && !trains[trainParams.selected].move) {
                             trains[trainParams.selected].move = true;
                             notify (formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenTrainNames",trainParams.selected])),false, 500,null, null, client.y);
                         } else if (cAngle >= minAngle && trains[trainParams.selected].accelerationSpeed < 0) {
@@ -1688,85 +1689,6 @@ function animateObjects() {
         } else {
             context.restore();
             context.restore();
-        }
-        classicUI.switches.display = (settings.showSwitches) ? true: false;
-        var showDuration = 11;
-        if(((hardware.mouse.isHold && !inPath && (clickTimeOut === null || clickTimeOut === undefined)) || frameNo-classicUI.switches.lastStateChange < 3*showDuration) && classicUI.switches.display){
-            Object.keys(switches).forEach(function(key) {
-                Object.keys(switches[key]).forEach(function(side) {
-                    context.save();
-                    context.beginPath();
-                    context.arc(background.x+switches[key][side].x, background.y+switches[key][side].y, classicUI.switches.radius, 0, 2*Math.PI);
-                    if ((context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY) && hardware.mouse.isHold) || (frameNo-classicUI.switches.lastStateChange < 3*showDuration && key == classicUI.switches.lastStateChangeKey && side == classicUI.switches.lastStateChangeSide)) {
-                        if(context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY) && hardware.mouse.isHold) {
-                            switches[key][side].turned = !switches[key][side].turned;
-                            hardware.mouse.isHold = false;
-                            notify (getString("appScreenSwitchTurns", "."),false, 500,null, null, client.y);
-                            classicUI.switches.lastStateChangeKey = key;
-                            classicUI.switches.lastStateChangeSide = side;
-                            classicUI.switches.lastStateChange = frameNo;
-                            context.fillStyle = switches[key][side].turned ? "rgba(144, 255, 144,1)" : "rgba(255,0,0,1)";
-                            context.closePath();
-                            context.fill();
-                            context.restore();
-                        } else if (!hardware.mouse.isHold && frameNo-classicUI.switches.lastStateChange < showDuration) {
-                            context.fillStyle = switches[key][side].turned ? "rgba(144, 255, 144,1)" : "rgba(255,0,0,1)";
-                            context.closePath();
-                            context.fill();
-                            context.restore();
-                        } else if (!hardware.mouse.isHold) {
-                            context.closePath();
-                            context.restore();
-                            context.save();
-                            context.beginPath();
-                            var fac = (1-((frameNo-showDuration-classicUI.switches.lastStateChange))/(2*showDuration));
-                            context.fillStyle = switches[key][side].turned ? "rgba(144, 255, 144," + fac + ")" : "rgba(255,0,0," + fac + ")";
-                            context.arc(background.x+switches[key][side].x, background.y+switches[key][side].y, fac*classicUI.switches.radius, 0, 2*Math.PI);
-                            context.closePath();
-                            context.fill();
-                            context.restore();
-                        }
-                    } else {
-                        context.closePath();
-                        context.restore(); 
-                    }
-                });
-            });
-        }
-        if(hardware.mouse.isHold && !inPath && (clickTimeOut === null || clickTimeOut === undefined) && classicUI.switches.display){
-            Object.keys(switches).forEach(function(key) {
-                Object.keys(switches[key]).forEach(function(side) {
-                    context.save();
-                    context.lineWidth = 5;
-                    context.translate(background.x+switches[key][side].x, background.y+switches[key][side].y);
-                    if( switches[key][side].turned ){
-                        classicUISwicthesLocate(switches[key][side].angles.normal, 0.9 * classicUI.switches.radius, "rgba(255, 235, 235, 1)");
-                        classicUISwicthesLocate(switches[key][side].angles.turned, 1.25 * classicUI.switches.radius, "rgba(170, 255, 170,1)");
-                    } else {
-                        classicUISwicthesLocate(switches[key][side].angles.turned, 0.9 * classicUI.switches.radius , "rgba(235, 255, 235, 1)");
-                        classicUISwicthesLocate(switches[key][side].angles.normal, 1.25 * classicUI.switches.radius , "rgba(255,40,40,1)");
-                    }
-                    context.save();
-                    context.beginPath();
-                    context.lineWidth = 5;
-                    context.arc(0, 0, 0.2*classicUI.switches.radius + (konamistate < 0 ? Math.random()*0.3*classicUI.switches.radius : 0), 0, 2*Math.PI);
-                    context.closePath();
-                    context.fillStyle = switches[key][side].turned ? "rgba(144, 238, 144,1)" : "rgba(255,0,0,1)";
-                    context.fill();
-                    context.restore();
-                    context.restore();
-                    if(debug) {
-                        context.save();
-                        context.beginPath();
-                        context.lineWidth = 1;
-                        context.arc(background.x+switches[key][side].x, background.y+switches[key][side].y, classicUI.switches.radius, 0, 2*Math.PI);
-                        context.closePath();
-                        context.strokeStyle = switches[key][side].turned ? "rgba(144, 238, 144,1)" : "rgba(255,0,0,1)";
-                        context.stroke();
-                        context.restore();
-                    }                
-                });
-            });
         }
         if(debug){
             context.save();
@@ -1793,6 +1715,87 @@ function animateObjects() {
             context.stroke();
             context.restore();
         }  
+    }
+	
+    /////SWITCHES/////
+    classicUI.switches.display = (settings.showSwitches) ? true: false;
+    var showDuration = 11;
+    if(((hardware.mouse.isHold && !inPath && (clickTimeOut === null || clickTimeOut === undefined)) || frameNo-classicUI.switches.lastStateChange < 3*showDuration) && classicUI.switches.display){
+        Object.keys(switches).forEach(function(key) {
+            Object.keys(switches[key]).forEach(function(side) {
+                context.save();
+                context.beginPath();
+                context.arc(background.x+switches[key][side].x, background.y+switches[key][side].y, classicUI.switches.radius, 0, 2*Math.PI);
+                if ((context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY) && hardware.mouse.isHold) || (frameNo-classicUI.switches.lastStateChange < 3*showDuration && key == classicUI.switches.lastStateChangeKey && side == classicUI.switches.lastStateChangeSide)) {
+                    if(context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY) && hardware.mouse.isHold) {
+                        switches[key][side].turned = !switches[key][side].turned;
+                        hardware.mouse.isHold = false;
+                        notify (getString("appScreenSwitchTurns", "."),false, 500,null, null, client.y);
+                        classicUI.switches.lastStateChangeKey = key;
+                        classicUI.switches.lastStateChangeSide = side;
+                        classicUI.switches.lastStateChange = frameNo;
+                        context.fillStyle = switches[key][side].turned ? "rgba(144, 255, 144,1)" : "rgba(255,0,0,1)";
+                        context.closePath();
+                        context.fill();
+                        context.restore();
+                    } else if (!hardware.mouse.isHold && frameNo-classicUI.switches.lastStateChange < showDuration) {
+                        context.fillStyle = switches[key][side].turned ? "rgba(144, 255, 144,1)" : "rgba(255,0,0,1)";
+                        context.closePath();
+                        context.fill();
+                        context.restore();
+                    } else if (!hardware.mouse.isHold) {
+                        context.closePath();
+                        context.restore();
+                        context.save();
+                        context.beginPath();
+                        var fac = (1-((frameNo-showDuration-classicUI.switches.lastStateChange))/(2*showDuration));
+                        context.fillStyle = switches[key][side].turned ? "rgba(144, 255, 144," + fac + ")" : "rgba(255,0,0," + fac + ")";
+                        context.arc(background.x+switches[key][side].x, background.y+switches[key][side].y, fac*classicUI.switches.radius, 0, 2*Math.PI);
+                        context.closePath();
+                        context.fill();
+                        context.restore();
+                    }
+                } else {
+                    context.closePath();
+                    context.restore(); 
+                }
+            });
+        });
+    }
+    if(hardware.mouse.isHold && !inPath && (clickTimeOut === null || clickTimeOut === undefined) && classicUI.switches.display){
+        Object.keys(switches).forEach(function(key) {
+            Object.keys(switches[key]).forEach(function(side) {
+                context.save();
+                context.lineWidth = 5;
+                context.translate(background.x+switches[key][side].x, background.y+switches[key][side].y);
+                if( switches[key][side].turned ){
+                    classicUISwicthesLocate(switches[key][side].angles.normal, 0.9 * classicUI.switches.radius, "rgba(255, 235, 235, 1)");
+                    classicUISwicthesLocate(switches[key][side].angles.turned, 1.25 * classicUI.switches.radius, "rgba(170, 255, 170,1)");
+                } else {
+                    classicUISwicthesLocate(switches[key][side].angles.turned, 0.9 * classicUI.switches.radius , "rgba(235, 255, 235, 1)");
+                    classicUISwicthesLocate(switches[key][side].angles.normal, 1.25 * classicUI.switches.radius , "rgba(255,40,40,1)");
+                }
+                context.save();
+                context.beginPath();
+                context.lineWidth = 5;
+                context.arc(0, 0, 0.2*classicUI.switches.radius + (konamistate < 0 ? Math.random()*0.3*classicUI.switches.radius : 0), 0, 2*Math.PI);
+                context.closePath();
+                context.fillStyle = switches[key][side].turned ? "rgba(144, 238, 144,1)" : "rgba(255,0,0,1)";
+                context.fill();
+                context.restore();
+                context.restore();
+                if(debug) {
+                    context.save();
+                    context.beginPath();
+                    context.lineWidth = 1;
+                    context.arc(background.x+switches[key][side].x, background.y+switches[key][side].y, classicUI.switches.radius, 0, 2*Math.PI);
+                    context.closePath();
+                    context.strokeStyle = switches[key][side].turned ? "rgba(144, 238, 144,1)" : "rgba(255,0,0,1)";
+                    context.stroke();
+                    context.restore();
+                }                
+            });
+        });
     }
     
     /////BACKGROUND/Margins-2/////    
@@ -2418,9 +2421,9 @@ window.onload = function() {
         
         placeClassicUIElements();
         
-		if(typeof placeOptions == "function") {        
-			placeOptions("load");
-		}
+        if(typeof placeOptions == "function") {        
+            placeOptions("load");
+        }
      
         animateObjects();
         
@@ -2454,10 +2457,10 @@ window.onload = function() {
                         if(settings.classicUI && !settings.alwaysShowSelectedTrain){ 
                             notify(formatJSString(getString("appScreenTrainSelected", "."), getString(["appScreenTrainNames",trainParams.selected]), getString("appScreenTrainSelectedAuto", " ")), true,3000,null,null, client.y);
                         } else if(localAppData !== null && (localAppData.version.major < APP_DATA.version.major || localAppData.version.minor < APP_DATA.version.minor) && typeof appUpdateNotification == "function") { 
-							appUpdateNotification();
+                            appUpdateNotification();
                         } else if (typeof appReadyNotification == "function") {
-							appReadyNotification();
-						}
+                            appReadyNotification();
+                        }
                         setLocalAppDataCopy(); 
                         for (var i = 0; i < toHide.length; i++) {
                             toHide[i].style.display = "none";

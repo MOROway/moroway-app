@@ -1563,17 +1563,23 @@ function animateObjects() {
         drawImage(pics[classicUI.trainSwitch.src], classicUI.trainSwitch.x, classicUI.trainSwitch.y, classicUI.trainSwitch.width, classicUI.trainSwitch.height);
         context.beginPath();
         context.rect(classicUI.trainSwitch.x, classicUI.trainSwitch.y, classicUI.trainSwitch.width, classicUI.trainSwitch.height);
-        if (context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY)) {
+        if ((context.isPointInPath(hardware.mouse.wheelX, hardware.mouse.wheelY) && hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls) || context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY)) {
             hardware.mouse.cursor = "pointer";
             if(typeof movingTimeOut !== "undefined"){
                 clearTimeout(movingTimeOut);
             }
-            if(hardware.mouse.isHold){
-                trainParams.selected++;
+			if((hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls) || hardware.mouse.isHold) {
+				if(hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls) {
+					trainParams.selected += hardware.mouse.wheelScrollY < 0 ? 1 : -1;
+				} else {
+					trainParams.selected++;
+					hardware.mouse.isHold = false;
+				}
                 if(trainParams.selected >= trains.length) {
                     trainParams.selected=0;
-                }
-                hardware.mouse.isHold = false;
+                } else if (trainParams.selected < 0) {
+					trainParams.selected = trains.length-1;
+				}
                 if (!settings.alwaysShowSelectedTrain) {
                     notify (formatJSString(getString("appScreenTrainSelected", "."), getString(["appScreenTrainNames",trainParams.selected])), true, 1250,null, null, client.y);
                 }

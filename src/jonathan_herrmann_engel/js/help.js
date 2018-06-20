@@ -2,7 +2,7 @@ var settings;
 
 function init(){
 	
-	 settings = getSettings ();
+	settings = getSettings ();
 	
 	var elem = document.createElement("p");
 	elem.textContent = formatJSString(getString("helpScreenGeneralWelcomeVersion", "."), APP_DATA.version.major, APP_DATA.version.minor, APP_DATA.version.patch, APP_DATA.version.date.year, (APP_DATA.version.date.month < 10 ? "0" + APP_DATA.version.date.month : APP_DATA.version.date.month), (APP_DATA.version.date.day < 10 ? "0" + APP_DATA.version.date.day : APP_DATA.version.date.day));
@@ -35,20 +35,8 @@ function init(){
 	document.querySelector("#download-windowslink").addEventListener("click", function(){followLink(getServerRedirectLink("download_windows"),"_blank", LINK_STATE_NORMAL);}, false);	
 	document.querySelector("#download-sourcelink").addEventListener("click", function(){followLink(getServerRedirectLink("source_code"),"_blank", LINK_STATE_NORMAL);}, false);
 	
-	handleServerJSONValues("webpics", function(res){
-		if(typeof(res.pics) == "object") {
-			var pics = document.querySelector("#website-pics");
-			res.pics.forEach(function(pic){
-				var img = document.createElement("div");
-				img.style.backgroundImage = "url('" + pic.urls.thumb.url + "')";
-				pics.appendChild(img);
-			});
-			
-		} else {
-			console.log("ERROR handling Website-Pics");
-		}
-	});
 	document.querySelector("#website-link").addEventListener("click", function(){followLink(getServerRedirectLink("moroweb"),"_blank", LINK_STATE_NORMAL);}, false);
+
 	
 	document.querySelector("#backOption").addEventListener("click", function(){try {window.close();}catch(err) {}; followLink("./","_self", LINK_STATE_INTERNAL_HTML);}, false);	
 	

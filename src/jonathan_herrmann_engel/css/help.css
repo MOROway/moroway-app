@@ -2,6 +2,10 @@
 	width: 50vw !important;
 }
 
+#website {
+	display: none;
+}
+
 #website-pics {
 	display: flex;
 	width: 450px;

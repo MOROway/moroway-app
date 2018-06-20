@@ -38,10 +38,8 @@ function init(){
 	handleServerJSONValues("webpics", function(res){
 		if(typeof(res.pics) == "object") {
 			var pics = document.querySelector("#website-pics");
-			pics.style = "display: flex; width: 450px; max-width: calc(100vw - 2* 10px); margin-left: 50%; transform: translateX(-50%); justify-content: center; align-content: center;	box-shadow: 0px 0px 20px 10px rgba(0,0,0,0.3); background-size: cover; background-repeat: no-repeat; background-position: center;";
 			res.pics.forEach(function(pic){
 				var img = document.createElement("div");
-				img.style = "height: 150px;	width: 150px; max-width: calc(100vw / 3 - 2 * 10px / 3); box-shadow: inset 0px 0px 20px 5px rgba(0,0,0,0.8); background-size: cover; background-repeat: no-repeat; background-position: center;";
 				img.style.backgroundImage = "url('" + pic.urls.thumb.url + "')";
 				pics.appendChild(img);
 			});

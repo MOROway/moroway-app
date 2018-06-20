@@ -1,4 +1,4 @@
-var updatedSW = 41; //TO BE INCREASED ON EACH NEW VERSION
+var updatedSW = 42; //TO BE INCREASED ON EACH NEW VERSION
 
 //generate cache-name from app-version, branch and sw-version
 var locationstr = location.pathname;
@@ -109,10 +109,10 @@ self.addEventListener('fetch', function(event) {
 
         return fetch(fetchRequest).then(
           function(response) {
-            if(!response || response.status !== 200 || response.type !== 'basic') {
+            if(!response || response.status !== 200 || response.type !== 'basic' || !response.url.startsWith(self.registration.scope)) {
               return response;
             }
-
+			
             var responseToCache = response.clone();
 
             caches.open(CACHE_NAME)
@@ -138,5 +138,5 @@ self.addEventListener('activate', function (event) {
       }))
     })
   )
-})
+});
 

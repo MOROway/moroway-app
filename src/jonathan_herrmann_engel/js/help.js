@@ -37,7 +37,6 @@ function init(){
 	
 	document.querySelector("#website-link").addEventListener("click", function(){followLink(getServerRedirectLink("moroweb"),"_blank", LINK_STATE_NORMAL);}, false);
 
-	
 	document.querySelector("#backOption").addEventListener("click", function(){try {window.close();}catch(err) {}; followLink("./","_self", LINK_STATE_INTERNAL_HTML);}, false);	
 	
 	var elems = document.querySelectorAll(".content");

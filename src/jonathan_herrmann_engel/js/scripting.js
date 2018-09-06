@@ -1446,7 +1446,7 @@ function animateObjects() {
 				collStopQuantity++;
 			}
 		});
-		if(collStopQuantity == cars.length-1){
+		if(collStopQuantity == cars.length){
 			notify (getString("appScreenCarAutoModeCrash", "."), true, 5000 ,null, null, client.y);
             carParams.autoModeOff = true;
             carParams.autoModeRuns = false;

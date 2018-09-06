@@ -1439,6 +1439,18 @@ function animateObjects() {
             }
         } while (change);
         cars = cCars;
+		
+		var collStopQuantity = 0;
+		cars.forEach(function(car){
+			if(car.collStop && car.cType == "normal"){
+				collStopQuantity++;
+			}
+		});
+		if(collStopQuantity == cars.length-1){
+			notify (getString("appScreenCarAutoModeCrash", "."), true, 5000 ,null, null, client.y);
+            carParams.autoModeOff = true;
+            carParams.autoModeRuns = false;
+		}
     }
     //General
     for(var i = 0; i < cars.length; i++) {

@@ -25,10 +25,10 @@ var settings = {};
 
 window.addEventListener("load", function(){
 	
-	if(typeof(Storage) !== "undefined") {
-		
+ 	if(typeof(window.localStorage) != "undefined") {
+			
 		settings = getSettings ();
-		
+			
 		for(var i = 0; i < Object.keys(settings).length; i++) {
 			var a = Object.values(settings)[i];
 			var b = Object.keys(settings)[i];
@@ -43,25 +43,24 @@ window.addEventListener("load", function(){
 				}
 			}
 		}
-		
+
 		Object.keys(STRINGS).forEach(function(val) {
 			var elem = document.createElement("button");
 			elem.className = "langvalue";
 			elem.textContent = getString("langName", "", "", val);
+			elem.dataset.langCode = val;
 			if(val == CURRENT_LANG){
 				elem.id="clang";
 			} else {
-				elem.onclick = function(){setCurrentLang(val); notify(getString("settingsScreenLangSelectChange", "!", "upper", val), true, 5000);};
+				elem.addEventListener("click", function(){setCurrentLang(val); notify(getString("settingsScreenLangSelectChange", "!", "upper", val), true, 5000, function(){window.top.location.reload();}, getString("settingsScreenLangSelectChangeButton", "", "upper", val));});
 			}
 			document.querySelector("#langoption").appendChild(elem);
 		});
 		document.querySelector("#backOption").addEventListener("click", function(){try {window.close();}catch(err) {}; followLink("./","_self", LINK_STATE_INTERNAL_HTML);}, false);
 		document.querySelector("#helpOption").addEventListener("click", function(){followLink("help","_self", LINK_STATE_INTERNAL_HTML);}, false);
-	
+		
 	} else {
-	
-		document.querySelector("body").innerHtml = "Keine Unterstützung für Ihren Browser möglich. Sorry!";
-	
+		document.querySelector("body").innerHTML = getString("generalNoDOMStorageSupport");
 	}
-	
+
 });

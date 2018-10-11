@@ -1,3 +1,6 @@
+//NOTIFY IF ERROR
+window.addEventListener("error", function() {document.querySelector("body").innerHTML = '<div style="background: red; color: white; font-size: 3em; line-height: 4em;">FATAL ERROR</div>'});
+
 //NOTIFICATIONS
 function notify(a, b, c, d, e, f){
    var notificationContainer = document.querySelector('#canvas-notifier');     

@@ -37,6 +37,8 @@ window.addEventListener("load", function(){
 				var textButton = document.querySelector("#"+b).querySelector(".textButton");
 				leftButton.id = b+"leftButton";
 				textButton.id = b+"textButton";
+				leftButton.addEventListener("click", function(event){settingsChange(event, 'leftButton');})
+				textButton.addEventListener("click", function(event){settingsChange(event, 'textButton');})
 				if(a){
 					leftButton.style.backgroundColor = "black";
 					leftButton.style.transform = "rotate(360deg)";

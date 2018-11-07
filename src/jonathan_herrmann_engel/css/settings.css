@@ -4,7 +4,6 @@ body {
 }
 
 .mdl-list__item {
-	display: block !important;
 	height: auto !important;
 	overflow: visible !important;
 }

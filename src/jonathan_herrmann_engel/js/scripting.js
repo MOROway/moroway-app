@@ -1090,6 +1090,13 @@ function animateObjects() {
         }
         context.closePath();
         context.restore();
+		if(debug){
+			context.save();        
+			context.translate(background.x+currentObject.x, background.y+currentObject.y);
+			context.rotate(currentObject.displayAngle);
+			context.strokeRect(-currentObject.width/2,-currentObject.height/2, currentObject.width, currentObject.height);
+			context.restore();
+		}
         if(debug && !carParams.autoModeRuns) {
             context.save();
             context.beginPath();
@@ -1198,9 +1205,8 @@ function animateObjects() {
             m = n = j = points.angle[i].length-1;
             jmax = true;
         }
-        m = cCars[i].collStop ? 0: m;
         n = cCars[k].collStop ? 0: n;
-        var sizeNo = cCars[k].collStop ? 1.01 : 1.05;
+		var sizeNo = 1.06;
         var x1 = points.x[i][m]+Math.sin(Math.PI/2-points.angle[i][m])*cCars[i].width/2+Math.cos(-Math.PI/2-points.angle[i][m])*cCars[i].height/2;
         var x2 = points.x[i][m]+Math.sin(Math.PI/2-points.angle[i][m])*cCars[i].width/2-Math.cos(-Math.PI/2-points.angle[i][m])*cCars[i].height/2;
         var x3 = points.x[i][m]+Math.sin(Math.PI/2-points.angle[i][m])*cCars[i].width/2;
@@ -1210,10 +1216,10 @@ function animateObjects() {
         context.translate(points.x[k][n], points.y[k][n]); 
         context.rotate(points.angle[k][n]);
         context.beginPath();
-        context.rect(-sizeNo*cCars[k].width/2, -sizeNo*cCars[k].height/2, sizeNo*cCars[k].width, sizeNo*cCars[k].height);
-        if (context.isPointInPath(x1, y1) || context.isPointInPath(x2, y2) || context.isPointInPath(x3, y3)){
-            coll = true;
-        }
+		context.rect(-sizeNo*cCars[k].width/2, -sizeNo*cCars[carParams.thickestCar].height/2, sizeNo*cCars[k].width, sizeNo*cCars[carParams.thickestCar].height);
+		if (context.isPointInPath(x1, y1) || context.isPointInPath(x2, y2) || context.isPointInPath(x3, y3)){
+			coll = true;
+		}
         context.restore();
         return (coll) ? j : (jmax) ? -1 : carAutoModeIsFutureCollision(i,k,++j);
     }
@@ -1349,8 +1355,8 @@ function animateObjects() {
     if((carParams.autoModeRuns && frameNo % carParams.wayNo === 0) || carParams.autoModeInit) {
         carParams.autoModeInit = false;
         var points = {x:[], y:[], angle:[]};
-        var arrLen =  carParams.wayNo*10;
-        var abstrNo = Math.ceil(arrLen*0.1);
+        var arrLen =  carParams.wayNo*20;
+        var abstrNo = Math.ceil(arrLen*0.05);
         var cCars = copyJSObject(cars);
         for(var i = 0; i < cCars.length; i++) {
             cCars[i].move = false;
@@ -1397,49 +1403,48 @@ function animateObjects() {
         do {
             change = false;
             for(var i = 0; i < cCars.length; i++) {
-                cCars[i].collStopNo = [];
                 for(var k = 0; k < cCars.length; k++) {
-                    if(k!=i) {
+                    if(i!=k && !cCars[i].collStop) {
                         cCars[i].collStopNo[k] = carAutoModeIsFutureCollision(i,k);
                     }
                 }
             }
-            if(state <= 2) {
-                for(var i = 0; i < cCars.length; i++) {
-                    for(var k = 0; k < cCars.length; k++) {
-                        if(i!=k && cCars[i].collStopNo[k] > -1 && !cCars[i].collStop) {
-                            var angleDiff = Math.abs(points.angle[i][cCars[i].collStopNo[k]]-points.angle[k][cCars[i].collStopNo[k]]);
-                            var a = cCars[i].collStopNo[k]/cCars[i].speed;
-                            var b = cCars[i].collStopNo[k]/cCars[k].speed;
-                            if(state === 0 && (angleDiff < 0.5*Math.PI || angleDiff > 1.5*Math.PI)){
-                                change = true;
-                                cCars[i].collStop = true;
-                                k = cCars.length;
-                                i = cCars.length;
-                            } else if (state == 1 && (angleDiff >= 0.5*Math.PI && angleDiff <= 1.5*Math.PI)){
-                                if (a < b || a === 0 || (a == b && !cCars[k].collStop)) {
-                                    change = true;
-                                    cCars[i].collStop = true;
-                                    k = cCars.length;
-                                    i = cCars.length;
-                                }
-                            } else if (state == 2 && (a  === 0 || (a < carParams.wayNo && !cCars[k].collStop))) {
-                                change = true;
-                                cCars[i].collStop = true;
-                                k = cCars.length;
-                                i = cCars.length;
-                            }
-                        }
-                    }
-                }
-                if(!change) {
-                    ++state;
-                    change = true;
-                }
-            }
+			for(var i = 0; i < cCars.length; i++) {
+                for(var k = 0; k < cCars.length; k++) {
+					if(i!=k && !cCars[i].collStop){
+						var a = cCars[i].collStopNo[k]/cCars[i].speed;
+						var b = cCars[i].collStopNo[k]/cCars[k].speed;
+						var isA;
+						if(cars[i].collStopNo[k] == -2){
+							isA = true;
+					    }else if(cars[k].collStopNo[i] == -2){
+							isA = false;
+						} else {
+							isA = a < b;
+						}
+						if(isA && cCars[k].collStopNo[i] > -2 && cCars[i].collStopNo[k] > -1){
+							cCars[i].collStop = true;
+							cCars[i].collStopNo[k] = -2;
+							change = true;
+						} else if(!isA && cCars[i].collStopNo[k] > -2 && cCars[k].collStopNo[i] > -1) {
+							cCars[k].collStop = true;
+							cCars[k].collStopNo[i] = -2;
+							change = true;
+						}
+					}
+				}
+			}
         } while (change);
         cars = cCars;
-		
+		for(var i = 0; i < cCars.length; i++) {
+			for(var k = 0; k < cCars.length; k++) {
+				if(i!= k && carCollisionCourse(i,false) && carCollisionCourse(k,false)){
+					notify (getString("appScreenCarAutoModeCrash", "."), true, 5000 ,null, null, client.y);
+					carParams.autoModeOff = true;
+					carParams.autoModeRuns = false;
+				}
+			}
+		}
 		var collStopQuantity = 0;
 		cars.forEach(function(car){
 			if(car.collStop && car.cType == "normal"){
@@ -1944,7 +1949,7 @@ var trainParams = {selected: Math.floor(Math.random()*trains.length), margin: 25
 var cars = [{src: 16, fac: 0.02, speed: 0.0008, startFrameFac: 0.65, angles: {start: Math.PI,normal: 0}},{src: 17, fac: 0.02, speed: 0.001, startFrameFac: 0.335, angles: {start: 0, normal: Math.PI}},{src: 0, fac: 0.0202, speed: 0.00082, startFrameFac: 0.65, angles: {start: Math.PI, normal: 0}}];
 var carPaths = [{start: [{type: "curve_right", x:[0.29,0.29],y:[0.38,0.227]}], normal: [{type: "curve_hright", x:[0.29,0.29],y:[0.227,0.347]},{type: "linear_vertical", x:[0,0], y: [0,0]},{type: "curve_hright2", x:[0,0], y: [0.282,0.402]},{type: "curve_l2r", x:[0,0.25], y: [0.402,0.412]},{type: "linear", x: [0.25,0.225], y: [0.412,0.412]},{type: "curve_right", x: [0.225,0.225], y: [0.412,0.227]},{type: "linear", x:[0.225,0.29], y:[0.227,0.227]}]},{start: [{type: "curve_left", x:[0.26,0.26], y: [0.3,0.198]},{type: "curve_r2l", x:[0.26,0.216], y: [0.198,0.197]}], normal: [{type: "curve_left", x:[0.216,0.216], y: [0.197,0.419]},{type: "linear", x:[0.216,0.246], y:[0.419,419]},{type: "curve_r2l", x:[0.246,0.286], y:[0.419,0.43]},{type: "linear", x:[0.286,0.31], y:[0.43,0.43]},{type: "curve_hleft", x:[0.31,0.31], y: [0.43,0.33]},{type: "linear_vertical", x:[0,0], y: [0,0]},{type: "curve_hleft2", x:[0,0], y: [0.347,0.197]},{type: "linear", x:[0,0.216], y:[0.197,0.197]},{type: "curve_left", x:[0.216,0.216], y: [0.197,0.419]},{type: "linear", x:[0.216,0.246], y:[0.419,419]},{type: "curve_r2l", x:[0.246,0.276], y:[0.419,0.434]},{type: "linear", x:[0.276,0.38], y:[0.434,434]},{type: "curve_l2r", x:[0.38,0.46], y:[0.434,0.419]},{type: "linear", x:[0.46,0.631], y:[0.419,0.419]},{type: "curve_r2l", x:[0.631,0.665], y:[0.419,0.43]},{type: "curve_left", x:[0.665,0.665], y: [0.43,0.322]},{type: "curve_l2r", x:[0.665,0.59], y: [0.322,0.39]},{type: "linear", x:[0.59,0.339], y:[0.39,0.39]},{type: "curve_hright", x:[0.339,0.339], y: [0.39,0.32]},{type: "linear_vertical", x:[0,0], y: [0,0]},{type: "curve_hleft2", x:[0,0], y: [0.347,0.197]},{type: "linear", x:[0,0.216], y:[0.197,0.197]}]},{start: [{type: "curve_right", x:[0.2773,0.2773],y:[0.38,0.227]},{type: "linear", x:[0.2773,0.29],y:[0.227,0.227]}], normal: [{type: "curve_hright", x:[0.29,0.29],y:[0.227,0.347]},{type: "linear_vertical", x:[0,0], y: [0,0]},{type: "curve_hleft2", x:[0,0], y: [0.299,0.419]},{type: "linear", x:[0,0.631], y:[0.419,0.419]},{type: "curve_r2l", x:[0.631,0.665], y:[0.419,0.43]},{type: "curve_left", x:[0.665,0.665], y: [0.43,0.322]},{type: "curve_l2r", x:[0.665,0.59], y: [0.322,0.39]},{type: "linear", x:[0.59,0.339], y:[0.39,0.39]},{type: "curve_l2r", x:[0.339,0.25], y: [0.39,0.412]},{type: "linear", x: [0.25,0.225], y: [0.412,0.412]},{type: "curve_right", x: [0.225,0.225], y: [0.412,0.227]},{type: "linear", x:[0.225,0.29], y:[0.227,0.227]}]}]; 
 var carWays = [];
-var carParams = {init: true, wayNo: 10};
+var carParams = {init: true, wayNo: 7};
 
 var taxOffice = {params: {number: 45, frameNo: 6, frameProbability: 0.6, fire: {x: 0.07, y: 0.06, size: 0.000833, color:{red: {red: 200, green: 0, blue: 0, alpha: 0.4}, yellow: {red: 255, green: 160, blue: 0, alpha: 1}, probability: 0.8}}, smoke: {x: 0.07, y: 0.06, size: 0.02, color: {red: 130, green: 120, blue: 130, alpha: 0.3}}, bluelights: {frameNo: 16, cars: [{frameNo: 0, x: [-0.0105, -0.0026], y: [0.177, 0.0047], size: 0.001},{frameNo: 3, x: [0.0275, -0.00275], y: [0.1472, 0.0092], size: 0.001},{frameNo: 5, x: [0.056, 0.0008], y: [0.18, 0.015], size: 0.001}]}}};
 
@@ -1993,7 +1998,8 @@ window.onload = function() {
             client.chosenInputMethod = "mouse";
             onMouseMove(event);
         }
-    }    
+ 		setCurrentHardwareConfig("input",client.chosenInputMethod);
+   }    
 
     function initialDisplay() {
         
@@ -2001,6 +2007,7 @@ window.onload = function() {
             cars.forEach(function(car, i){
                 car.speed *= background.width;
                 car.collStop = true;
+				car.collStopNo = [];
                 if(i === 0){
                     carParams.lowestSpeedNo = i;
                 } else if (car.speed < cars[carParams.lowestSpeedNo].speed) {
@@ -2135,6 +2142,11 @@ window.onload = function() {
             for (var i = 0; i < cars.length; i++){
                 cars[i].width = cars[i].fac * background.width;
                 cars[i].height = cars[i].fac * (pics[cars[i].src].height * (background.width / pics[cars[i].src].width)); 
+				if(i === 0){
+                    carParams.thickestCar = i;
+                } else if (cars[i].height > cars[carParams.thickestCar].height) {
+                    carParams.thickestCar = i;
+                }
                 cars[i].cType =  typeof carWays[i].start == "undefined" ?  "normal" : "start";
                 cars[i].displayAngle = carWays[i][cars[i].cType][cars[i].counter].angle;
                 cars[i].x = carWays[i][cars[i].cType][cars[i].counter].x;

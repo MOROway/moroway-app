@@ -11,9 +11,11 @@ function placeOptions(state){
 			document.querySelector("iframe#" + id).style.display = "none";
 	  }
 		
-	  var menu = {container: document.querySelector("#canvas-options"),containerMargin:0,help:document.querySelector("#canvas-help"), settings:document.querySelector("#canvas-settings")};
+	  var menu = {container: document.querySelector("#canvas-options"),containerMargin:0,team:document.querySelector("#canvas-team"),single:document.querySelector("#canvas-single"),help:document.querySelector("#canvas-help"), settings:document.querySelector("#canvas-settings")};
 	  if(state == "load") {
 		menu.help.addEventListener("click", function(){followLink("help", "_blank", LINK_STATE_INTERNAL_HTML);}, false);
+		menu.team.addEventListener("click", function(){followLink("?mode=multiplay", "_self", LINK_STATE_INTERNAL_HTML);}, false);
+		menu.single.addEventListener("click", function(){followLink("?", "_self", LINK_STATE_INTERNAL_HTML);}, false);
 		menu.settings.addEventListener("click", function(){
 			  var id = "settingsimport";
 			  if(window.innerWidth > 500 + parseInt(window.getComputedStyle(document.querySelector("#" + id)).getPropertyValue("width"), 10)){
@@ -46,12 +48,16 @@ function placeOptions(state){
 				document.querySelector("iframe#" + id).contentWindow.followLink = function(input1,input2, input3){
 						window.open(input1, "_blank");
 				}
+			  } else if (onlineGame.enabled) {
+				followLink("settings", "_blank", LINK_STATE_INTERNAL_HTML);
 			  } else {
 				followLink("settings", "_self", LINK_STATE_INTERNAL_HTML);
 			  }
 		    }, false);
 	  }
 	  menu.settings.style.display = "inline";	  
+	  menu.team.style.display = onlineGame.enabled ? "none" : "inline";	  
+	  menu.single.style.display = onlineGame.enabled ? "inline" : "none";	  
 	  menu.help.style.display = "none";
 	  if(menu.container.offsetHeight < client.y && 2*background.y > background.height) {
           menu.help.style.display = "inline";

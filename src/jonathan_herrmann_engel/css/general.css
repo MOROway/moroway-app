@@ -23,7 +23,15 @@ article {
 .mdl-layout__title {
 	color: rgb(207, 207, 207);
 }
-
+.card_container {
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: row;
+	align-items: stretch;
+	justify-items: center;
+	align-content: center;
+	justify-content: center;
+}
 .mdl-card {
 	vertical-align: middle;
 	background: rgb(207, 207, 207);

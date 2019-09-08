@@ -1,6 +1,6 @@
 ////Required code (needs to be set on each platform)
 function followLink(input1,input2, input3){
-	 if(input3 == LINK_STATE_INTERNAL_HTML && !(input1.endsWith("/")) && input1.indexOf("#") == -1)
+	 if(input3 == LINK_STATE_INTERNAL_HTML && !(input1.endsWith("/")) && input1.indexOf("#") == -1 && input1.indexOf("?") == -1)
 		 input1 = input1 + "/";
 	 window.open(input1, input2);
 }

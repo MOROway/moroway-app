@@ -89,14 +89,24 @@ function getTouchMove(event) {
 function getTouchStart(event) {
     hardware.lastInputTouch = hardware.mouse.downTime = Date.now(); 
     hardware.mouse.moveX = hardware.mouse.downX = event.changedTouches[0].clientX*client.devicePixelRatio;
-    hardware.mouse.moveY = hardware.mouse.downY = event.changedTouches[0].clientY*client.devicePixelRatio; 
+    hardware.mouse.moveY = hardware.mouse.downY = event.changedTouches[0].clientY*client.devicePixelRatio;
+    if(hardware.mouse.isHoldTimeout !== undefined && hardware.mouse.isHoldTimeout !== null) {
+	    window.clearTimeout(hardware.mouse.isHoldTimeout);
+	}
     hardware.mouse.isHold = true;
 }
 function getTouchEnd(event) {   
     hardware.mouse.upX = event.changedTouches[0].clientX*client.devicePixelRatio;
     hardware.mouse.upY = event.changedTouches[0].clientY*client.devicePixelRatio;
     hardware.mouse.upTime = Date.now(); 
-    hardware.mouse.isHold = false; 
+    if(onlineGame.enabled) {
+        if(onlineGame.nextAnimate === undefined || onlineGame.nextAnimate === null){
+            onlineGame.nextAnimate = 0;
+        }
+        hardware.mouse.isHoldTimeout = window.setTimeout(function(){hardware.mouse.isHold = false;}, Math.max(onlineGame.nextAnimate-Date.now(),0));
+    } else {
+        hardware.mouse.isHold = false; 
+    }
 }
 function getTouchLeave(event) {
     hardware.mouse.isHold = false; 
@@ -142,6 +152,10 @@ function placeBackground() {
     client.y = background.y / client.devicePixelRatio;
 }
     
+function defineTrainSpeed(train){
+	train.speed = train.speedFac*background.width;
+}	
+	
 function defineTrainParams(){
     
     function getBezierLength(bezierPoints,repNo){
@@ -342,8 +356,8 @@ function defineTrainParams(){
       
  
     /////SPEED/////
-    trains.forEach(function(train){
-        train.speed = train.speedFac*background.width;
+	trains.forEach(function(train){
+       defineTrainSpeed(train)
     });
     
 }
@@ -894,19 +908,24 @@ function animateObjects() {
                 if((hardware.lastInputTouch < hardware.lastInputMouse && hardware.mouse.downTime - hardware.mouse.upTime > 0 && context.isPointInPath(hardware.mouse.upX, hardware.mouse.upY) && context.isPointInPath(hardware.mouse.downX, hardware.mouse.downY) && hardware.mouse.downTime - hardware.mouse.upTime < doubleClickTime) || (hardware.lastInputTouch > hardware.lastInputMouse && context.isPointInPath(hardware.mouse.downX, hardware.mouse.downY) && Date.now()-hardware.mouse.downTime > longTouchTime)) {
                     if(typeof clickTimeOut !== "undefined"){
                         clearTimeout(clickTimeOut);
-                         clickTimeOut = null;
+                        clickTimeOut = null;
                    }
                     if(hardware.lastInputTouch > hardware.lastInputMouse) {
                         hardware.mouse.isHold = false;
                     }
                     if(trains[input1].accelerationSpeed <= 0 && Math.abs(trains[input1].accelerationSpeed) < 0.2){ 
-                        if(trains[input1].accelerationSpeed < 0) {
-                            trains[input1].accelerationSpeed = 0;     
-                            trains[input1].move = false;     
-                        }
-                        trains[input1].lastDirectionChange = frameNo;
-                        trains[input1].standardDirection = !trains[input1].standardDirection;
-                        notify(formatJSString(getString("appScreenObjectChangesDirection","."), getString(["appScreenTrainNames",input1])), false, 750,null,null, client.y);
+						if(onlineGame.enabled){
+							teamplaySync("action","trains", input1, [{"accelerationSpeed": 0}, {"move": false}, {"lastDirectionChange": frameNo}, {"standardDirection": !trains[input1].standardDirection}], [{getString: ["appScreenObjectChangesDirection","."]}, {getString: [["appScreenTrainNames",input1]]}]);
+						} else {
+							if(trains[input1].accelerationSpeed < 0) {
+								trains[input1].accelerationSpeed = 0;     
+								trains[input1].move = false;     
+							}
+							trains[input1].lastDirectionChange = frameNo;
+							trains[input1].standardDirection = !trains[input1].standardDirection;
+							notify(formatJSString(getString("appScreenObjectChangesDirection","."), getString(["appScreenTrainNames",input1])), false, 750,null,null, client.y);
+						}
+						
                     }
                 } else {
                     if(typeof clickTimeOut !== "undefined"){
@@ -919,18 +938,31 @@ function animateObjects() {
                             hardware.mouse.isHold = false;
                         }
                         if(!collisionCourse(input1, false)) {
-                            if(trains[input1].move && trains[input1].accelerationSpeed > 0){ 
-                                trains[input1].accelerationSpeed *= -1;     
-                                notify(formatJSString(getString("appScreenObjectStops", "."), getString(["appScreenTrainNames",input1])),  false, 500 ,null,  null, client.y);
+                            if(trains[input1].move && trains[input1].accelerationSpeed > 0){
+								if(onlineGame.enabled){
+									teamplaySync("action","trains", input1, [{"accelerationSpeed": trains[input1].accelerationSpeed * -1}], [{getString: ["appScreenObjectStops", "."]}, {getString:[["appScreenTrainNames",input1]]}]);
+								} else {							
+									trains[input1].accelerationSpeed *= -1;     
+									notify(formatJSString(getString("appScreenObjectStops", "."), getString(["appScreenTrainNames",input1])),  false, 500 ,null,  null, client.y);
+								}
                             } else {
                                 if(trains[input1].move){
-                                    trains[input1].accelerationSpeed *= -1;
-                                    trains[trainParams.selected].speedInPercent = 50;                                    
+									if(onlineGame.enabled){
+										teamplaySync("action","trains", input1, [{"accelerationSpeed": trains[input1].accelerationSpeed * -1},{"speedInPercent":50}], [{getString:["appScreenObjectStarts", "."]}, {getString:[["appScreenTrainNames",input1]]}]);
+									} else {
+										trains[input1].accelerationSpeed *= -1;
+										trains[input1].speedInPercent = 50;        
+										notify(formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenTrainNames",input1])),  false, 500,null, null, client.y);
+									}										
                                 } else {
-                                    trains[input1].move = true;
-                                    trains[input1].speedInPercent = 50;
-                                }
-                                notify(formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenTrainNames",input1])),  false, 500,null, null, client.y);
+									if(onlineGame.enabled){
+										teamplaySync("action","trains", input1, [{"move": true},{"speedInPercent":50}], [{getString:["appScreenObjectStarts", "."]}, {getString:[["appScreenTrainNames",input1]]}]);
+									} else {
+										trains[input1].move = true;
+										trains[input1].speedInPercent = 50;
+										notify(formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenTrainNames",input1])),  false, 500,null, null, client.y);
+									}
+								}
                             }
                         }                           
                     }, (hardware.lastInputTouch > hardware.lastInputMouse) ? longTouchWaitTime : doubleClickWaitTime);                             
@@ -1101,7 +1133,7 @@ function animateObjects() {
             context.save();
             context.beginPath();
             context.strokeStyle = "rgb(" + Math.floor(input1/carWays.length*255) + ",0,0)";
-            context.lineWidth="1";
+            context.lineWidth = 1;
             context.moveTo(background.x+carWays[input1][currentObject.cType][0].x,background.y+carWays[input1][currentObject.cType][0].y);
             for(var i = 1; i < carWays[input1][currentObject.cType].length;i+=10){
                 context.lineTo(background.x+carWays[input1][currentObject.cType][i].x,background.y+carWays[input1][currentObject.cType][i].y);
@@ -1236,6 +1268,11 @@ function animateObjects() {
         context.restore();
     }
     
+	/////TEAM_PLAY/////
+	if(onlineGame.enabled){
+		var teamplayStarttime = Date.now();
+    }
+	
     /////RESIZE/////
     if(resized) {
         
@@ -1362,9 +1399,6 @@ function animateObjects() {
             cCars[i].move = false;
             cCars[i].backwardsState = 0;
             cCars[i].collStop = false;
-            points.x[i] = [];
-            points.y[i] = [];
-            points.angle[i] = [];
             var counter = cCars[i].counter;
             var cAbstrNo = Math.round((cCars[i].speed/cCars[carParams.lowestSpeedNo].speed)*abstrNo);
             var countJ = 0;
@@ -1375,7 +1409,7 @@ function animateObjects() {
                 context.save();
                 context.beginPath();
                 context.strokeStyle = "rgb(" + Math.floor(i/carWays.length*255) + ",0,0)";
-                context.lineWidth="1";
+                context.lineWidth = 1;
                 context.moveTo(background.x+carWays[i][cCars[i].cType][counter].x,background.y+carWays[i][cCars[i].cType][counter].y);
             }
             for(var j = 0; j < arrLen; j+=cAbstrNo) {
@@ -1634,8 +1668,12 @@ function animateObjects() {
                 hardware.mouse.cursor = "pointer";
                 if(hardware.mouse.isHold){
                     hardware.mouse.isHold = false;
-                    trains[trainParams.selected].standardDirection = !trains[trainParams.selected].standardDirection;
-                    notify(formatJSString(getString("appScreenObjectChangesDirection","."), getString(["appScreenTrainNames",trainParams.selected])), false, 750,null,null, client.y);
+					if(onlineGame.enabled){
+							teamplaySync("action","trains", trainParams.selected, [{"standardDirection":!trains[trainParams.selected].standardDirection}], [{getString:["appScreenObjectChangesDirection","."]}, {getString:[["appScreenTrainNames",trainParams.selected]]}]);
+					} else {
+						trains[trainParams.selected].standardDirection = !trains[trainParams.selected].standardDirection;
+						notify(formatJSString(getString("appScreenObjectChangesDirection","."), getString(["appScreenTrainNames",trainParams.selected])), false, 750,null,null, client.y);
+					}
                 }  
             }
             context.restore();  
@@ -1650,7 +1688,7 @@ function animateObjects() {
         }
         context.beginPath();
         context.rect(-classicUI.transformer.input.width/2, -classicUI.transformer.input.height/2, classicUI.transformer.input.width, classicUI.transformer.input.height);
-        if (context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY) || (context.isPointInPath(hardware.mouse.wheelX, hardware.mouse.wheelY) && hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls)) {
+        if ((context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY) && hardware.mouse.isHold) || (context.isPointInPath(hardware.mouse.wheelX, hardware.mouse.wheelY) && hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls)) {
             context.restore();
             context.restore();
             if(typeof movingTimeOut !== "undefined"){
@@ -1662,61 +1700,93 @@ function animateObjects() {
             if(!collisionCourse(trainParams.selected, false)){
                 if(client.isSmall){  
                     if(hardware.mouse.isHold){
-                        trains[trainParams.selected].speedInPercent = 50;
                         hardware.mouse.isHold = false;
+						if(!onlineGame.enabled){
+							trains[trainParams.selected].speedInPercent = 50;
+						}
                         if(trains[trainParams.selected].move && trains[trainParams.selected].accelerationSpeed > 0){ 
-                            trains[trainParams.selected].accelerationSpeed *= -1;     
-                            notify (formatJSString(getString("appScreenObjectStops", "."), getString(["appScreenTrainNames",trainParams.selected])),false, 500,null, null, client.y);
+							if(onlineGame.enabled){
+								teamplaySync("action","trains", trainParams.selected, [{"speedInPercent":50},{"accelerationSpeed": trains[trainParams.selected].accelerationSpeed * -1}], [{getString: ["appScreenObjectStops", "."]}, {getString:[["appScreenTrainNames",trainParams.selected]]}]);
+							} else {
+								trains[trainParams.selected].accelerationSpeed *= -1;     
+								notify (formatJSString(getString("appScreenObjectStops", "."), getString(["appScreenTrainNames",trainParams.selected])),false, 500,null, null, client.y);
+							}
                         } else {
-                            if(trains[trainParams.selected].move){
-                                trains[trainParams.selected].accelerationSpeed *= -1;                                     
-                            } else {
-                                trains[trainParams.selected].move = true;
-                            }
-                            notify(formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenTrainNames",trainParams.selected])),false, 500,null, null, client.y);
+							if(onlineGame.enabled){
+								if(trains[trainParams.selected].move){
+									teamplaySync("action","trains", trainParams.selected, [{"speedInPercent":50},{"accelerationSpeed": trains[trainParams.selected].accelerationSpeed * -1}], [{getString:["appScreenObjectStarts", "."]}, {getString:[["appScreenTrainNames",trainParams.selected]]}]);
+								} else {
+									teamplaySync("action","trains", trainParams.selected, [{"speedInPercent":50},{"move": true}], [{getString:["appScreenObjectStarts", "."]}, {getString:[["appScreenTrainNames",trainParams.selected]]}]);
+								}
+							} else {
+								if(trains[trainParams.selected].move){
+									trains[trainParams.selected].accelerationSpeed *= -1;                                     
+								} else {
+									trains[trainParams.selected].move = true;
+								}
+								notify(formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenTrainNames",trainParams.selected])),false, 500,null, null, client.y);
+							}
                         }
                     }
                 } else if((hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls && !(hardware.mouse.wheelY > y && hardware.mouse.wheelX < x )) || (!(hardware.mouse.moveY > y && hardware.mouse.moveX < x ))) {
-                    var minAngle = 10;
-                    var cAngle;
+                    var angle;
+					var minAngle = 10;
+					var oldAngle = classicUI.transformer.input.angle;
                     if(hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls && !(hardware.mouse.wheelY > y && hardware.mouse.wheelX < x)) {
-                        var angle = classicUI.transformer.input.angle * (hardware.mouse.wheelScrollY < 0 ? 1.1 : 0.9);
-                        classicUI.transformer.input.angle = angle >= 0 ? angle <= classicUI.transformer.input.maxAngle ? angle : classicUI.transformer.input.maxAngle : 0;
+                        angle = classicUI.transformer.input.angle * (hardware.mouse.wheelScrollY < 0 ? 1.1 : 0.9);
                     } else {
-                        var angle;
                         if (hardware.mouse.moveY>y){
                             angle = Math.PI + Math.abs(Math.atan(((hardware.mouse.moveY-y)/(hardware.mouse.moveX-x))));
                         } else if (hardware.mouse.moveY<y && hardware.mouse.moveX > x){
                             angle = Math.PI - Math.abs(Math.atan(((hardware.mouse.moveY-y)/(hardware.mouse.moveX-x))));  
                         } else {
                             angle = Math.abs(Math.atan(((hardware.mouse.moveY-y)/(hardware.mouse.moveX-x))));
-                        }  
-                        if(hardware.mouse.isHold){
-                            classicUI.transformer.input.angle = angle >= 0 ? angle <= classicUI.transformer.input.maxAngle ? angle : classicUI.transformer.input.maxAngle : 0;
                         }
                     }
-                    cAngle = classicUI.transformer.input.angle/classicUI.transformer.input.maxAngle*100;
-                    cAngle = cAngle < minAngle ? 0 : cAngle;
-                    if (hardware.mouse.wheelScrollY < 0 && hardware.mouse.wheelScrolls && !(hardware.mouse.wheelY > y && hardware.mouse.wheelX < x) && cAngle === 0) {
-                        cAngle = minAngle;
-                        classicUI.transformer.input.angle = cAngle/100*classicUI.transformer.input.maxAngle;
+                    classicUI.transformer.input.angle = angle >= 0 ? angle <= classicUI.transformer.input.maxAngle ? angle : classicUI.transformer.input.maxAngle : 0;
+                    var cAngle = classicUI.transformer.input.angle/classicUI.transformer.input.maxAngle*100;
+                    if (hardware.mouse.wheelScrollY < 0 && hardware.mouse.wheelScrolls && !(hardware.mouse.wheelY > y && hardware.mouse.wheelX < x) && cAngle === 0){
+						cAngle = minAngle;
+						classicUI.transformer.input.angle = cAngle*classicUI.transformer.input.maxAngle/100;
+					} else if(classicUI.transformer.input.angle < 0.95*oldAngle && cAngle < minAngle) {
+						cAngle = classicUI.transformer.input.angle = 0;
                     }
-                    if(cAngle >= minAngle && trains[trainParams.selected].accelerationSpeed > 0 && trains[trainParams.selected].speedInPercent != cAngle) {
-                        trains[trainParams.selected].accelerationSpeedCustom = (trains[trainParams.selected].currentSpeedInPercent)/cAngle;
+                    if(cAngle > 0 && trains[trainParams.selected].accelerationSpeed > 0 && trains[trainParams.selected].speedInPercent != cAngle) {
+						if(onlineGame.enabled){
+							teamplaySync("action","trains", trainParams.selected, [{"accelerationSpeedCustom":(trains[trainParams.selected].currentSpeedInPercent)/cAngle}], null);
+						} else {
+							trains[trainParams.selected].accelerationSpeedCustom = (trains[trainParams.selected].currentSpeedInPercent)/cAngle;
+						}
                     }
-                    if(cAngle >= minAngle) {
-                        trains[trainParams.selected].speedInPercent = cAngle;
+                    if(cAngle > 0) {
+						if(onlineGame.enabled){
+							teamplaySync("action","trains", trainParams.selected, [{"speedInPercent":cAngle}], null);
+						} else {
+							trains[trainParams.selected].speedInPercent = cAngle;
+						}
                     } else {
                         hardware.mouse.isHold = false;
                     }
-                    if(cAngle < minAngle && trains[trainParams.selected].accelerationSpeed > 0){ 
-                        trains[trainParams.selected].accelerationSpeed *= -1;    
-                        notify (formatJSString(getString("appScreenObjectStops", "."), getString(["appScreenTrainNames",trainParams.selected])),false, 500,null, null, client.y);
-                    } else if(cAngle >= minAngle && !trains[trainParams.selected].move) {
-                        trains[trainParams.selected].move = true;
-                        notify (formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenTrainNames",trainParams.selected])),false, 500,null, null, client.y);
-                    } else if (cAngle >= minAngle && trains[trainParams.selected].accelerationSpeed < 0) {
-                        trains[trainParams.selected].accelerationSpeed *=-1;
+                    if(cAngle === 0 && trains[trainParams.selected].accelerationSpeed > 0){ 
+						if(onlineGame.enabled){
+							teamplaySync("action","trains", trainParams.selected, [{"accelerationSpeed":trains[trainParams.selected].accelerationSpeed * -1}], [{getString:["appScreenObjectStops", "."]}, {getString:[["appScreenTrainNames",trainParams.selected]]}]);
+						} else {
+							trains[trainParams.selected].accelerationSpeed *= -1;    
+							notify (formatJSString(getString("appScreenObjectStops", "."), getString(["appScreenTrainNames",trainParams.selected])),false, 500,null, null, client.y);
+						}
+                    } else if(cAngle > 0 && !trains[trainParams.selected].move) {
+						if(onlineGame.enabled){
+							teamplaySync("action","trains", trainParams.selected, [{"move":true}],[{getString:["appScreenObjectStarts", "."]}, {getString:[["appScreenTrainNames",trainParams.selected]]}]);
+						} else {
+							trains[trainParams.selected].move = true;
+							notify (formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenTrainNames",trainParams.selected])),false, 500,null, null, client.y);
+						}
+                    } else if (cAngle > 0 && trains[trainParams.selected].accelerationSpeed < 0) {
+						if(onlineGame.enabled){
+							teamplaySync("action","trains", trainParams.selected, [{"accelerationSpeed":trains[trainParams.selected].accelerationSpeed * -1}], null);
+						} else {
+							trains[trainParams.selected].accelerationSpeed *=-1;
+						}
                     }
                 } else {
                     hardware.mouse.isHold = false;
@@ -1760,7 +1830,7 @@ function animateObjects() {
     }
     
     /////SWITCHES/////
-    classicUI.switches.display = (settings.showSwitches) ? true: false;
+    classicUI.switches.display = (onlineGame.enabled || settings.showSwitches) ? true: false;
     var showDuration = 11;
     if(((hardware.mouse.isHold && !inPath && (clickTimeOut === null || clickTimeOut === undefined)) || frameNo-classicUI.switches.lastStateChange < 3*showDuration) && classicUI.switches.display){
         Object.keys(switches).forEach(function(key) {
@@ -1770,12 +1840,16 @@ function animateObjects() {
                 context.arc(background.x+switches[key][side].x, background.y+switches[key][side].y, classicUI.switches.radius, 0, 2*Math.PI);
                 if ((context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY) && hardware.mouse.isHold) || (frameNo-classicUI.switches.lastStateChange < 3*showDuration && key == classicUI.switches.lastStateChangeKey && side == classicUI.switches.lastStateChangeSide)) {
                     if(context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY) && hardware.mouse.isHold) {
-                        switches[key][side].turned = !switches[key][side].turned;
                         hardware.mouse.isHold = false;
-                        notify (getString("appScreenSwitchTurns", "."),false, 500,null, null, client.y);
-                        classicUI.switches.lastStateChangeKey = key;
-                        classicUI.switches.lastStateChangeSide = side;
-                        classicUI.switches.lastStateChange = frameNo;
+						if(onlineGame.enabled){
+							teamplaySync("action","switches", [key,side], [{"turned":!switches[key][side].turned}], [{getString:["appScreenSwitchTurns", "."]}]);
+						} else {
+							switches[key][side].turned = !switches[key][side].turned;
+							classicUI.switches.lastStateChangeKey = key;
+							classicUI.switches.lastStateChangeSide = side;
+							classicUI.switches.lastStateChange = frameNo;
+							notify (getString("appScreenSwitchTurns", "."),false, 500,null, null, client.y);
+						}
                         context.fillStyle = switches[key][side].turned ? "rgba(144, 255, 144,1)" : "rgba(255,0,0,1)";
                         context.closePath();
                         context.fill();
@@ -1912,8 +1986,37 @@ function animateObjects() {
     hardware.mouse.wheelScrolls = false;
     
     /////REPAINT/////
-    window.requestAnimationFrame(animateObjects);
+	if(onlineGame.enabled){
+		if(onlineGame.syncing){
+			teamplaySync("sync-ready");
+		} else if(!onlineGame.stop){
+			var teamplayResttime = Math.max(onlineGame.animateInterval-(Date.now()-teamplayStarttime),0);
+			if(onlineGame.animateTimeout !== undefined && onlineGame.animateTimeout !== null) {
+				window.clearTimeout(onlineGame.animateTimeout);
+			}
+            onlineGame.nextAnimate = Date.now()+teamplayResttime;
+			onlineGame.animateTimeout = window.setTimeout(animateObjects, teamplayResttime);
+		}
+    } else {
+		window.requestAnimationFrame(animateObjects);
+	}
 
+}	
+
+function teamplaySync (mode, objname, index, params, notification) {
+	switch (mode) {
+	case "action":
+		var output = {};
+		output.objname = objname;
+		output.index = index;
+		output.params = params;	
+		output.notification = notification;
+		onlineConnection.send({mode: "action", gameId: onlineGame.id, message: JSON.stringify(output)});
+		break;
+	case "sync-ready":
+		onlineConnection.send({mode: "sync-ready"});
+		break;
+	}
 }
 
 /**************
@@ -1957,6 +2060,9 @@ var classicUI = {trainSwitch: {src: 11, selectedTrainDisplay: {}}, transformer: 
 
 var hardware = {mouse: {moveX:0, moveY:0,downX:0, downY:0, downTime: 0,upX:0, upY:0, upTime: 0, isMoving: false, isHold: false, cursor: "default"}};
 var client = {devicePixelRatio: 1};
+
+var onlineGame = {animateInterval: 40, syncInterval: 20000, excludeFromSync: {"t": ["src", "fac", "speedFac", "accelerationSpeedStartFac", "accelerationSpeedFac", "bogieDistance", "width", "height", "speed", "cars"], "tc": ["src", "fac", "bogieDistance", "width", "height"]}};
+var onlineConnection = {serverURI: getServerLink("wss:") + "/multiplay"};
 
 var debug = false;
 
@@ -2054,7 +2160,7 @@ window.onload = function() {
         function placeTrainsAtInitialPositions() {
   
             trains.forEach(function(train){
-                train.standardDirection = settings.showSwitches ? train.standardDirectionStartValue.switches : train.standardDirectionStartValue.noSwicthes;
+                train.standardDirection = (onlineGame.enabled || settings.showSwitches) ? train.standardDirectionStartValue.switches : train.standardDirectionStartValue.noSwicthes;
                 delete train.standardDirectionStartValue;
             
                 train.width = train.fac * background.width;
@@ -2426,7 +2532,7 @@ window.onload = function() {
             }
             return ((currentObject.state === 0 || currentObject.state == -1)  && stateNullAgain) ? obj : defineCarWays(cType,isFirst,i,++j,obj, currentObject, stateNullAgain);
         }
-
+		
         context.clearRect(0, 0, canvas.width, canvas.height);
 
         placeBackground();
@@ -2478,19 +2584,481 @@ window.onload = function() {
      
         animateObjects();
         
-    }
-
+    }			
+	function resetForElem(parent, elem, to) {
+		if (to == undefined) {
+			to = "";
+		}
+		parent.childNodes.forEach(
+			function(currentElem){
+				if(currentElem.nodeName.substr(0,1) != "#"){
+					currentElem.style.display = currentElem == elem ? to : "none";
+				}
+			}
+		);
+	}
+	
     settings = getSettings();
     canvas = document.querySelector("canvas");
     context = canvas.getContext("2d");
     
     document.addEventListener("keydown", onKeyDown);
-    hardware.lastInputMouse = hardware.lastInputTouch = 0;
-    canvas.addEventListener("touchstart",chooseInputMethod);
-    canvas.addEventListener("mousemove",chooseInputMethod);
-    
-    Pace.on("hide", function(){
-            var timeWait = 0.5;
+	if(getQueryString("mode") == "multiplay") {
+		if ("WebSocket" in window) {
+			onlineGame.enabled = true;
+		} else {
+			onlineGame.enabled = false;
+			notify(getString("appScreenTeamplayNoWebsocket", "!", "upper"), true, 6000, null, null, client.y);
+		}
+	} else {
+		onlineGame.enabled = false;
+	}
+	
+	if(onlineGame.enabled){
+		var loadingAnimElem = document.querySelector("#branding img");
+		var loadingAnimElemDefaultFilter = "blur(1px) saturate(5) sepia(1) hue-rotate({{0}}deg)";
+		loadingAnimElem.style.transition = "filter 0.08s";
+		loadingAnimElem.style.filter = formatJSString(loadingAnimElemDefaultFilter, Math.random()*260+100);
+		var loadingAnimElemChangingFilter = window.setInterval(function(){
+			loadingAnimElem.style.filter = formatJSString(loadingAnimElemDefaultFilter, Math.random()*260+100);
+		}, 10);
+		window.set 
+		var parent = document.querySelector("#content");
+		var elem = parent.querySelector("#game");
+		resetForElem(parent, elem, "block");
+		var parent = document.querySelector("#game");
+		var elem = parent.querySelector("#game-gameplay");
+		resetForElem(parent, elem);
+		onlineConnection.connect = (function(host) {
+			function hideLoadingAnimation(){
+				try{
+					document.styleSheets[0].insertRule(".pace, .pace-progress {display: none !important;}");
+				} catch (e){
+					if(debug){
+						console.log(e);
+					}
+					var elem = document.querySelector("head");
+					var elemStyle = document.createElement("style");
+					elemStyle.textContent = ".pace, .pace-progress {display: none !important;}";
+					elem.appendChild(elemStyle);
+				}
+				window.clearInterval(loadingAnimElemChangingFilter);
+				document.querySelector("#branding").style.display = "none";	
+				canvas.style.opacity = 1;
+			}
+			function showStartGame(){
+				hideLoadingAnimation();
+				onlineGame.stop = false;
+				onlineGame.stopRequestByMe = false;
+				document.addEventListener("visibilitychange", pauseGameIfBackground);
+				window.addEventListener("beforeunload", function () {
+					document.removeEventListener("visibilitychange", pauseGameIfBackground);
+					if(onlineGame.stopRequestByMe) {
+						onlineConnection.send({mode: "resume"});
+					}
+				});
+				var parent = document.querySelector("#content");
+				var elem = parent.querySelector("#game");
+				resetForElem(parent, elem, "block");
+				var parent = document.querySelector("#game");
+				var elem = parent.querySelector("#game-start");
+				resetForElem(parent, elem);
+				elem.querySelector("#game-start-button").onclick = function(){
+					onlineConnection.send({mode:"start"});
+				};
+			}			
+			function showNewGameLink(){
+				hideLoadingAnimation();
+				var parent = document.querySelector("#content");
+				var elem = parent.querySelector("#setup");
+				resetForElem(parent, elem, "block");
+				var parent = document.querySelector("#setup-inner-content");
+				var elem = parent.querySelector("#setup-create");
+				resetForElem(parent, elem);
+				var elem = document.querySelector("#setup #setup-create #setup-create-link");
+				elem.addEventListener("click",function(){followLink("?mode=multiplay", "_self", LINK_STATE_INTERNAL_HTML)});
+				var elem = document.querySelector("#setup #setup-create #setup-create-escape");
+				elem.addEventListener("click",function(){followLink("?", "_self", LINK_STATE_INTERNAL_HTML)});
+			}
+			function getPlayerNameFromInput(){
+				var elem = document.querySelector("#setup-init-name");
+				var name = elem.value;
+				var nameCheck = name.replace(/[^a-zA-Z0-9]/g, "");
+				if(name.length > 0 && name == nameCheck){
+					window.sessionStorage.setItem("playername", name);
+					return name;
+				} else {
+					elem.value = nameCheck;
+				}
+				return false;
+			}
+			function sendPlayerName(name){
+				onlineConnection.send({mode:"init", message: name});
+			}
+			function sendSyncRequest(){
+				if(!onlineGame.stop){
+					var output = {};
+					var number = 0;
+					number += trains.length;
+					trains.forEach(function(train){
+						number += train.cars.length
+					});
+					number++; //Switches
+					var obj = {"number": number};
+					onlineConnection.send({mode: "sync-request", message: JSON.stringify(obj)});
+				} else {
+					window.setTimeout(sendSyncRequest, onlineGame.syncInterval);
+				}			
+			}
+			function sendSyncData(){
+				var task = {};
+				task.o = "s";
+				var obj = copyJSObject(switches);
+				task.d = obj;
+				onlineConnection.send({mode:"sync-task", message: JSON.stringify(task)});	
+				for(var i = 0; i < trains.length; i++){
+					task = {};
+					task.o = "t";
+					task.i = i;
+					obj = copyJSObject(trains[i]);
+					obj.front.x = (obj.front.x-background.x) / background.width;
+					obj.back.x = (obj.back.x-background.x) / background.width;
+					obj.x = (obj.x-background.x) / background.width;				
+					obj.front.y = (obj.front.y - background.y) / background.height;
+					obj.back.y = (obj.back.y-background.y) / background.height;
+					obj.y = (obj.y-background.y) / background.height;
+					obj.width = obj.width / background.width;
+					obj.height = obj.height / background.height;
+					onlineGame.excludeFromSync[task.o].forEach(function(key){
+						delete obj[key];
+					});
+					if(obj.circleFamily != null){
+						Object.keys(rotationPoints).forEach(function(key){
+							if(trains[i].circleFamily == rotationPoints[key]) {
+								obj.circleFamily = key;
+							}
+						});
+						Object.keys(rotationPoints[obj.circleFamily]).forEach(function(key){
+							if(trains[i].circle == rotationPoints[obj.circleFamily][key]) {
+								obj.circle = key;
+							}
+						});
+					} else {
+						delete obj.circle;
+					}
+					task.d = obj;
+					onlineConnection.send({mode:"sync-task", message: JSON.stringify(task)});	
+					for(var j = 0; j < trains[i].cars.length; j++){
+						task = {};
+						task.o = "tc";
+						task.i = [i,j];
+						obj = copyJSObject(trains[i].cars[j]);
+						obj.front.x = (obj.front.x-background.x) / background.width;
+						obj.back.x = (obj.back.x-background.x) / background.width;
+						obj.x = (obj.x-background.x) / background.width;				
+						obj.front.y = (obj.front.y - background.y) / background.height;
+						obj.back.y = (obj.back.y-background.y) / background.height;
+						obj.y = (obj.y-background.y) / background.height;
+						obj.width = obj.width / background.width;
+						obj.height = obj.height / background.height;
+						onlineGame.excludeFromSync[task.o].forEach(function(key){
+							delete obj[key];
+						});
+						task.d = obj;
+						onlineConnection.send({mode:"sync-task", message: JSON.stringify(task)});	
+					}
+				}
+			}
+			function pauseGameIfBackground() {
+				if (document.hidden) {
+					onlineGame.stopRequestByMe = true;
+					onlineConnection.send({mode: "pause"});
+				} else {
+					onlineGame.stopRequestByMe = false;
+					onlineConnection.send({mode: "resume"});
+				}
+			}
+			onlineConnection.socket = new WebSocket(host);
+			onlineConnection.socket.onopen = function () {
+				onlineConnection.send({mode:"hello", message: APP_DATA.version.major+APP_DATA.version.minor/10});
+			};
+			onlineConnection.socket.onclose = function () {
+				showNewGameLink();
+				notify(getString("appScreenTeamplayConnectionError", "."), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
+			};
+			onlineConnection.socket.onmessage = function (message) {
+			var json = JSON.parse(message.data);
+				if(debug){
+					console.log(json);
+				}
+				switch (json.mode) {
+					case "hello":
+						if(json.errorLevel < 2) {
+							if(json.errorLevel == 1){
+								notify(getString("appScreenTeamplayUpdateNote", "!"), false, 900, null,null,client.y);
+							}
+							var parent = document.querySelector("#content");
+							var elem = parent.querySelector("#setup");
+							resetForElem(parent, elem, "block");
+							if(window.sessionStorage.getItem("playername") != null){
+								sendPlayerName(window.sessionStorage.getItem("playername"));
+							} else {
+								hideLoadingAnimation();
+								var parent = document.querySelector("#setup-inner-content");
+								var elem = parent.querySelector("#setup-init");
+								resetForElem(parent, elem);
+								elem.querySelector("#setup-init-button").addEventListener("click", function(event) {
+										var name = getPlayerNameFromInput();
+										if(name !== false) {
+											sendPlayerName(name);
+										}
+								});
+								elem.querySelector("#setup-init-name").addEventListener("keyup", function(event) {
+									if(event.key === "Enter") {
+										var name = getPlayerNameFromInput();
+										if(name !== false) {
+											sendPlayerName(name);
+										}
+									}
+								}); 
+							}
+						} else {
+							notify(getString("appScreenTeamplayUpdateError", "!"), true, 6000, null,null,client.y);
+						}
+					break;
+					case "init":
+						if(json.errorLevel === 0){
+							onlineGame.sessionId = json.sessionId;
+							if(onlineGame.gameKey == "" || onlineGame.gameId == ""){
+								onlineConnection.send({mode:"connect"}); 
+							} else {
+								onlineConnection.send({mode:"join",gameKey:onlineGame.gameKey,gameId:onlineGame.gameId}); 
+							}
+						} else {
+							showNewGameLink();
+							notify(getString("appScreenTeamplayConnectionError", "."), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
+						}
+					break;
+					case "connect":
+						if(json.errorLevel === 0){
+							onlineGame.locomotive = true;
+							onlineGame.gameKey = json.gameKey;
+							onlineGame.gameId = json.gameId;
+							hideLoadingAnimation();
+							var parent = document.querySelector("#setup-inner-content");
+							var elem = parent.querySelector("#setup-start");
+							resetForElem(parent, elem)
+							elem.querySelector("#setup-start-gamelink").textContent = getShareLink(onlineGame.gameId, onlineGame.gameKey);
+							elem.querySelector("#setup-start-button").onclick = function(){copy("#setup #setup-start #setup-start-gamelink")};
+						} else {
+							showNewGameLink();
+							notify(getString("appScreenTeamplayCreateError", "!"), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
+						}
+					break;
+					case "join":
+						if(json.sessionId == onlineGame.sessionId) {
+							if(json.errorLevel === 0){
+								onlineGame.locomotive = false;
+								showStartGame();
+							} else {
+								showNewGameLink();
+								notify(getString("appScreenTeamplayJoinError", "!"), true, 6000, function(){followLink("error#tp-join", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
+							}
+						} else {
+							if(json.errorLevel === 0){
+								showStartGame();
+							} else {
+								showNewGameLink();
+								notify(getString("appScreenTeamplayJoinTeammateError", "!"), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
+							}
+						}
+					break;
+					case "start":
+						if(json.errorLevel < 2){
+							switch(json.message){
+								case "wait":
+									if(json.sessionId == onlineGame.sessionId) {
+										var parent = document.querySelector("#game");
+										var elem = parent.querySelector("#game-wait");
+										resetForElem(parent, elem);
+									} else {
+										notify(getString("appScreenTeamplayTeammateReady", "?"), false, 1000, null,null,client.y);
+									}
+								break;
+								case "run":
+									onlineGame.syncing = false;
+									if(onlineGame.locomotive){
+										window.setTimeout(sendSyncRequest, onlineGame.syncInterval);
+									}
+									var parent = document.querySelector("#game");
+									var elem = parent.querySelector("#game-gameplay");
+									resetForElem(parent, elem);
+								break;
+							}
+						} else {
+							showNewGameLink();
+							notify(getString("appScreenTeamplayStartError", "!"), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
+						}
+					break;
+					case "action":
+						var json = JSON.parse(message.data);
+						var input = JSON.parse(json.message);
+                        var notifyArr = [];
+						if(typeof input.notification == "object" && Array.isArray(input.notification)){
+                            input.notification.forEach(function(elem){
+                                if(typeof elem == "object" && Array.isArray(elem.getString)) {
+                                     notifyArr.push(getString( ...elem.getString ));
+                                } else if(typeof elem == "string") {
+                                     notifyArr.push( elem );
+                                }
+                            });
+                            var notifyStr = formatJSString( ...notifyArr );
+							if(onlineGame.sessionId != json.sessionId){
+								notifyStr = json.sessionName + ": " + notifyStr;
+							}
+							notify(notifyStr, false, 1000, null,null,client.y)
+						}
+						var obj;
+						switch (input.objname){
+						case "trains":
+							obj = trains[input.index];
+						break;
+						case "switches":
+							obj = switches[input.index[0]][input.index[1]]
+							classicUI.switches.lastStateChangeKey = input.index[0];
+							classicUI.switches.lastStateChangeSide = input.index[1];
+							classicUI.switches.lastStateChange = frameNo;
+						break;
+						}
+						var counter = 0;
+						input.params.forEach(function(param){
+							obj[Object.keys(param)[0]] = Object.values(param)[0];
+						});
+					break;
+					case "sync-request":
+						var json = JSON.parse(message.data);
+						var json_message = JSON.parse(json.message);
+						onlineGame.syncingTimeout = window.setTimeout(function(){
+							onlineGame.syncing = false;
+							onlineConnection.send({mode: "sync-cancel"});
+						},1000);
+						onlineGame.syncingCounter = 0;
+						onlineGame.syncingCounterFinal = parseInt(json_message.number,10);
+						onlineGame.syncing = true;
+					break;
+					case "sync-ready":
+						if(onlineGame.locomotive){
+							sendSyncData();
+						}
+					break;
+					case "sync-task":
+						if(onlineGame.syncing) {
+							onlineGame.syncingCounter++;
+							var json = JSON.parse(message.data);
+							var task = JSON.parse(json.message);
+							switch(task.o){
+								case "t":
+									Object.keys(task.d).forEach(function(key){
+										trains[task.i][key] = task.d[key];
+									});
+									trains[task.i].front.x = background.x+(trains[task.i].front.x * background.width);
+									trains[task.i].back.x = background.x+(trains[task.i].back.x * background.width);
+									trains[task.i].x = background.x+(trains[task.i].x * background.width);
+									trains[task.i].front.y = background.y+(trains[task.i].front.y * background.height);
+									trains[task.i].back.y = background.y+(trains[task.i].back.y * background.height);
+									trains[task.i].y = background.y+(trains[task.i].y * background.height);
+									if(trains[task.i].circleFamily != null){
+										trains[task.i].circle = rotationPoints[trains[task.i].circleFamily][trains[task.i].circle];
+										trains[task.i].circleFamily = rotationPoints[trains[task.i].circleFamily];
+									}
+									defineTrainSpeed(trains[task.i]);
+								break;
+								case "tc":
+									Object.keys(task.d).forEach(function(key){
+										trains[task.i[0]].cars[task.i[1]][key] = task.d[key];
+									});
+									trains[task.i[0]].cars[task.i[1]].front.x = background.x+(trains[task.i[0]].cars[task.i[1]].front.x * background.width);
+									trains[task.i[0]].cars[task.i[1]].back.x = background.x+(trains[task.i[0]].cars[task.i[1]].back.x * background.width);
+									trains[task.i[0]].cars[task.i[1]].x = background.x+(trains[task.i[0]].cars[task.i[1]].x * background.width);
+									trains[task.i[0]].cars[task.i[1]].front.y = background.y+(trains[task.i[0]].cars[task.i[1]].front.y * background.height);
+									trains[task.i[0]].cars[task.i[1]].back.y = background.y+(trains[task.i[0]].cars[task.i[1]].back.y * background.height);
+									trains[task.i[0]].cars[task.i[1]].y = background.y+(trains[task.i[0]].cars[task.i[1]].y * background.height);
+								break;
+								case "s":
+									Object.keys(task.d).forEach(function(key){
+										Object.keys(switches[key]).forEach(function(currentKey){
+											switches[key][currentKey].turned = task["d"][key][currentKey].turned;
+										});
+									});
+								break;
+							}
+							if(onlineGame.syncingCounter == onlineGame.syncingCounterFinal){
+								window.clearTimeout(onlineGame.syncingTimeout);
+								onlineConnection.send({mode: "sync-done"});
+							}
+						}
+					break;
+					case "sync-done":
+						onlineGame.syncing = false;
+						if(onlineGame.locomotive){
+							window.setTimeout(sendSyncRequest, onlineGame.syncInterval);
+						}
+						if(!onlineGame.stop){
+							animateObjects();
+						}
+					break;
+					case "pause":
+						onlineGame.stop = true;
+						notify(getString("appScreenTeamplayGamePaused", "."), true, 900, null, null, client.y);
+					break;
+					case "resume":
+						if(onlineGame.stop){
+							onlineGame.stop = false;
+							notify(getString("appScreenTeamplayGameResumed", "."), true, 900, null, null, client.y);
+							animateObjects();
+						}
+					break;
+					case "leave":
+						if(json.errorLevel == 2){
+							showNewGameLink();
+							notify(getString("appScreenTeamplayTeammateLeft", "."), true, 900, null, null, client.y);
+						} else {
+							notify(json.sessionName + ": " + getString("appScreenTeamplaySomebodyLeft", "."), true, 900, null, null, client.y);
+						}
+					break;
+					case "unknown":
+						notify(getString("appScreenTeamplayUnknownRequest", "."), true, 2000, null, null, client.y);
+					break;
+				}
+			};
+			onlineConnection.socket.onerror = function (error) {
+				showNewGameLink();
+				notify(getString("appScreenTeamplayConnectionError", "!"), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
+			};
+		});
+		onlineConnection.send = (function(obj) {
+			onlineConnection.socket.send(JSON.stringify(obj));
+		});
+		onlineGame.gameKey = getQueryString("key");
+		onlineGame.gameId = getQueryString("id");
+		document.getElementById("setup").addEventListener("mousemove", function(event) {
+			document.getElementById("setup-ball").style.left = event.pageX + "px";
+			document.getElementById("setup-ball").style.top = event.pageY + "px";
+		});  
+		document.getElementById("setup").addEventListener("mouseout", function(event) {
+			document.getElementById("setup-ball").style.left = "-1vw";
+			document.getElementById("setup-ball").style.top = "-1vw";
+		});
+		onlineConnection.connect(onlineConnection.serverURI);
+	} else {
+		document.querySelectorAll("#content > *:not(#game), #game > *:not(#game-gameplay)").forEach(function(elem) {
+			elem.style.display = "none";
+		});
+		document.querySelectorAll("#content > #game, #game > #game-gameplay").forEach(function(elem) {
+			elem.style.display = "block";
+		});
+		Pace.on("hide", function(){
+			var timeWait = 0.5;
             var timeLoad = 0.5;
             var toDestroy = document.querySelectorAll(".pace");
             for (var i = 0; i < toDestroy.length; i++) {
@@ -2520,8 +3088,12 @@ window.onload = function() {
                         canvas.style.opacity = "1";
                     }, timeLoad*1000);
             }, timeWait*1000);
-    });
-
+		});
+	}
+    hardware.lastInputMouse = hardware.lastInputTouch = 0;
+    canvas.addEventListener("touchstart",chooseInputMethod);
+    canvas.addEventListener("mousemove",chooseInputMethod);
+    
     extendedMeasureViewspace();
       
     var defaultPics = copyJSObject(pics);
@@ -2546,7 +3118,7 @@ window.onload = function() {
             }
         };
         pics[pic.id].onerror = function() {
-                 notify(getString("appScreenIsFail", "!", "upper"), true, 60000, function(){followLink("error", "_blank", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
+                 notify(getString("appScreenIsFail", "!", "upper"), true, 60000, function(){followLink("error#pic", "_blank", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
         };
     }); 
 };

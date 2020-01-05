@@ -6,6 +6,7 @@
 
 function extendedMeasureViewspace() {
     client.isSmall = measureViewspace(1).isSmallDevice;
+    client.isTiny = measureViewspace(2).isTinyDevice;
     client.devicePixelRatio = window.devicePixelRatio;
     client.width = window.innerWidth;
     client.height = window.innerHeight;
@@ -91,22 +92,15 @@ function getTouchStart(event) {
     hardware.mouse.moveX = hardware.mouse.downX = event.changedTouches[0].clientX*client.devicePixelRatio;
     hardware.mouse.moveY = hardware.mouse.downY = event.changedTouches[0].clientY*client.devicePixelRatio;
     if(hardware.mouse.isHoldTimeout !== undefined && hardware.mouse.isHoldTimeout !== null) {
-	    window.clearTimeout(hardware.mouse.isHoldTimeout);
-	}
+        window.clearTimeout(hardware.mouse.isHoldTimeout);
+    }
     hardware.mouse.isHold = true;
 }
 function getTouchEnd(event) {   
     hardware.mouse.upX = event.changedTouches[0].clientX*client.devicePixelRatio;
     hardware.mouse.upY = event.changedTouches[0].clientY*client.devicePixelRatio;
     hardware.mouse.upTime = Date.now(); 
-    if(onlineGame.enabled) {
-        if(onlineGame.nextAnimate === undefined || onlineGame.nextAnimate === null){
-            onlineGame.nextAnimate = 0;
-        }
-        hardware.mouse.isHoldTimeout = window.setTimeout(function(){hardware.mouse.isHold = false;}, Math.max(onlineGame.nextAnimate-Date.now(),0));
-    } else {
-        hardware.mouse.isHold = false; 
-    }
+    hardware.mouse.isHold = false;
 }
 function getTouchLeave(event) {
     hardware.mouse.isHold = false; 
@@ -135,8 +129,8 @@ function onKeyDown(event) {
 /******************************************
 * Animation functions for load and resize *
 ******************************************/
-    
-function placeBackground() {
+
+ function placeBackground() {
     if (canvas.width / canvas.height < pics[background.src].width / pics[background.src].height) {
         background.width = canvas.width;
         background.height = pics[background.src].height * (canvas.width / pics[background.src].width);
@@ -150,216 +144,6 @@ function placeBackground() {
     }
     client.x = background.x / client.devicePixelRatio;
     client.y = background.y / client.devicePixelRatio;
-}
-    
-function defineTrainSpeed(train){
-	train.speed = train.speedFac*background.width;
-}	
-	
-function defineTrainParams(){
-    
-    function getBezierLength(bezierPoints,repNo){
-        var x = [];
-        var y = [];
-        var dis = 0;
-        for(var i = 0; i <= repNo; i++){
-            x[i] = getBezierPoints(i/repNo,bezierPoints.x[0],bezierPoints.x[1],bezierPoints.x[2],bezierPoints.x[3]);
-            y[i] = getBezierPoints(i/repNo,bezierPoints.y[0],bezierPoints.y[1],bezierPoints.y[2],bezierPoints.y[3]);
-            if(i > 0) {
-                dis += Math.sqrt(Math.pow(Math.abs(x[i-1]-x[i]),2)+Math.pow(Math.abs(Math.abs(y[i-1]-y[i]),2),2));
-            }
-        }
-        return dis;
-    }
-   
-    function getBezierPoints(fac, a,b,c,d) {
-          return Math.pow((1-fac),3)*a+3*fac*Math.pow((1-fac),2)*b+3*Math.pow((fac),2)*(1-fac)*c+Math.pow(fac,3)*d;
-    }
-    
-    /////Rotation Points/////
-    var circles = [];
-    var bezierPoints;   
-    
-    //INNER/NARROW
-    rotationPoints.inner.narrow.x[0] = 0.17 * background.width; 
-    rotationPoints.inner.narrow.x[1] = 0.75 * background.width;
-    rotationPoints.inner.narrow.x[2] = 0.78 * background.width;
-    rotationPoints.inner.narrow.x[3] = 0.16 * background.width;
-    rotationPoints.inner.narrow.x[4] = 0.952 * background.width;
-    rotationPoints.inner.narrow.x[5] = 0.962 * background.width;
-    rotationPoints.inner.narrow.x[6] = 0.0024 * background.width;
-    rotationPoints.inner.narrow.x[7] = -0.025 * background.width;
-    rotationPoints.inner.narrow.y[0] = 0.126 * background.height;
-    rotationPoints.inner.narrow.y[1] = 0.145 * background.height;
-    rotationPoints.inner.narrow.y[2] = 0.823 * background.height;
-    rotationPoints.inner.narrow.y[3] = 0.817 * background.height;
-    rotationPoints.inner.narrow.y[4] = 0.124 * background.height;
-    rotationPoints.inner.narrow.y[5] = 0.856 * background.height;
-    rotationPoints.inner.narrow.y[6] = 0.82 * background.height;
-    rotationPoints.inner.narrow.y[7] = 0.16 * background.height;
-    circles[0] = rotationPoints.inner.narrow;
-
-    //INNER/WIDE
-    rotationPoints.inner.wide.x[0] = 0.17 * background.width; 
-    rotationPoints.inner.wide.x[1] = 0.749 * background.width;
-    rotationPoints.inner.wide.x[2] = rotationPoints.inner.narrow.x[2];
-    rotationPoints.inner.wide.x[3] = rotationPoints.inner.narrow.x[3];
-    rotationPoints.inner.wide.x[4] = 0.94 * background.width;
-    rotationPoints.inner.wide.x[5] = 0.97 * background.width;
-    rotationPoints.inner.wide.x[6] = 0.0013 * background.width;
-    rotationPoints.inner.wide.x[7] = -0.024 * background.width;
-    rotationPoints.inner.wide.y[0] = 0.0826 * background.height;
-    rotationPoints.inner.wide.y[1] = 0.1 * background.height;
-    rotationPoints.inner.wide.y[2] = rotationPoints.inner.narrow.y[2];
-    rotationPoints.inner.wide.y[3] = rotationPoints.inner.narrow.y[3];
-    rotationPoints.inner.wide.y[4] = 0.082 * background.height;
-    rotationPoints.inner.wide.y[5] = 0.847 * background.height;
-    rotationPoints.inner.wide.y[6] = 0.822 * background.height;
-    rotationPoints.inner.wide.y[7] = 0.13 * background.height;
-    circles[1] = rotationPoints.inner.wide;
-    switches.innerWide.left.x = 0.044 * background.width;
-    switches.innerWide.left.y =  0.34 * background.height;
-    switches.innerWide.right.x = 0.9 * background.width;
-    switches.innerWide.right.y =  0.356 * background.height;    
-    
-    //OUTER/NARROW
-    rotationPoints.outer.narrow.x[0] = rotationPoints.outer.narrow.x[3] = 0.17 * background.width;
-    rotationPoints.outer.narrow.x[1] = 0.77 * background.width;
-    rotationPoints.outer.narrow.x[2] = 0.795 * background.width;
-    rotationPoints.outer.narrow.x[4] = 0.98 * background.width;
-    rotationPoints.outer.narrow.x[5] = 0.985 * background.width;
-    rotationPoints.outer.narrow.y[0] = 0.013 * background.height;
-    rotationPoints.outer.narrow.y[1] = 0.017 * background.height;
-    rotationPoints.outer.narrow.y[2] = 0.893 * background.height;
-    rotationPoints.outer.narrow.y[3] = 0.882 * background.height;
-    rotationPoints.outer.narrow.y[4] = 0.001 * background.height;
-    rotationPoints.outer.narrow.y[5] = 0.908 * background.height;
-    circles[2] = rotationPoints.outer.narrow;
-    
-    var repNo = 1000;
-    for (var i = 0; i < circles.length; i++) {
-        circles[i].bezierLength = {};
-        if(circles[i].x[4] !== undefined && circles[i].x[5] !== undefined) {
-            bezierPoints = {x:[circles[i].x[1],circles[i].x[4],circles[i].x[5],circles[i].x[2]], y:[circles[i].y[1],circles[i].y[4],circles[i].y[5],circles[i].y[2]]};
-            circles[i].bezierLength.right = getBezierLength(bezierPoints,repNo);
-        }
-        if(circles[i].x[6] !== undefined && circles[i].x[7] !== undefined) {
-            bezierPoints = {x:[circles[i].x[3],circles[i].x[6],circles[i].x[7],circles[i].x[0]], y:[circles[i].y[3],circles[i].y[6],circles[i].y[7],circles[i].y[0]]};
-            circles[i].bezierLength.left = getBezierLength(bezierPoints,repNo);
-        }
-    }
-    
-  /*------------------------------------------------------------------------------------------------------------------*
-   *  0---------------------------------------------------------1                                                     *
-   *  -      ___       ___                                      -                                                     *
-   *  -     |   \      |   \   ________  _____   _______        -        0-3: required                                *
-   *  7    |    \     |    \   | __   |  ||__|  | __   |        4        4-7: optional                                *
-   *  -   |  / \ \   |  / \ \  | |__| |  ||\    | |__| |        -                                                     *
-   *  6  |  /   \ \ |  /   \ \ |______|  ||\\   |______|        5        Ohne optionale Punkte gilt:                  *
-   *  -  ______________________________________________         -                   x0 = x3 bzw. x1 = x2              *
-   *  -  _______________________________________________        -                                                     *
-   *  3---------------------------------------------------------2                                                     *
-   *------------------------------------------------------------------------------------------------------------------*/ 
-   
-   
-    //INNER2OUTER/LEFT
-
-    rotationPoints.inner2outer.left.x[1] = -0.039 * background.width;
-    rotationPoints.inner2outer.left.x[2] = -0.038 * background.width;
-    rotationPoints.inner2outer.left.y[1] = 0.83 * background.height;
-    rotationPoints.inner2outer.left.y[2] = 0.03 * background.height;
-    bezierPoints = {x:[rotationPoints.inner.narrow.x[3],rotationPoints.inner2outer.left.x[1],rotationPoints.inner2outer.left.x[2],rotationPoints.outer.narrow.x[0]], y:[rotationPoints.inner.narrow.y[3],rotationPoints.inner2outer.left.y[1],rotationPoints.inner2outer.left.y[2],rotationPoints.outer.narrow.y[0]]};
-    rotationPoints.inner2outer.left.bezierLength = getBezierLength(bezierPoints,repNo);
-    switches.inner2outer.left.x = 0.087 * background.width;
-    switches.inner2outer.left.y = 0.77 * background.height;
-    switches.outer2inner.left.x = 0.011 * background.width;
-    switches.outer2inner.left.y = 0.465 * background.height;
-    
-    //INNER2OUTER/RIGHT
-    rotationPoints.inner2outer.right.x[1] = 0.98 * background.width;
-    rotationPoints.inner2outer.right.x[2] = 0.986 * background.width;
-    rotationPoints.inner2outer.right.y[1] = 0.015 * background.height;
-    rotationPoints.inner2outer.right.y[2] = 0.858 * background.height;
-    bezierPoints = {x:[rotationPoints.outer.narrow.x[1],rotationPoints.inner2outer.right.x[1],rotationPoints.inner2outer.right.x[2],rotationPoints.inner.narrow.x[2]], y:[rotationPoints.outer.narrow.y[1],rotationPoints.inner2outer.right.y[1],rotationPoints.inner2outer.right.y[2],rotationPoints.inner.narrow.y[2]]};
-    rotationPoints.inner2outer.right.bezierLength = getBezierLength(bezierPoints,repNo);
-    switches.inner2outer.right.x = 0.85 * background.width;
-    switches.inner2outer.right.y = 0.786 * background.height;    
-    switches.outer2inner.right.x = 0.934 * background.width;
-    switches.outer2inner.right.y = 0.505 * background.height; 
-    
-  /*------------------------------------------------------------------------------------------------------------------*
-   *  left--------------------------------------------------right                                                     *
-   *  -      ___       ___                                      -                                                     *
-   *  -     |   \      |   \   ________  _____   _______        -                                                     *
-   *  2    |    \     |    \   | __   |  ||__|  | __   |        1        1-2: required                                *
-   *  -   |  / \ \   |  / \ \  | |__| |  ||\    | |__| |        -                                                     *
-   *  1  |  /   \ \ |  /   \ \ |______|  ||\\   |______|        2                                                     *
-   *  -  ______________________________________________         -                                                     *
-   *  -  _______________________________________________        -                                                     *
-   *  -----------------------------------------------------------                                                     *
-   *------------------------------------------------------------------------------------------------------------------*/
-   
-   
-    //OUTER/ALTSTATE3
-    switches.outerAltState3.left.x = 0.194 * background.width;
-    switches.outerAltState3.left.y =  0.886 * background.height;
-    switches.outerAltState3.right.x =  0.77 * background.width;
-    switches.outerAltState3.right.y =  0.89 * background.height;
-    
-    rotationPoints.outer.altState3.right = {x: [], y: []};
-    rotationPoints.outer.altState3.right.x[0] = rotationPoints.outer.narrow.x[2];
-    rotationPoints.outer.altState3.right.x[1] = 0.64 * background.width;
-    rotationPoints.outer.altState3.right.x[2] = rotationPoints.outer.altState3.right.x[0] - ( rotationPoints.outer.altState3.right.x[0] - rotationPoints.outer.altState3.right.x[1])/2;
-    rotationPoints.outer.altState3.right.x[3] = rotationPoints.outer.altState3.right.x[0] - ( rotationPoints.outer.altState3.right.x[0] - rotationPoints.outer.altState3.right.x[1])/4;
-    rotationPoints.outer.altState3.right.x[4] = rotationPoints.outer.altState3.right.x[1] + ( rotationPoints.outer.altState3.right.x[0] - rotationPoints.outer.altState3.right.x[1])/4;
-    rotationPoints.outer.altState3.right.y[0] = rotationPoints.outer.narrow.y[2];
-    rotationPoints.outer.altState3.right.y[1] = 0.957 * background.height;
-    rotationPoints.outer.altState3.right.y[2] = rotationPoints.outer.altState3.right.y[0] + ( rotationPoints.outer.altState3.right.y[1] - rotationPoints.outer.altState3.right.y[0])/2;    
-    rotationPoints.outer.altState3.right.y[3] = rotationPoints.outer.altState3.right.y[0] + ( rotationPoints.outer.altState3.right.y[1] - rotationPoints.outer.altState3.right.y[0])/8;
-    rotationPoints.outer.altState3.right.y[4] = rotationPoints.outer.altState3.right.y[1] - ( rotationPoints.outer.altState3.right.y[1] - rotationPoints.outer.altState3.right.y[0])/8;
-        
-    rotationPoints.outer.altState3.left = {x: [], y: []};
-    rotationPoints.outer.altState3.left.x[0] = rotationPoints.outer.narrow.x[3];
-    rotationPoints.outer.altState3.left.x[1] = 0.289 * background.width;
-    rotationPoints.outer.altState3.left.x[2] = rotationPoints.outer.altState3.left.x[0] + (  rotationPoints.outer.altState3.left.x[1] - rotationPoints.outer.altState3.left.x[0] )/2;
-    rotationPoints.outer.altState3.left.x[3] = rotationPoints.outer.altState3.left.x[0] + ( rotationPoints.outer.altState3.left.x[1] -  rotationPoints.outer.altState3.left.x[0] )/4;
-    rotationPoints.outer.altState3.left.x[4] = rotationPoints.outer.altState3.left.x[1] - ( rotationPoints.outer.altState3.left.x[1] -  rotationPoints.outer.altState3.left.x[0] )/4;
-    rotationPoints.outer.altState3.left.y[0] = rotationPoints.outer.narrow.y[3];
-    rotationPoints.outer.altState3.left.y[1] = 0.95 * background.height;
-    rotationPoints.outer.altState3.left.y[2] = rotationPoints.outer.altState3.left.y[0] + ( rotationPoints.outer.altState3.left.y[1] - rotationPoints.outer.altState3.left.y[0] )/2;
-    rotationPoints.outer.altState3.left.y[3] = rotationPoints.outer.altState3.left.y[0] + ( rotationPoints.outer.altState3.left.y[1] - rotationPoints.outer.altState3.left.y[0] )/8;
-    rotationPoints.outer.altState3.left.y[4] = rotationPoints.outer.altState3.left.y[1] - ( rotationPoints.outer.altState3.left.y[1] - rotationPoints.outer.altState3.left.y[0] )/8;
-
-    bezierPoints = {x:[rotationPoints.outer.altState3.right.x[0],rotationPoints.outer.altState3.right.x[3],rotationPoints.outer.altState3.right.x[3],rotationPoints.outer.altState3.right.x[2]], y:[rotationPoints.outer.altState3.right.y[0],rotationPoints.outer.altState3.right.y[3],rotationPoints.outer.altState3.right.y[3],rotationPoints.outer.altState3.right.y[2]]};
-    var templenright = getBezierLength(bezierPoints,100);
-    bezierPoints = {x:[rotationPoints.outer.altState3.right.x[2],rotationPoints.outer.altState3.right.x[4],rotationPoints.outer.altState3.right.x[4],rotationPoints.outer.altState3.right.x[1]], y:[rotationPoints.outer.altState3.right.y[2],rotationPoints.outer.altState3.right.y[4],rotationPoints.outer.altState3.right.y[4],rotationPoints.outer.altState3.right.y[1]]};
-    rotationPoints.outer.altState3.right.bezierLength = templenright + getBezierLength(bezierPoints,100);    
-    
-    bezierPoints = {x:[rotationPoints.outer.altState3.left.x[0],rotationPoints.outer.altState3.left.x[3],rotationPoints.outer.altState3.left.x[3],rotationPoints.outer.altState3.left.x[2]], y:[rotationPoints.outer.altState3.left.y[0],rotationPoints.outer.altState3.left.y[3],rotationPoints.outer.altState3.left.y[3],rotationPoints.outer.altState3.left.y[2]]};
-    var templenleft = getBezierLength(bezierPoints,100);
-    bezierPoints = {x:[rotationPoints.outer.altState3.left.x[2],rotationPoints.outer.altState3.left.x[4],rotationPoints.outer.altState3.left.x[4],rotationPoints.outer.altState3.left.x[1]], y:[rotationPoints.outer.altState3.left.y[2],rotationPoints.outer.altState3.left.y[4],rotationPoints.outer.altState3.left.y[4],rotationPoints.outer.altState3.left.y[1]]};
-    rotationPoints.outer.altState3.left.bezierLength = templenleft + getBezierLength(bezierPoints,100);
-
-    
-  /*------------------------------------------------------------------------------------------------------------------*
-   *  -----------------------------------------------------------                                                     *
-   *  -      ___       ___                                      -                                                     *
-   *  -     |   \      |   \   ________  _____   _______        -                                                     *
-   *  -    |    \     |    \   | __   |  ||__|  | __   |        -        0-1: required                                *
-   *  -   |  / \ \   |  / \ \  | |__| |  ||\    | |__| |        -                                                     *
-   *  -  |  /   \ \ |  /   \ \ |______|  ||\\   |______|        -                                                     *
-   *  -  ______________________________________________         -                                                     *
-   *  - 3_3__4_4________________________________________4 4 3 3 -                                                     *
-   *  0----2----1-------------------------------------1----2----0                                                     *
-   *------------------------------------------------------------------------------------------------------------------*/
-   
-      
- 
-    /////SPEED/////
-	trains.forEach(function(train){
-       defineTrainSpeed(train)
-    });
-    
 }
 
 function placeClassicUIElements(){
@@ -399,485 +183,20 @@ function placeClassicUIElements(){
 }
 
 /******************************************
-             animate  functions
+             draw  functions
 ******************************************/
-
-function animateObjects() {
-    
-    function animateTrains(input1){
-      
-        function animateTrain(i) {
-            function changeCOSection(cO,isFront){
-                if(trains[input1].standardDirection){ // Switch sections
-                    if (cO.state == 1 && Math.round(cO.x - background.x) >= Math.round(trains[input1].circle.x[1])) {
-                        if(classicUI.switches.display && isFront && i == -1 && trains[input1].circleFamily == rotationPoints.outer && switches.outer2inner.right.turned){
-                            trains[input1].switchCircles = true;
-                        }  
-                        if(trains[input1].switchCircles){
-                            cO.x = background.x + Math.round(rotationPoints.outer.narrow.x[1]);
-                            cO.y = background.y + Math.round(rotationPoints.outer.narrow.y[1]);
-                            cO.state = -2; 
-                            cO.angle = 0;
-                            cO.currentCurveFac = 0;
-                            if(isFront && i == -1) {
-                                trains[input1].circle = copyJSObject(trains[input1].circle);
-                                trains[input1].circle.x[2] = rotationPoints.inner.narrow.x[2];
-                                trains[input1].circle.y[2] = rotationPoints.inner.narrow.y[2];
-                                trains[input1].circle.x[3] = rotationPoints.inner.narrow.x[3];
-                                trains[input1].circle.y[3] = rotationPoints.inner.narrow.y[3];
-                                trains[input1].circle.x[4] = rotationPoints.inner2outer.right.x[1];
-                                trains[input1].circle.y[4] = rotationPoints.inner2outer.right.y[1];
-                                trains[input1].circle.x[5] = rotationPoints.inner2outer.right.x[2];
-                                trains[input1].circle.y[5] = rotationPoints.inner2outer.right.y[2];
-                                trains[input1].circleFamily = null;
-                            }
-                          } else {
-                                cO.x = background.x + Math.round(trains[input1].circle.x[1]);
-                                cO.y = background.y + Math.round(trains[input1].circle.y[1]);
-                                cO.state++;
-                                cO.angle = 0; 
-                                cO.currentCurveFac = 0;
-                          }
-                    } else if (Math.abs(cO.state) == 2 && Math.round(cO.x - background.x) <= Math.round(trains[input1].circle.x[2]) && cO.y - background.y > trains[input1].circle.y[1]+(trains[input1].circle.y[2]-trains[input1].circle.y[1])/2) {
-                        if(cO.state == -2 && !isFront && i == trains[input1].cars.length-1) {
-                            trains[input1].circle = rotationPoints.inner.narrow;
-                            trains[input1].circleFamily = rotationPoints.inner;
-                            trains[input1].switchCircles = false;
-                        }
-                        cO.x = background.x + Math.round(trains[input1].circle.x[2]);
-                        cO.y = background.y + Math.round(trains[input1].circle.y[2]);
-                        cO.currentCurveFac=0;
-                        cO.state = ((trains[input1].circleFamily == rotationPoints.outer && switches.outerAltState3.right.turned && isFront && i == -1) || trains[input1].front.state == -3) ? -3 : 3;
-                    } else if (Math.abs(cO.state) == 3 && Math.round(cO.x - background.x) <= Math.round(trains[input1].circle.x[3])) {
-                        if(classicUI.switches.display && isFront && i == -1 && trains[input1].circleFamily == rotationPoints.inner && switches.inner2outer.left.turned){
-                            trains[input1].switchCircles = true;
-                        } else if (classicUI.switches.display && isFront && i == -1 && trains[input1].circleFamily == rotationPoints.inner && switches.innerWide.left.turned) {
-                          trains[input1].circle = rotationPoints.inner.wide;
-                        } else if (classicUI.switches.display && isFront && i == -1 && trains[input1].circleFamily == rotationPoints.inner) {
-                          trains[input1].circle = rotationPoints.inner.narrow;  
-                        }
-                        if(trains[input1].switchCircles){
-                            cO.x = background.x + Math.round(rotationPoints.inner.narrow.x[3]);
-                            cO.y = background.y + Math.round(rotationPoints.inner.narrow.y[3]);
-                            cO.state = -4; 
-                            cO.angle = Math.PI;
-                            cO.currentCurveFac = 0;
-                            if(isFront && i == -1) {
-                                trains[input1].circle = copyJSObject(trains[input1].circle);
-                                trains[input1].circle.x[0] = rotationPoints.outer.narrow.x[0];
-                                trains[input1].circle.y[0] = rotationPoints.outer.narrow.y[0];
-                                trains[input1].circle.x[1] = rotationPoints.outer.narrow.x[1];
-                                trains[input1].circle.y[1] = rotationPoints.outer.narrow.y[1];
-                                trains[input1].circle.x[6] = rotationPoints.inner2outer.left.x[1];
-                                trains[input1].circle.y[6] = rotationPoints.inner2outer.left.y[1];
-                                trains[input1].circle.x[7] = rotationPoints.inner2outer.left.x[2];
-                                trains[input1].circle.y[7] = rotationPoints.inner2outer.left.y[2];
-                                trains[input1].circleFamily = null;
-                            }
-                        } else {
-                            cO.x = background.x + Math.round(trains[input1].circle.x[3]);
-                            cO.y = background.y + Math.round(trains[input1].circle.y[3]);
-                            cO.state=4;
-                            cO.angle = Math.PI;
-                            cO.currentCurveFac = 0;
-                        }
-                    } else if (Math.abs(cO.state) == 4 && Math.round(cO.x - background.x) >= Math.round(trains[input1].circle.x[0]) && cO.y - background.y < trains[input1].circle.y[0]+(trains[input1].circle.y[3]-trains[input1].circle.y[0])/2) {
-                        if(cO.state == -4 && !isFront && i == trains[input1].cars.length-1) {
-                            trains[input1].circle = rotationPoints.outer.narrow;
-                            trains[input1].circleFamily = rotationPoints.outer;
-                            trains[input1].switchCircles = false;
-                        }
-                        cO.x = background.x + Math.round(trains[input1].circle.x[0]);
-                        cO.y = background.y + Math.round(trains[input1].circle.y[0]);
-                        cO.state = 1;            
-                    }
-                } else {
-                    if (cO.state == 1 && Math.round(cO.x - background.x) <= Math.round(trains[input1].circle.x[0])) {
-                        if(classicUI.switches.display && !isFront && i == trains[input1].cars.length-1 && trains[input1].circleFamily == rotationPoints.outer && switches.outer2inner.left.turned){
-                            trains[input1].switchCircles = true;
-                        }
-                        if(trains[input1].switchCircles){
-                            cO.x = background.x + Math.round(rotationPoints.outer.narrow.x[0]);
-                            cO.y = background.y + Math.round(rotationPoints.outer.narrow.y[0]);
-                            cO.state = -4; 
-                            cO.angle = 2*Math.PI;
-                            cO.currentCurveFac = 1;
-                            if(!isFront && i == trains[input1].cars.length-1) {
-                                trains[input1].circle = copyJSObject(trains[input1].circle);
-                                trains[input1].circle.x[3] = rotationPoints.inner.narrow.x[3];
-                                trains[input1].circle.y[3] = rotationPoints.inner.narrow.y[3];
-                                trains[input1].circle.x[2] = rotationPoints.inner.narrow.x[2];
-                                trains[input1].circle.y[2] = rotationPoints.inner.narrow.y[2];
-                                trains[input1].circle.x[6] = rotationPoints.inner2outer.left.x[1];
-                                trains[input1].circle.y[6] = rotationPoints.inner2outer.left.y[1];
-                                trains[input1].circle.x[7] = rotationPoints.inner2outer.left.x[2];
-                                trains[input1].circle.y[7] = rotationPoints.inner2outer.left.y[2];
-                                trains[input1].circleFamily = null;
-                            }
-                        } else {
-                                cO.x = background.x + Math.round(trains[input1].circle.x[0]);
-                                cO.y = background.y + Math.round(trains[input1].circle.y[0]);
-                                cO.state = 4;
-                                cO.angle = 2*Math.PI; 
-                                cO.currentCurveFac = 1;
-                        }
-                    } else if (Math.abs(cO.state) == 2 && Math.round(cO.x - background.x) <= Math.round(trains[input1].circle.x[1]) && cO.y - background.y < trains[input1].circle.y[1]+(trains[input1].circle.y[2]-trains[input1].circle.y[1])/2) {
-                        if(cO.state == -2 && isFront && i == -1) {
-                            trains[input1].circle = rotationPoints.outer.narrow;
-                            trains[input1].circleFamily = rotationPoints.outer;
-                            trains[input1].switchCircles = false;
-                        }
-                        cO.x = background.x + Math.round(trains[input1].circle.x[1]);
-                        cO.y = background.y + Math.round(trains[input1].circle.y[1]);
-                        cO.state=1;
-                    } else if (Math.abs(cO.state) == 3 && Math.round(cO.x - background.x) >= Math.round(trains[input1].circle.x[2]) && Math.round(cO.y - background.y) >= background.height/2) {
-                        if(classicUI.switches.display && !isFront && i == trains[input1].cars.length-1 && trains[input1].circleFamily == rotationPoints.inner && switches.inner2outer.right.turned){
-                            trains[input1].switchCircles = true;
-                        } else if(classicUI.switches.display && !isFront && i == trains[input1].cars.length-1 && trains[input1].circleFamily == rotationPoints.inner && switches.innerWide.right.turned){
-                            trains[input1].circle = rotationPoints.inner.wide;
-                        } else if(classicUI.switches.display && !isFront && i == trains[input1].cars.length-1 && trains[input1].circleFamily == rotationPoints.inner){
-                            trains[input1].circle = rotationPoints.inner.narrow;
-                        }
-                        if(trains[input1].switchCircles){
-                            cO.x = background.x + Math.round(rotationPoints.inner.narrow.x[2]);
-                            cO.y = background.y + Math.round(rotationPoints.inner.narrow.y[2]);
-                            cO.state = -2; 
-                            cO.angle = Math.PI;
-                            cO.currentCurveFac = 1;
-                            if(!isFront && i == trains[input1].cars.length-1) {
-                                trains[input1].circle = copyJSObject(trains[input1].circle);
-                                trains[input1].circle.x[1] = rotationPoints.outer.narrow.x[1];
-                                trains[input1].circle.y[1] = rotationPoints.outer.narrow.y[1];
-                                trains[input1].circle.x[0] = rotationPoints.outer.narrow.x[0];
-                                trains[input1].circle.y[0] = rotationPoints.outer.narrow.y[0];
-                                trains[input1].circle.x[4] = rotationPoints.inner2outer.right.x[1];
-                                trains[input1].circle.y[4] = rotationPoints.inner2outer.right.y[1];
-                                trains[input1].circle.x[5] = rotationPoints.inner2outer.right.x[2];
-                                trains[input1].circle.y[5] = rotationPoints.inner2outer.right.y[2];
-                                trains[input1].circleFamily = null;
-                            }
-                        } else {
-                            cO.x = background.x + Math.round(trains[input1].circle.x[2]);
-                            cO.y = background.y + Math.round(trains[input1].circle.y[2]);
-                            cO.state = 2;
-                            cO.angle = Math.PI;
-                            cO.currentCurveFac = 1;
-                        }
-                    } else if (Math.abs(cO.state) == 4 && Math.round(cO.x - background.x) >= Math.round(trains[input1].circle.x[3]) && cO.y - background.y > trains[input1].circle.y[0]+(trains[input1].circle.y[3]-trains[input1].circle.y[0])/2) {
-                        if(cO.state == -4 && isFront && i == -1) {
-                            trains[input1].circle = rotationPoints.inner.narrow;
-                            trains[input1].circleFamily = rotationPoints.inner;
-                            trains[input1].switchCircles = false;
-                        }
-                        cO.x = background.x + Math.round(trains[input1].circle.x[3]);
-                        cO.y = background.y + Math.round(trains[input1].circle.y[3]);
-                        cO.currentCurveFac=0;
-                        cO.state = ((trains[input1].circleFamily == rotationPoints.outer && switches.outerAltState3.left.turned && ((trains[input1].cars.length === 0 && trains[input1].back.state == -3) || (trains[input1].cars.length === 0 && !isFront) || (trains[input1].cars.length > 0 && !isFront && i == trains[input1].cars.length-1))) || (trains[input1].cars.length > 0 && trains[input1].cars[trains[input1].cars.length-1].back.state == -3)) ? -3 : 3;
-
-                    }
-                }
-            }
-            
-            function setCOPos(cO, isFront) {
-
-                function setCOPosLinear(linearPoints, isBackwards, isRotated){
-                    var angleCorr = isRotated? Math.PI:0;
-                    var calcCorr = 1;
-                    if((isRotated && !isBackwards) || (!isRotated && isBackwards)){
-                      calcCorr = -1;
-                    }
-                    var x = cO.x;
-                    var y = cO.y;
-                    var angle = Math.asin((linearPoints.y[1]-linearPoints.y[0])/(linearPoints.x[1]-linearPoints.x[0]));
-                    var hypotenuse = Math.sqrt(Math.pow((x) - linearPoints.x[0],2)+Math.pow((y) - linearPoints.y[0],2),2);
-                    hypotenuse += speed*customSpeed;
-                    x = linearPoints.x[0]+calcCorr * (Math.cos(angle)*hypotenuse);
-                    y = linearPoints.y[0]+calcCorr * (Math.sin(angle)*hypotenuse);
-                    angle += angleCorr;
-                    cO.x = x;
-                    cO.y = y;
-                    cO.angle = angle;
-                }
-                
-                function setCOPosCircle(circlePoints, isBackwards){ 
-                    var backwardsCorr = isBackwards ? -1:1;
-                    var radius = Math.abs(circlePoints.y[0]-circlePoints.y[1])/2;    
-                    var arc = Math.abs(cO.angle)*radius;
-                    arc += backwardsCorr*speed*customSpeed; 
-                    cO.angle = (arc / radius);
-                    var chord = 2* radius * Math.sin((cO.angle)/2);
-                    var gamma = Math.PI/2-(Math.PI-(cO.angle))/2;
-                    var x = Math.cos(gamma)*chord;
-                    var y = Math.sin(gamma)*chord;
-                    cO.x = x + circlePoints.x[0];
-                    cO.y = y + circlePoints.y[0];
-                }
-      
-                function setCOPosBezier(bezierPoints, isBackwards, length){    
-                    function getBezierFac(fac, approxNO, maxDuration) {
-                        var x = getBezierPoints((fac),bezierPoints.x[0],bezierPoints.x[1],bezierPoints.x[2],bezierPoints.x[3]);
-                        var y = getBezierPoints((fac),bezierPoints.y[0],bezierPoints.y[1],bezierPoints.y[2],bezierPoints.y[3]);
-                        var distance = (Math.sqrt(Math.pow((cO.x-x),2)+Math.pow((cO.y-y),2)));
-                        var fac1 = fac * (1+1/approxNO);
-                        var fac2 = fac * (1-1/approxNO);
-                        var x1 = getBezierPoints((fac1),bezierPoints.x[0],bezierPoints.x[1],bezierPoints.x[2],bezierPoints.x[3]);
-                        var x2 = getBezierPoints((fac2),bezierPoints.x[0],bezierPoints.x[1],bezierPoints.x[2],bezierPoints.x[3]);
-                        var y1 = getBezierPoints((fac1),bezierPoints.y[0],bezierPoints.y[1],bezierPoints.y[2],bezierPoints.y[3]);
-                        var y2 = getBezierPoints((fac2),bezierPoints.y[0],bezierPoints.y[1],bezierPoints.y[2],bezierPoints.y[3]);
-                        var distance1 = (Math.sqrt(Math.pow((cO.x-x1),2)+Math.pow((cO.y-y1),2)));
-                        var distance2 = (Math.sqrt(Math.pow((cO.x-x2),2)+Math.pow((cO.y-y2),2)));
-                        var newFac = Math.abs(distance1) < Math.abs(distance2) ? fac1 : fac2;
-                        var newDistance = Math.abs(distance1) < Math.abs(distance2) ? distance1 : distance2;
-                        return Math.abs(distance) < Math.abs(newDistance) ? fac : (Math.abs(newDistance) < 0.1*Math.abs(bezierPoints.x[0]-bezierPoints.x[3]) || --maxDuration < 1) ? (newFac < 0 ? 0 : newFac > 1 ? 1 : newFac) : getBezierFac(newFac, approxNO, maxDuration);
-                    }
-                    function getBezierPoints(fac, a,b,c,d) {
-                        return Math.pow((1-fac),3)*a+3*fac*Math.pow((1-fac),2)*b+3*Math.pow((fac),2)*(1-fac)*c+Math.pow(fac,3)*d;
-                    }
-                    function getBezierPointsDifferential(fac, a,b,c,d) {
-                        return 3*Math.pow((1-fac),2)*(b-a)+6*fac*(1-fac)*(c-b)+3*Math.pow(fac,2)*(d-c);
-                    }
-                    function getBezierAngle(fac,a,b) { 
-                        var dxdt = getBezierPointsDifferential(fac, a[0],a[1],a[2],a[3]);
-                        var dydt = getBezierPointsDifferential(fac, b[0],b[1],b[2],b[3]);
-                        return Math.atan2(dydt ,dxdt);
-                    }
-                    var backwardsCorr = isBackwards? -1 :1;
-                    var fac = i < 0 && isFront ? cO.currentCurveFac : getBezierFac(cO.currentCurveFac, 100, 100); 
-                    cO.currentCurveFac = fac + backwardsCorr*((speed*customSpeed)/length);                    
-                    cO.x = getBezierPoints((cO.currentCurveFac),bezierPoints.x[0],bezierPoints.x[1],bezierPoints.x[2],bezierPoints.x[3]);
-                    cO.y = getBezierPoints((cO.currentCurveFac),bezierPoints.y[0],bezierPoints.y[1],bezierPoints.y[2],bezierPoints.y[3]);        
-                    cO.angle = getBezierAngle((cO.currentCurveFac),bezierPoints.x,bezierPoints.y);
-                    if(debug) {
-                        context.save(); 
-                        context.strokeStyle="floralWhite";
-                        context.beginPath();
-                        context.moveTo(bezierPoints.x[0], bezierPoints.y[0] );
-                        context.bezierCurveTo(bezierPoints.x[1], bezierPoints.y[1],bezierPoints.x[2], bezierPoints.y[2],bezierPoints.x[3], bezierPoints.y[3]);
-                        context.stroke();
-                        context.closePath();
-                        context.restore();
-                    }
-                }
-                var points;    
-                if(cO.state == 1){ // Calc bogie position
-                    points = {x:[trains[input1].circle.x[0] + background.x,trains[input1].circle.x[1] + background.x],y:[trains[input1].circle.y[0] + background.y,trains[input1].circle.y[1] + background.y]};
-                    if(!trains[input1].standardDirection){points.x.reverse();points.y.reverse();}
-                    setCOPosLinear(points, !trains[input1].standardDirection, false) ;
-                } else if(Math.abs(cO.state) == 2)  { 
-                    if(typeof trains[input1].circle.x[4] == "undefined" || typeof trains[input1].circle.x[5] == "undefined" || typeof trains[input1].circle.y[4] == "undefined" || typeof trains[input1].circle.y[5] == "undefined"){
-                        points ={x:[trains[input1].circle.x[1]+background.x],y:[trains[input1].circle.y[1]+background.y,trains[input1].circle.y[2]+background.y]};
-                        setCOPosCircle(points, !trains[input1].standardDirection);
-                    } else { 
-                        points ={x:[trains[input1].circle.x[1] + background.x,trains[input1].circle.x[4] + background.x,trains[input1].circle.x[5] + background.x,trains[input1].circle.x[2] + background.x],y:[trains[input1].circle.y[1] + background.y,trains[input1].circle.y[4] + background.y,trains[input1].circle.y[5] + background.y,trains[input1].circle.y[2] + background.y]};
-                        setCOPosBezier(points, !trains[input1].standardDirection, cO.state == -2 ? rotationPoints.inner2outer.right.bezierLength : trains[input1].circle.bezierLength.right);
-                    }
-                } else if (cO.state == 3) {
-                    points =  {x:[trains[input1].circle.x[2] + background.x,trains[input1].circle.x[3] + background.x],y:[trains[input1].circle.y[2] + background.y,trains[input1].circle.y[3] + background.y]};
-                    if(!trains[input1].standardDirection){points.x.reverse();points.y.reverse();}
-                    setCOPosLinear(points,!trains[input1].standardDirection, true, false);
-                } else if (cO.state == -3) {
-                    if(trains[input1].circleFamily == rotationPoints.outer) {
-                        if(cO.x > rotationPoints.outer.altState3.right.x[1]+background.x) {
-                            if(cO.x-background.x > rotationPoints.outer.altState3.right.x[2]){
-                                points ={x:[background.x+rotationPoints.outer.altState3.right.x[0],background.x+rotationPoints.outer.altState3.right.x[3],background.x+rotationPoints.outer.altState3.right.x[3],background.x+rotationPoints.outer.altState3.right.x[2]],y:[background.y+rotationPoints.outer.altState3.right.y[0],background.y+rotationPoints.outer.altState3.right.y[3],background.y+rotationPoints.outer.altState3.right.y[3],background.y+rotationPoints.outer.altState3.right.y[2]]};
-                                setCOPosBezier(points, !trains[input1].standardDirection, 0.5*rotationPoints.outer.altState3.right.bezierLength);
-                            } else {
-                                points ={x:[background.x+rotationPoints.outer.altState3.right.x[2],background.x+rotationPoints.outer.altState3.right.x[4],background.x+rotationPoints.outer.altState3.right.x[4],background.x+rotationPoints.outer.altState3.right.x[1]],y:[background.y+rotationPoints.outer.altState3.right.y[2],background.y+rotationPoints.outer.altState3.right.y[4],background.y+rotationPoints.outer.altState3.right.y[4],background.y+rotationPoints.outer.altState3.right.y[1]]};
-                                points.x.reverse();
-                                points.y.reverse();
-                                setCOPosBezier(points, trains[input1].standardDirection, 0.5*rotationPoints.outer.altState3.right.bezierLength);
-                                cO.angle += Math.PI;
-                            }
-                        } else if(cO.x > rotationPoints.outer.altState3.left.x[1]+background.x) {
-                            points =  {x:[rotationPoints.outer.altState3.right.x[1] + background.x, rotationPoints.outer.altState3.left.x[1] + background.x],y:[rotationPoints.outer.altState3.right.y[1] + background.y,rotationPoints.outer.altState3.left.y[1] + background.y]};
-                            if(!trains[input1].standardDirection){points.x.reverse();points.y.reverse();}
-                            setCOPosLinear(points,!trains[input1].standardDirection, true);
-                            cO.currentCurveFac = 0;
-                        } else {
-                            if(cO.x-background.x > rotationPoints.outer.altState3.left.x[2]){
-                                var x1 = rotationPoints.outer.altState3.left.x[1] + background.x;
-                                var x2 = rotationPoints.outer.altState3.left.x[2] + background.x;
-                                var x3 = rotationPoints.outer.altState3.left.x[4] + background.x;
-                                var y1 = rotationPoints.outer.altState3.left.y[1] + background.y;
-                                var y2 = rotationPoints.outer.altState3.left.y[2] + background.y;
-                                var y3 = rotationPoints.outer.altState3.left.y[4] + background.y;
-                                points ={x:[x1,x3,x3,x2],y:[y1,y3,y3,y2]};
-                                setCOPosBezier(points, !trains[input1].standardDirection,0.5*rotationPoints.outer.altState3.left.bezierLength);                    
-                            } else {
-                                var x1 = rotationPoints.outer.altState3.left.x[2] + background.x;
-                                var x2 = rotationPoints.outer.altState3.left.x[0] + background.x;
-                                var x3 = rotationPoints.outer.altState3.left.x[3] + background.x;
-                                var y1 = rotationPoints.outer.altState3.left.y[2] + background.y;
-                                var y2 = rotationPoints.outer.altState3.left.y[0] + background.y;
-                                var y3 = rotationPoints.outer.altState3.left.y[3] + background.y;
-                                points ={x:[x1,x3,x3,x2],y:[y1,y3,y3,y2]};
-                                points.x.reverse();
-                                points.y.reverse();
-                                setCOPosBezier(points, trains[input1].standardDirection,0.5*rotationPoints.outer.altState3.left.bezierLength);
-                                cO.angle += Math.PI;        
-
-                            }
-                        }
-                    }
-                } else if(Math.abs(cO.state) == 4 ){
-                    if(typeof trains[input1].circle.x[6] == "undefined" || typeof trains[input1].circle.x[7] == "undefined" || typeof trains[input1].circle.y[6] == "undefined" || typeof trains[input1].circle.y[7] == "undefined"){
-                        points = {x:[trains[input1].circle.x[0]+background.x],y:[trains[input1].circle.y[0]+background.y,trains[input1].circle.y[3]+background.y]};
-                        setCOPosCircle(points, !trains[input1].standardDirection);
-                    } else {
-                        points ={x:[trains[input1].circle.x[3] + background.x,trains[input1].circle.x[6] + background.x,trains[input1].circle.x[7] + background.x,trains[input1].circle.x[0] + background.x],y:[trains[input1].circle.y[3] + background.y,trains[input1].circle.y[6] + background.y,trains[input1].circle.y[7] + background.y,trains[input1].circle.y[0] + background.y]};
-                        setCOPosBezier(points, !trains[input1].standardDirection, cO.state == -4 ? rotationPoints.inner2outer.left.bezierLength : trains[input1].circle.bezierLength.left);       
-                    }
-                }
-            }
-      
-            function setCOPosCorr(cO,isFront) { // Fix car position and angle relative to locomotive
-                function getPointsForPosCorr(x,y,angle,height) {
-                    var xa = [];
-                    var ya = [];
-                    xa[0] = x;
-                    xa[1] = x+Math.cos(-Math.PI/2-angle)*height/2;
-                    xa[2] = x-Math.cos(-Math.PI/2-angle)*height/2;
-                    ya[0] = y;
-                    ya[1] = y-Math.sin(-Math.PI/2-angle)*height/2;
-                    ya[2] = y+Math.sin(-Math.PI/2-angle)*height/2;
-                    if(debug) {
-                        context.fillRect(xa[0]-3,ya[0]-3,6,6);
-                        context.fillRect(xa[1]-3,ya[1]-3,6,6);
-                        context.fillRect(xa[2]-3,ya[2]-3,6,6);
-                    }
-                    return {x:xa,y:ya};
-                }
-                var prevCurrentObject = isFront ? (i > 0 ? trains[input1].cars[i-1] : trains[input1]) : (currentObject);
-                var prevCO = isFront ? (i > 0 ? trains[input1].cars[i-1].back : trains[input1].back) : (currentObject.front);
-                var prevPoints = getPointsForPosCorr(prevCO.x, prevCO.y, prevCO.angle, prevCurrentObject.height);    
-                var supposedDistance = isFront ? prevCurrentObject.width*prevCurrentObject.bogieDistance+trains[input1].width/trainParams.margin+currentObject.width*currentObject.bogieDistance : currentObject.width-2*currentObject.width*currentObject.bogieDistance;
-                var maxRepeatNo = 100;
-                var distance;
-                do { 
-                    var points = getPointsForPosCorr(cO.x, cO.y, cO.angle, currentObject.height);    
-                    distance = Math.min(Math.abs(Math.sqrt(Math.pow(points.x[0] - prevPoints.x[0],2)+Math.pow(points.y[0] - prevPoints.y[0],2),2)), Math.abs(Math.sqrt(Math.pow(points.x[1] - prevPoints.x[1],2)+Math.pow(points.y[1] - prevPoints.y[1],2),2)),Math.abs(Math.sqrt(Math.pow(points.x[2] - prevPoints.x[2],2)+Math.pow(points.y[2] - prevPoints.y[2],2),2)));
-                    cO.x -= (supposedDistance-distance)*Math.cos(cO.angle);
-                    cO.y -= (supposedDistance-distance)*Math.sin(cO.angle);
-                } while (Math.abs(supposedDistance-distance) > 0.001 && --maxRepeatNo > 0);
-            } 
-
-            function setCurrentObjectDisplayAngle(){
-                if((currentObject.front.state) == 1) {
-                    currentObject.displayAngle = Math.atan((currentObject.front.y-currentObject.back.y)/(currentObject.front.x-currentObject.back.x));
-                } else if(Math.abs(currentObject.front.state) == 2)  { 
-                    currentObject.displayAngle = Math.atan((currentObject.front.y-currentObject.back.y)/(currentObject.front.x-currentObject.back.x));
-                    if(currentObject.y > background.y+trains[input1].circle.y[1]+(trains[input1].circle.y[2]-trains[input1].circle.y[1])/2 && currentObject.displayAngle < 0) {
-                        currentObject.displayAngle = Math.PI+currentObject.displayAngle;
-                    }
-                    if(currentObject.displayAngle < 0 || currentObject.displayAngle > Math.PI  || (currentObject.y > background.y+trains[input1].circle.y[1]+(trains[input1].circle.y[2]-trains[input1].circle.y[1])*0.75 && currentObject.displayAngle < Math.PI/2) || (currentObject.y < background.y+trains[input1].circle.y[1]+(trains[input1].circle.y[2]-trains[input1].circle.y[1])*0.25 && currentObject.displayAngle > Math.PI/2)){
-                      if(currentObject.y > background.y+trains[input1].circle.y[1]+(trains[input1].circle.y[2]-trains[input1].circle.y[1])*0.75){
-                        currentObject.displayAngle = Math.PI;
-                      } else if (currentObject.y < background.y+trains[input1].circle.y[1]+(trains[input1].circle.y[2]-trains[input1].circle.y[1])*0.25) {
-                        currentObject.displayAngle = 0;
-                      } else {
-                        currentObject.displayAngle -= Math.PI;
-                      }
-                    }
-                } else if (Math.abs(currentObject.front.state) == 3) {
-                    currentObject.displayAngle = Math.PI+Math.atan((currentObject.front.y-currentObject.back.y)/(currentObject.front.x-currentObject.back.x));
-                } else if(Math.abs(currentObject.front.state) == 4 ){
-                    currentObject.displayAngle = Math.PI+Math.atan((currentObject.front.y-currentObject.back.y)/(currentObject.front.x-currentObject.back.x));
-                    if(currentObject.y < background.y+trains[input1].circle.y[0]+(trains[input1].circle.y[3]-trains[input1].circle.y[0])/2 && currentObject.displayAngle < Math.PI) {
-                        currentObject.displayAngle = 2*Math.PI-(Math.PI-currentObject.displayAngle);
-                    }
-                    if( currentObject.displayAngle < Math.PI || currentObject.displayAngle > 2*Math.PI || (currentObject.y > background.y+trains[input1].circle.y[0]+(trains[input1].circle.y[3]-trains[input1].circle.y[0])*0.75 && currentObject.displayAngle > 1.5*Math.PI) || (currentObject.y < background.y+trains[input1].circle.y[0]+(trains[input1].circle.y[3]-trains[input1].circle.y[0])*0.25 && currentObject.displayAngle < 1.5*Math.PI)){
-                        if(currentObject.y < background.y+trains[input1].circle.y[0]+(trains[input1].circle.y[3]-trains[input1].circle.y[0])*0.25){
-                            currentObject.displayAngle = 2*Math.PI;
-                        } else if (currentObject.y > background.y+trains[input1].circle.y[0]+(trains[input1].circle.y[3]-trains[input1].circle.y[0])*0.75){
-                            currentObject.displayAngle = Math.PI;
-                        } else {
-                            currentObject.displayAngle += Math.PI;
-                        }
-                    }
-                }
-                while(currentObject.displayAngle  < 0) {
-                    currentObject.displayAngle  += Math.PI*2;
-                }
-                while (currentObject.displayAngle  > Math.PI*2){
-                    currentObject.displayAngle -= Math.PI*2;
-                }
-            }
-            
+function getObjects() {
+    if(!onlineGame.enabled || !onlineGame.syncing) {
+		animateWorker.postMessage({k: "getTrains"});
+	} else {
+		window.requestAnimationFrame(getObjects);
+	}
+}
+function drawObjects() {
+    function drawTrains(input1){
+        function drawTrain(i) {
             var currentObject = (i < 0)?trains[input1]:trains[input1].cars[i];
-            
-            if (trains[input1].move) { //Calc train position
-            
-                if( i == -1 ) { //Calc acceleration
-                    if(trains[input1].accelerationSpeed === 0) {
-                        trains[input1].accelerationSpeed = trains[input1].accelerationSpeedStartFac;
-                    }
-                    if(trains[input1].accelerationSpeed > 0 && trains[input1].accelerationSpeed < 1) {
-                        trains[input1].accelerationSpeed *= trains[input1].accelerationSpeedFac;
-                        if(trains[input1].accelerationSpeed >= 1) {
-                            trains[input1].accelerationSpeed = 1;
-                        }
-                    } else if (trains[input1].accelerationSpeed < 0 && trains[input1].accelerationSpeed >= -1) {
-                        trains[input1].accelerationSpeed /= trains[input1].accelerationSpeedFac;
-                        if(trains[input1].accelerationSpeed >= -trains[input1].accelerationSpeedStartFac) {
-                            trains[input1].accelerationSpeed = 0;
-                            trains[input1].move = false;
-                        }
-                    }
-                    if(trains[input1].accelerationSpeedCustom < 1) {
-                        trains[input1].accelerationSpeedCustom *= trains[input1].accelerationSpeedFac;
-                        if(trains[input1].accelerationSpeedCustom >= 1) {
-                            trains[input1].accelerationSpeedCustom = 1;
-                        }
-                    } else {
-                        trains[input1].accelerationSpeedCustom /= trains[input1].accelerationSpeedFac;
-                        if(trains[input1].accelerationSpeedCustom <= 1) {
-                            trains[input1].accelerationSpeedCustom = 1;
-                        }
-                    }
-                    trains[input1].currentSpeedInPercent = trains[input1].accelerationSpeedCustom*trains[input1].speedInPercent;
-                }    
-                var speed = Math.abs(trains[input1].speed*trains[input1].accelerationSpeed);
-                var customSpeed = trains[input1].currentSpeedInPercent/100;
-                    
-                changeCOSection(currentObject.front, true);
-                changeCOSection(currentObject.back, false);
-                setCOPos(currentObject.front, true);
-                setCOPos(currentObject.back, false);
-                
-                if(debug) {
-                    currentObject.x = (currentObject.front.x+currentObject.back.x)/2;
-                    currentObject.y = (currentObject.front.y+currentObject.back.y)/2;        
-                    setCurrentObjectDisplayAngle();
-                    context.save();        
-                    context.translate(currentObject.x, currentObject.y);
-                    context.rotate(currentObject.displayAngle);
-                    context.fillRect(-currentObject.width/2,-currentObject.height/2, currentObject.width, currentObject.height);
-                    context.restore();
-                }
-            
-                if(i == -1) {
-                    setCOPosCorr(currentObject.back, false);
-                } else {
-                    setCOPosCorr(currentObject.front, true);
-                    setCOPosCorr(currentObject.back, false);
-                }
-            
-                currentObject.x = (currentObject.front.x+currentObject.back.x)/2;
-                currentObject.y = (currentObject.front.y+currentObject.back.y)/2;        
-                setCurrentObjectDisplayAngle();
-                
-            } else {
-                trains[input1].accelerationSpeed = 0;
-                trains[input1].accelerationSpeedCustom = 1;
-            }
-        
-            if(debug) {
-                context.fillRect(background.x+trains[input1].circle.x[0], background.y+trains[input1].circle.y[0], 5, 5);
-                context.fillRect(background.x+trains[input1].circle.x[1], background.y+trains[input1].circle.y[1], 5, 5);
-                context.fillRect(background.x+trains[input1].circle.x[2], background.y+trains[input1].circle.y[2], 5, 5);
-                context.fillRect(background.x+trains[input1].circle.x[3], background.y+trains[input1].circle.y[3], 5, 5);
-            }
-            
+       
             context.save();        
             context.translate(currentObject.x, currentObject.y);
             context.rotate(currentObject.displayAngle);
@@ -914,18 +233,7 @@ function animateObjects() {
                         hardware.mouse.isHold = false;
                     }
                     if(trains[input1].accelerationSpeed <= 0 && Math.abs(trains[input1].accelerationSpeed) < 0.2){ 
-						if(onlineGame.enabled){
-							teamplaySync("action","trains", input1, [{"accelerationSpeed": 0}, {"move": false}, {"lastDirectionChange": frameNo}, {"standardDirection": !trains[input1].standardDirection}], [{getString: ["appScreenObjectChangesDirection","."]}, {getString: [["appScreenTrainNames",input1]]}]);
-						} else {
-							if(trains[input1].accelerationSpeed < 0) {
-								trains[input1].accelerationSpeed = 0;     
-								trains[input1].move = false;     
-							}
-							trains[input1].lastDirectionChange = frameNo;
-							trains[input1].standardDirection = !trains[input1].standardDirection;
-							notify(formatJSString(getString("appScreenObjectChangesDirection","."), getString(["appScreenTrainNames",input1])), false, 750,null,null, client.y);
-						}
-						
+                        actionSync("trains", input1, [{"accelerationSpeed": 0}, {"move": false}, {"lastDirectionChange": frameNo}, {"standardDirection": !trains[input1].standardDirection}], [{getString: ["appScreenObjectChangesDirection","."]}, {getString: [["appScreenTrainNames",input1]]}]);
                     }
                 } else {
                     if(typeof clickTimeOut !== "undefined"){
@@ -939,45 +247,27 @@ function animateObjects() {
                         }
                         if(!collisionCourse(input1, false)) {
                             if(trains[input1].move && trains[input1].accelerationSpeed > 0){
-								if(onlineGame.enabled){
-									teamplaySync("action","trains", input1, [{"accelerationSpeed": trains[input1].accelerationSpeed * -1}], [{getString: ["appScreenObjectStops", "."]}, {getString:[["appScreenTrainNames",input1]]}]);
-								} else {							
-									trains[input1].accelerationSpeed *= -1;     
-									notify(formatJSString(getString("appScreenObjectStops", "."), getString(["appScreenTrainNames",input1])),  false, 500 ,null,  null, client.y);
-								}
+                                actionSync("trains", input1, [{"accelerationSpeed": trains[input1].accelerationSpeed *= -1}], [{getString: ["appScreenObjectStops", "."]}, {getString:[["appScreenTrainNames",input1]]}]);
                             } else {
                                 if(trains[input1].move){
-									if(onlineGame.enabled){
-										teamplaySync("action","trains", input1, [{"accelerationSpeed": trains[input1].accelerationSpeed * -1},{"speedInPercent":50}], [{getString:["appScreenObjectStarts", "."]}, {getString:[["appScreenTrainNames",input1]]}]);
-									} else {
-										trains[input1].accelerationSpeed *= -1;
-										trains[input1].speedInPercent = 50;        
-										notify(formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenTrainNames",input1])),  false, 500,null, null, client.y);
-									}										
+                                   actionSync("trains", input1, [{"accelerationSpeed": trains[input1].accelerationSpeed *= -1},{"speedInPercent":50}], [{getString:["appScreenObjectStarts", "."]}, {getString:[["appScreenTrainNames",input1]]}]);
                                 } else {
-									if(onlineGame.enabled){
-										teamplaySync("action","trains", input1, [{"move": true},{"speedInPercent":50}], [{getString:["appScreenObjectStarts", "."]}, {getString:[["appScreenTrainNames",input1]]}]);
-									} else {
-										trains[input1].move = true;
-										trains[input1].speedInPercent = 50;
-										notify(formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenTrainNames",input1])),  false, 500,null, null, client.y);
-									}
-								}
+                                   actionSync("trains", input1, [{"move": true},{"speedInPercent":50}], [{getString:["appScreenObjectStarts", "."]}, {getString:[["appScreenTrainNames",input1]]}]);
+                                   trains[input1].move = true;
+                                   trains[input1].accelerationSpeed = 1;
+                                }
+                                trains[input1].speedInPercent = 50;
                             }
                         }                           
                     }, (hardware.lastInputTouch > hardware.lastInputMouse) ? longTouchWaitTime : doubleClickWaitTime);                             
                 }
             }
-            if(debug){context.stroke();}
-
             context.restore();
-
         }
          
         for(var i = -1; i < trains[input1].cars.length; i++){
-            animateTrain(i);
+            drawTrain(i);
         }
-        
     }       
 
     function collisionCourse(input1, input2){
@@ -1003,11 +293,6 @@ function animateObjects() {
         var y1 = currentObject.y+fac*Math.cos(Math.PI/2-currentObject.displayAngle)*currentObject.width/2-Math.sin(-Math.PI/2-currentObject.displayAngle)*currentObject.height/2;
         var y2 = currentObject.y+fac*Math.cos(Math.PI/2-currentObject.displayAngle)*currentObject.width/2+Math.sin(-Math.PI/2-currentObject.displayAngle)*currentObject.height/2;
         var y3 = currentObject.y+fac*Math.cos(Math.PI/2-currentObject.displayAngle)*currentObject.width/2;
-        if(debug) {
-            context.fillRect(x1-3,y1-3,6,6);
-            context.fillRect(x2-3,y2-3,6,6);
-            context.fillRect(x3-3,y3-3,6,6);
-        }
         for(var i = 0; i < trains.length; i++){
             if(input1 != i && (trains[input1].circleFamily === null || trains[i].circleFamily === null || trains[input1].circleFamily == trains[i].circleFamily)){
                 for(var j = -1; j < trains[i].cars.length; j++){
@@ -1018,17 +303,14 @@ function animateObjects() {
                     context.beginPath();
                     context.rect(-currentObject.width/2, -currentObject.height/2, currentObject.width, currentObject.height);
                     if (context.isPointInPath(x1, y1) || context.isPointInPath(x2, y2) || context.isPointInPath(x3, y3)){
-                        if(input2 && trains[input1].move){
-                            notify(formatJSString(getString("appScreenObjectHasCrashed", "."), getString(["appScreenTrainNames",input1]), getString(["appScreenTrainNames",i])), true, 2000,null,null, client.y);
-                        }
                         collision = true;
-                        trains[input1].move = false;
-                        trains[input1].accelerationSpeed = 0;
-                        trains[input1].accelerationSpeedCustom = 1;
-                    }
-                    if(debug) {
-                        context.fillStyle = "blue";
-                        context.fill();
+                        if(trains[input1].move){
+                            var note = (input2) ? [{getString:["appScreenObjectHasCrashed", "."]}, {getString:[["appScreenTrainNames",input1]]}, {getString:[["appScreenTrainNames",i]]}] : null;
+                            actionSync("trains",input1, [{move:false},{accelerationSpeed:0},{accelerationSpeedCustom:1}], note);
+                            trains[input1].move = false;
+                            trains[input1].accelerationSpeed = 0;
+                            trains[input1].accelerationSpeedCustom = 1;
+                        }
                     }
                     context.restore();
               }
@@ -1037,8 +319,9 @@ function animateObjects() {
         context.restore();
         return(collision);
     } 
-  
-    function animateCars(input1){
+    
+    function drawCars(input1){
+        var currentObject = cars[input1];
         var currentObject = cars[input1];
         carCollisionCourse(input1,true);
         context.save();        
@@ -1122,13 +405,13 @@ function animateObjects() {
         }
         context.closePath();
         context.restore();
-		if(debug){
-			context.save();        
-			context.translate(background.x+currentObject.x, background.y+currentObject.y);
-			context.rotate(currentObject.displayAngle);
-			context.strokeRect(-currentObject.width/2,-currentObject.height/2, currentObject.width, currentObject.height);
-			context.restore();
-		}
+        if(debug){
+            context.save();        
+            context.translate(background.x+currentObject.x, background.y+currentObject.y);
+            context.rotate(currentObject.displayAngle);
+            context.strokeRect(-currentObject.width/2,-currentObject.height/2, currentObject.width, currentObject.height);
+            context.restore();
+        }
         if(debug && !carParams.autoModeRuns) {
             context.save();
             context.beginPath();
@@ -1238,7 +521,7 @@ function animateObjects() {
             jmax = true;
         }
         n = cCars[k].collStop ? 0: n;
-		var sizeNo = 1.06;
+        var sizeNo = 1.06;
         var x1 = points.x[i][m]+Math.sin(Math.PI/2-points.angle[i][m])*cCars[i].width/2+Math.cos(-Math.PI/2-points.angle[i][m])*cCars[i].height/2;
         var x2 = points.x[i][m]+Math.sin(Math.PI/2-points.angle[i][m])*cCars[i].width/2-Math.cos(-Math.PI/2-points.angle[i][m])*cCars[i].height/2;
         var x3 = points.x[i][m]+Math.sin(Math.PI/2-points.angle[i][m])*cCars[i].width/2;
@@ -1248,10 +531,10 @@ function animateObjects() {
         context.translate(points.x[k][n], points.y[k][n]); 
         context.rotate(points.angle[k][n]);
         context.beginPath();
-		context.rect(-sizeNo*cCars[k].width/2, -sizeNo*cCars[carParams.thickestCar].height/2, sizeNo*cCars[k].width, sizeNo*cCars[carParams.thickestCar].height);
-		if (context.isPointInPath(x1, y1) || context.isPointInPath(x2, y2) || context.isPointInPath(x3, y3)){
-			coll = true;
-		}
+        context.rect(-sizeNo*cCars[k].width/2, -sizeNo*cCars[carParams.thickestCar].height/2, sizeNo*cCars[k].width, sizeNo*cCars[carParams.thickestCar].height);
+        if (context.isPointInPath(x1, y1) || context.isPointInPath(x2, y2) || context.isPointInPath(x3, y3)){
+            coll = true;
+        }
         context.restore();
         return (coll) ? j : (jmax) ? -1 : carAutoModeIsFutureCollision(i,k,++j);
     }
@@ -1268,98 +551,6 @@ function animateObjects() {
         context.restore();
     }
     
-	/////TEAM_PLAY/////
-	if(onlineGame.enabled){
-		var teamplayStarttime = Date.now();
-    }
-	
-    /////RESIZE/////
-    if(resized) {
-        
-        var oldbackground = copyJSObject(background);
-        
-        extendedMeasureViewspace();
-        
-        context = canvas.getContext("2d");
-
-    
-        placeBackground();
-        
-        for(var i = 0; i < trains.length; i++){
-          for(var j = 0; j < trains[i].circle.x.length; j++) {
-            trains[i].circle.x[j] *= background.width/oldbackground.width;
-            trains[i].circle.y[j] *= background.height/oldbackground.height;
-          }
-        }      
-        defineTrainParams();
-        for(var i = 0; i < trains.length; i++){  
-            trains[i].front.x = background.x+((trains[i].front.x-oldbackground.x) * background.width/oldbackground.width);
-            trains[i].back.x = background.x+((trains[i].back.x-oldbackground.x) * background.width/oldbackground.width);
-            trains[i].x = background.x+((trains[i].x-oldbackground.x) * background.width/oldbackground.width);
-            trains[i].front.y = background.y+((trains[i].front.y-oldbackground.y) * background.height/oldbackground.height);
-            trains[i].back.y = background.y+((trains[i].back.y-oldbackground.y) * background.height/oldbackground.height);
-            trains[i].y = background.y+((trains[i].y-oldbackground.y) * background.height/oldbackground.height);
-            trains[i].width = trains[i].width * background.width/oldbackground.width;
-            trains[i].height = trains[i].height * background.height/oldbackground.height;
-            for(var j = 0; j < trains[i].cars.length; j++){
-                trains[i].cars[j].front.x = background.x+((trains[i].cars[j].front.x-oldbackground.x) * background.width/oldbackground.width);
-                trains[i].cars[j].back.x = background.x+((trains[i].cars[j].back.x-oldbackground.x) * background.width/oldbackground.width);
-                trains[i].cars[j].x = background.x+((trains[i].cars[j].x-oldbackground.x) * background.width/oldbackground.width);
-                trains[i].cars[j].front.y = background.y+((trains[i].cars[j].front.y-oldbackground.y) * background.height/oldbackground.height);
-                trains[i].cars[j].back.y = background.y+((trains[i].cars[j].back.y-oldbackground.y) * background.height/oldbackground.height);
-                trains[i].cars[j].y = background.y+((trains[i].cars[j].y-oldbackground.y) * background.height/oldbackground.height);
-                trains[i].cars[j].width = trains[i].cars[j].width * background.width/oldbackground.width;
-                trains[i].cars[j].height = trains[i].cars[j].height * background.height/oldbackground.height;
-            }
-        }     
-        
-        carWays.forEach(function(way){
-            Object.keys(way).forEach(function(cType) {
-                way[cType].forEach(function(point){
-                    point.x*=background.width/oldbackground.width;
-                    point.y*=background.height/oldbackground.height;
-                });
-            });
-        });
-        cars.forEach(function(car){
-            car.speed *= background.width/oldbackground.width;
-            car.x *= background.width/oldbackground.width;
-            car.y *= background.height/oldbackground.height;
-            car.width *= background.width / oldbackground.width;
-            car.height *= background.height / oldbackground.height;
-        });
-        
-        taxOffice.params.fire.x *= background.width/oldbackground.width;
-        taxOffice.params.fire.y *= background.height/oldbackground.height;
-        taxOffice.params.fire.size *= background.width/oldbackground.width;
-        taxOffice.params.smoke.x *= background.width/oldbackground.width;
-        taxOffice.params.smoke.y *= background.height/oldbackground.height;
-        taxOffice.params.smoke.size *= background.width/oldbackground.width;
-        for (var i = 0; i <  taxOffice.params.number; i++) {            
-            taxOffice.fire[i].x *= background.width/oldbackground.width;
-            taxOffice.fire[i].y *= background.height/oldbackground.height;
-            taxOffice.fire[i].size *= background.width/oldbackground.width;
-            taxOffice.smoke[i].x *= background.width/oldbackground.width;
-            taxOffice.smoke[i].y *= background.height/oldbackground.height;
-            taxOffice.smoke[i].size *= background.width/oldbackground.width;
-        }
-        taxOffice.params.bluelights.cars.forEach(function(car){
-            car.x[0] *= background.width/oldbackground.width;
-            car.x[1] *= background.width/oldbackground.width;
-            car.y[0] *= background.height/oldbackground.height;
-            car.y[1] *= background.height/oldbackground.height;
-            car.size *= background.width/oldbackground.width;
-        });
-        
-        placeClassicUIElements();
-        
-        if(typeof placeOptions == "function") {
-            placeOptions("resize");
-        }
-        resized = false;
-        
-    }
-    
     /////GENERAL/////  
     context.clearRect(0, 0, canvas.width, canvas.height);
     frameNo++;
@@ -1373,7 +564,7 @@ function animateObjects() {
     } else {
         canvas.style.cursor = "none";
     }
-    
+
     /////BACKGROUND/Margins-1/////    
     var pic = pics[background.src];
     var width = pic.height/pic.width - canvas.height/canvas.width < 0 ? canvas.height*(pic.width/pic.height) : canvas.width;
@@ -1383,10 +574,12 @@ function animateObjects() {
     drawImage(pic, background.x, background.y, background.width, background.height);
     
     /////TRAINS/////
-    for(var i = 0; i < trains.length; i++) {
-        animateTrains(i);
+    if(!resized) {
+        for(var i = 0; i < trains.length; i++) {
+            drawTrains(i);
+        }
     }
-    
+
     /////CARS/////
     //Auto Mode
     if((carParams.autoModeRuns && frameNo % carParams.wayNo === 0) || carParams.autoModeInit) {
@@ -1443,57 +636,57 @@ function animateObjects() {
                     }
                 }
             }
-			for(var i = 0; i < cCars.length; i++) {
+            for(var i = 0; i < cCars.length; i++) {
                 for(var k = 0; k < cCars.length; k++) {
-					if(i!=k && !cCars[i].collStop){
-						var a = cCars[i].collStopNo[k]/cCars[i].speed;
-						var b = cCars[i].collStopNo[k]/cCars[k].speed;
-						var isA;
-						if(cars[i].collStopNo[k] == -2){
-							isA = true;
-					    }else if(cars[k].collStopNo[i] == -2){
-							isA = false;
-						} else {
-							isA = a < b;
-						}
-						if(isA && cCars[k].collStopNo[i] > -2 && cCars[i].collStopNo[k] > -1){
-							cCars[i].collStop = true;
-							cCars[i].collStopNo[k] = -2;
-							change = true;
-						} else if(!isA && cCars[i].collStopNo[k] > -2 && cCars[k].collStopNo[i] > -1) {
-							cCars[k].collStop = true;
-							cCars[k].collStopNo[i] = -2;
-							change = true;
-						}
-					}
-				}
-			}
+                    if(i!=k && !cCars[i].collStop){
+                        var a = cCars[i].collStopNo[k]/cCars[i].speed;
+                        var b = cCars[i].collStopNo[k]/cCars[k].speed;
+                        var isA;
+                        if(cars[i].collStopNo[k] == -2){
+                            isA = true;
+                        }else if(cars[k].collStopNo[i] == -2){
+                            isA = false;
+                        } else {
+                            isA = a < b;
+                        }
+                        if(isA && cCars[k].collStopNo[i] > -2 && cCars[i].collStopNo[k] > -1){
+                            cCars[i].collStop = true;
+                            cCars[i].collStopNo[k] = -2;
+                            change = true;
+                        } else if(!isA && cCars[i].collStopNo[k] > -2 && cCars[k].collStopNo[i] > -1) {
+                            cCars[k].collStop = true;
+                            cCars[k].collStopNo[i] = -2;
+                            change = true;
+                        }
+                    }
+                }
+            }
         } while (change);
         cars = cCars;
-		for(var i = 0; i < cCars.length; i++) {
-			for(var k = 0; k < cCars.length; k++) {
-				if(i!= k && carCollisionCourse(i,false) && carCollisionCourse(k,false)){
-					notify (getString("appScreenCarAutoModeCrash", "."), true, 5000 ,null, null, client.y);
-					carParams.autoModeOff = true;
-					carParams.autoModeRuns = false;
-				}
-			}
-		}
-		var collStopQuantity = 0;
-		cars.forEach(function(car){
-			if(car.collStop && car.cType == "normal"){
-				collStopQuantity++;
-			}
-		});
-		if(collStopQuantity == cars.length){
-			notify (getString("appScreenCarAutoModeCrash", "."), true, 5000 ,null, null, client.y);
+        for(var i = 0; i < cCars.length; i++) {
+            for(var k = 0; k < cCars.length; k++) {
+                if(i!= k && carCollisionCourse(i,false) && carCollisionCourse(k,false)){
+                    notify (getString("appScreenCarAutoModeCrash", "."), true, 5000 ,null, null, client.y);
+                    carParams.autoModeOff = true;
+                    carParams.autoModeRuns = false;
+                }
+            }
+        }
+        var collStopQuantity = 0;
+        cars.forEach(function(car){
+            if(car.collStop && car.cType == "normal"){
+                collStopQuantity++;
+            }
+        });
+        if(collStopQuantity == cars.length){
+            notify (getString("appScreenCarAutoModeCrash", "."), true, 5000 ,null, null, client.y);
             carParams.autoModeOff = true;
             carParams.autoModeRuns = false;
-		}
+        }
     }
     //General
     for(var i = 0; i < cars.length; i++) {
-        animateCars(i);
+        drawCars(i);
     }
 
     /////KONAMI/Animals/////    
@@ -1516,10 +709,10 @@ function animateObjects() {
         });
     }
 
-    
+
     /////BACKGROUND/Layer-2/////
     drawImage(pics[background.secondLayer], background.x, background.y, background.width, background.height);
-    
+
     /////TAX OFFICE/////
     if(settings.burnTheTaxOffice){
         //General (BEGIN)
@@ -1586,7 +779,7 @@ function animateObjects() {
         //General (END)
         context.restore();
     }
-    
+
     /////CLASSIC UI/////
     if(settings.classicUI) {
         var step = Math.PI/30;
@@ -1668,12 +861,7 @@ function animateObjects() {
                 hardware.mouse.cursor = "pointer";
                 if(hardware.mouse.isHold){
                     hardware.mouse.isHold = false;
-					if(onlineGame.enabled){
-							teamplaySync("action","trains", trainParams.selected, [{"standardDirection":!trains[trainParams.selected].standardDirection}], [{getString:["appScreenObjectChangesDirection","."]}, {getString:[["appScreenTrainNames",trainParams.selected]]}]);
-					} else {
-						trains[trainParams.selected].standardDirection = !trains[trainParams.selected].standardDirection;
-						notify(formatJSString(getString("appScreenObjectChangesDirection","."), getString(["appScreenTrainNames",trainParams.selected])), false, 750,null,null, client.y);
-					}
+                    actionSync("trains", trainParams.selected, [{"standardDirection":!trains[trainParams.selected].standardDirection}], [{getString:["appScreenObjectChangesDirection","."]}, {getString:[["appScreenTrainNames",trainParams.selected]]}]);
                 }  
             }
             context.restore();  
@@ -1682,10 +870,6 @@ function animateObjects() {
         context.translate(0, -classicUI.transformer.input.diffY);
         context.rotate(classicUI.transformer.input.angle);
         drawImage(pics[classicUI.transformer.input.src], -classicUI.transformer.input.width/2, -classicUI.transformer.input.height/2, classicUI.transformer.input.width, classicUI.transformer.input.height);
-        if(debug){
-            context.fillRect(-classicUI.transformer.input.width/2, classicUI.transformer.input.height/2,6,6);
-            context.fillRect(-3,-3,6,6);
-        }
         context.beginPath();
         context.rect(-classicUI.transformer.input.width/2, -classicUI.transformer.input.height/2, classicUI.transformer.input.width, classicUI.transformer.input.height);
         if ((context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY) && hardware.mouse.isHold) || (context.isPointInPath(hardware.mouse.wheelX, hardware.mouse.wheelY) && hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls)) {
@@ -1698,40 +882,26 @@ function animateObjects() {
             var x=classicUI.transformer.x+classicUI.transformer.width/2+ classicUI.transformer.input.diffY*Math.sin(classicUI.transformer.angle);
             var y=classicUI.transformer.y+classicUI.transformer.height/2- classicUI.transformer.input.diffY*Math.cos(classicUI.transformer.angle);
             if(!collisionCourse(trainParams.selected, false)){
-                if(client.isSmall){  
+                if(client.isTiny){  
                     if(hardware.mouse.isHold){
                         hardware.mouse.isHold = false;
-						if(!onlineGame.enabled){
-							trains[trainParams.selected].speedInPercent = 50;
-						}
-                        if(trains[trainParams.selected].move && trains[trainParams.selected].accelerationSpeed > 0){ 
-							if(onlineGame.enabled){
-								teamplaySync("action","trains", trainParams.selected, [{"speedInPercent":50},{"accelerationSpeed": trains[trainParams.selected].accelerationSpeed * -1}], [{getString: ["appScreenObjectStops", "."]}, {getString:[["appScreenTrainNames",trainParams.selected]]}]);
-							} else {
-								trains[trainParams.selected].accelerationSpeed *= -1;     
-								notify (formatJSString(getString("appScreenObjectStops", "."), getString(["appScreenTrainNames",trainParams.selected])),false, 500,null, null, client.y);
-							}
+                        if(trains[trainParams.selected].move && trains[trainParams.selected].accelerationSpeed > 0){
+                            actionSync("trains", trainParams.selected, [{"speedInPercent":50},{"accelerationSpeed": trains[trainParams.selected].accelerationSpeed *= -1}], [{getString: ["appScreenObjectStops", "."]}, {getString:[["appScreenTrainNames",trainParams.selected]]}]);
                         } else {
-							if(onlineGame.enabled){
-								if(trains[trainParams.selected].move){
-									teamplaySync("action","trains", trainParams.selected, [{"speedInPercent":50},{"accelerationSpeed": trains[trainParams.selected].accelerationSpeed * -1}], [{getString:["appScreenObjectStarts", "."]}, {getString:[["appScreenTrainNames",trainParams.selected]]}]);
-								} else {
-									teamplaySync("action","trains", trainParams.selected, [{"speedInPercent":50},{"move": true}], [{getString:["appScreenObjectStarts", "."]}, {getString:[["appScreenTrainNames",trainParams.selected]]}]);
-								}
-							} else {
-								if(trains[trainParams.selected].move){
-									trains[trainParams.selected].accelerationSpeed *= -1;                                     
-								} else {
-									trains[trainParams.selected].move = true;
-								}
-								notify(formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenTrainNames",trainParams.selected])),false, 500,null, null, client.y);
-							}
+                            if(trains[trainParams.selected].move){
+                                actionSync("trains", trainParams.selected, [{"speedInPercent":50},{"accelerationSpeed": trains[trainParams.selected].accelerationSpeed *= -1}], [{getString:["appScreenObjectStarts", "."]}, {getString:[["appScreenTrainNames",trainParams.selected]]}]);
+                            } else {
+                                actionSync("trains", trainParams.selected, [{"speedInPercent":50},{"move": true}], [{getString:["appScreenObjectStarts", "."]}, {getString:[["appScreenTrainNames",trainParams.selected]]}]);
+                                trains[trainParams.selected].move=true;
+                                trains[trainParams.selected].accelerationSpeed = 1;
+                            }
                         }
+                        trains[trainParams.selected].speedInPercent=50;
                     }
                 } else if((hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls && !(hardware.mouse.wheelY > y && hardware.mouse.wheelX < x )) || (!(hardware.mouse.moveY > y && hardware.mouse.moveX < x ))) {
                     var angle;
-					var minAngle = 10;
-					var oldAngle = classicUI.transformer.input.angle;
+                    var minAngle = 10;
+                    var oldAngle = classicUI.transformer.input.angle;
                     if(hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls && !(hardware.mouse.wheelY > y && hardware.mouse.wheelX < x)) {
                         angle = classicUI.transformer.input.angle * (hardware.mouse.wheelScrollY < 0 ? 1.1 : 0.9);
                     } else {
@@ -1746,47 +916,32 @@ function animateObjects() {
                     classicUI.transformer.input.angle = angle >= 0 ? angle <= classicUI.transformer.input.maxAngle ? angle : classicUI.transformer.input.maxAngle : 0;
                     var cAngle = classicUI.transformer.input.angle/classicUI.transformer.input.maxAngle*100;
                     if (hardware.mouse.wheelScrollY < 0 && hardware.mouse.wheelScrolls && !(hardware.mouse.wheelY > y && hardware.mouse.wheelX < x) && cAngle === 0){
-						cAngle = minAngle;
-						classicUI.transformer.input.angle = cAngle*classicUI.transformer.input.maxAngle/100;
-					} else if(classicUI.transformer.input.angle < 0.95*oldAngle && cAngle < minAngle) {
-						cAngle = classicUI.transformer.input.angle = 0;
+                        cAngle = minAngle;
+                        classicUI.transformer.input.angle = cAngle*classicUI.transformer.input.maxAngle/100;
+                    } else if(classicUI.transformer.input.angle < 0.95*oldAngle && cAngle < minAngle) {
+                        cAngle = classicUI.transformer.input.angle = 0;
                     }
                     if(cAngle > 0 && trains[trainParams.selected].accelerationSpeed > 0 && trains[trainParams.selected].speedInPercent != cAngle) {
-						if(onlineGame.enabled){
-							teamplaySync("action","trains", trainParams.selected, [{"accelerationSpeedCustom":(trains[trainParams.selected].currentSpeedInPercent)/cAngle}], null);
-						} else {
-							trains[trainParams.selected].accelerationSpeedCustom = (trains[trainParams.selected].currentSpeedInPercent)/cAngle;
-						}
+                        var accSpeed = (trains[trainParams.selected].currentSpeedInPercent)/cAngle;
+                        actionSync("trains", trainParams.selected, [{"accelerationSpeedCustom":accSpeed}], null);
+                        trains[trainParams.selected].accelerationSpeedCustom=accSpeed;
+                        trains[trainParams.selected].currentSpeedInPercent = trains[trainParams.selected].accelerationSpeedCustom*trains[trainParams.selected].speedInPercent;
                     }
                     if(cAngle > 0) {
-						if(onlineGame.enabled){
-							teamplaySync("action","trains", trainParams.selected, [{"speedInPercent":cAngle}], null);
-						} else {
-							trains[trainParams.selected].speedInPercent = cAngle;
-						}
+                        actionSync("trains", trainParams.selected, [{"speedInPercent":cAngle}], null);
+                        trains[trainParams.selected].speedInPercent=cAngle;
+                        trains[trainParams.selected].currentSpeedInPercent = trains[trainParams.selected].accelerationSpeedCustom*trains[trainParams.selected].speedInPercent;
                     } else {
                         hardware.mouse.isHold = false;
                     }
                     if(cAngle === 0 && trains[trainParams.selected].accelerationSpeed > 0){ 
-						if(onlineGame.enabled){
-							teamplaySync("action","trains", trainParams.selected, [{"accelerationSpeed":trains[trainParams.selected].accelerationSpeed * -1}], [{getString:["appScreenObjectStops", "."]}, {getString:[["appScreenTrainNames",trainParams.selected]]}]);
-						} else {
-							trains[trainParams.selected].accelerationSpeed *= -1;    
-							notify (formatJSString(getString("appScreenObjectStops", "."), getString(["appScreenTrainNames",trainParams.selected])),false, 500,null, null, client.y);
-						}
+                        actionSync("trains", trainParams.selected, [{"accelerationSpeed":trains[trainParams.selected].accelerationSpeed *= -1}], [{getString:["appScreenObjectStops", "."]}, {getString:[["appScreenTrainNames",trainParams.selected]]}]);
                     } else if(cAngle > 0 && !trains[trainParams.selected].move) {
-						if(onlineGame.enabled){
-							teamplaySync("action","trains", trainParams.selected, [{"move":true}],[{getString:["appScreenObjectStarts", "."]}, {getString:[["appScreenTrainNames",trainParams.selected]]}]);
-						} else {
-							trains[trainParams.selected].move = true;
-							notify (formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenTrainNames",trainParams.selected])),false, 500,null, null, client.y);
-						}
+                        actionSync("trains", trainParams.selected, [{"move":true}],[{getString:["appScreenObjectStarts", "."]}, {getString:[["appScreenTrainNames",trainParams.selected]]}]);
+                        trains[trainParams.selected].move = true;
+                        trains[trainParams.selected].accelerationSpeed = 1;
                     } else if (cAngle > 0 && trains[trainParams.selected].accelerationSpeed < 0) {
-						if(onlineGame.enabled){
-							teamplaySync("action","trains", trainParams.selected, [{"accelerationSpeed":trains[trainParams.selected].accelerationSpeed * -1}], null);
-						} else {
-							trains[trainParams.selected].accelerationSpeed *=-1;
-						}
+                        actionSync("trains", trainParams.selected, [{"accelerationSpeed":trains[trainParams.selected].accelerationSpeed *= -1}], null);
                     }
                 } else {
                     hardware.mouse.isHold = false;
@@ -1797,42 +952,16 @@ function animateObjects() {
                 trains[trainParams.selected].move =  false;
                 hardware.mouse.isHold = false;
             }
- 
+
         } else {
             context.restore();
             context.restore();
         }
-        if(debug){
-            context.save();
-            var x = classicUI.transformer.x+classicUI.transformer.width/2+ classicUI.transformer.input.diffY*Math.sin(classicUI.transformer.angle);
-            var y = classicUI.transformer.y+classicUI.transformer.height/2- classicUI.transformer.input.diffY*Math.cos( classicUI.transformer.angle);
-            context.fillStyle = "red";
-            context.fillRect(x-2,y-2,4,4);
-            var a = -(classicUI.transformer.input.diffY-classicUI.transformer.input.height/2); var b = classicUI.transformer.width/2-(classicUI.transformer.width/2-classicUI.transformer.input.width/2);
-            var c = classicUI.transformer.input.diffY+classicUI.transformer.input.height/2; var d = b;
-            var x1 = classicUI.transformer.x+classicUI.transformer.width/2; var y1 =classicUI.transformer.y+classicUI.transformer.height/2;
-            var x =[x1+c*Math.sin(classicUI.transformer.angle)-d*Math.cos(classicUI.transformer.angle),x1+c*Math.sin(classicUI.transformer.angle), x1+c*Math.sin(classicUI.transformer.angle)+d*Math.cos(classicUI.transformer.angle), x1 -(a+b)*Math.cos(classicUI.transformer.angle),x1-a*Math.cos(classicUI.transformer.angle),x1 -(a-b)*Math.cos(classicUI.transformer.angle)];
-            var y =[y1-c*Math.cos(classicUI.transformer.angle)-d*Math.sin(classicUI.transformer.angle),y1-c*Math.cos(classicUI.transformer.angle),y1-c*Math.cos(classicUI.transformer.angle)+d*Math.sin(classicUI.transformer.angle), y1+(a-b)*Math.sin(classicUI.transformer.angle),y1+a*Math.sin(classicUI.transformer.angle),y1+(a+b)*Math.sin(classicUI.transformer.angle)];
-            context.fillRect(x[0],y[0],4,4);
-            context.fillRect(x[1],y[1],4,4);
-            context.fillRect(x[2],y[2],4,4);
-            context.fillRect(x[3],y[3],4,4);
-            context.fillRect(x[4],y[4],4,4);
-            context.fillRect(x[5],y[5],4,4);
-            context.fillStyle = "black";
-            var x=x1+ classicUI.transformer.input.diffY*Math.sin(classicUI.transformer.angle);
-            var y=y1- classicUI.transformer.input.diffY*Math.cos(classicUI.transformer.angle);
-            context.beginPath();
-            context.arc(x,y,classicUI.transformer.input.width/2,Math.PI,Math.PI+classicUI.transformer.input.maxAngle,false);
-            context.stroke();
-            context.restore();
-        }  
     }
-    
+
     /////SWITCHES/////
-    classicUI.switches.display = (onlineGame.enabled || settings.showSwitches) ? true: false;
     var showDuration = 11;
-    if(((hardware.mouse.isHold && !inPath && (clickTimeOut === null || clickTimeOut === undefined)) || frameNo-classicUI.switches.lastStateChange < 3*showDuration) && classicUI.switches.display){
+    if(((hardware.mouse.isHold && !inPath && (clickTimeOut === null || clickTimeOut === undefined)) || frameNo-classicUI.switches.lastStateChange < 3*showDuration)){
         Object.keys(switches).forEach(function(key) {
             Object.keys(switches[key]).forEach(function(side) {
                 context.save();
@@ -1841,15 +970,16 @@ function animateObjects() {
                 if ((context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY) && hardware.mouse.isHold) || (frameNo-classicUI.switches.lastStateChange < 3*showDuration && key == classicUI.switches.lastStateChangeKey && side == classicUI.switches.lastStateChangeSide)) {
                     if(context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY) && hardware.mouse.isHold) {
                         hardware.mouse.isHold = false;
-						if(onlineGame.enabled){
-							teamplaySync("action","switches", [key,side], [{"turned":!switches[key][side].turned}], [{getString:["appScreenSwitchTurns", "."]}]);
-						} else {
-							switches[key][side].turned = !switches[key][side].turned;
-							classicUI.switches.lastStateChangeKey = key;
-							classicUI.switches.lastStateChangeSide = side;
-							classicUI.switches.lastStateChange = frameNo;
-							notify (getString("appScreenSwitchTurns", "."),false, 500,null, null, client.y);
-						}
+                        if(onlineGame.enabled){
+                            teamplaySync("action","switches", [key,side], [{"turned":!switches[key][side].turned}], [{getString:["appScreenSwitchTurns", "."]}]);
+                        } else {
+                            switches[key][side].turned = !switches[key][side].turned;
+                            classicUI.switches.lastStateChangeKey = key;
+                            classicUI.switches.lastStateChangeSide = side;
+                            classicUI.switches.lastStateChange = frameNo;
+                            animateWorker.postMessage({k: "switches", switches: switches});
+                            notify (getString("appScreenSwitchTurns", "."),false, 500,null, null, client.y);
+                        }
                         context.fillStyle = switches[key][side].turned ? "rgba(144, 255, 144,1)" : "rgba(255,0,0,1)";
                         context.closePath();
                         context.fill();
@@ -1878,7 +1008,7 @@ function animateObjects() {
             });
         });
     }
-    if(hardware.mouse.isHold && !inPath && (clickTimeOut === null || clickTimeOut === undefined) && classicUI.switches.display){
+    if(hardware.mouse.isHold && !inPath && (clickTimeOut === null || clickTimeOut === undefined)){
         Object.keys(switches).forEach(function(key) {
             Object.keys(switches[key]).forEach(function(side) {
                 context.save();
@@ -1900,20 +1030,10 @@ function animateObjects() {
                 context.fill();
                 context.restore();
                 context.restore();
-                if(debug) {
-                    context.save();
-                    context.beginPath();
-                    context.lineWidth = 1;
-                    context.arc(background.x+switches[key][side].x, background.y+switches[key][side].y, classicUI.switches.radius, 0, 2*Math.PI);
-                    context.closePath();
-                    context.strokeStyle = switches[key][side].turned ? "rgba(144, 238, 144,1)" : "rgba(255,0,0,1)";
-                    context.stroke();
-                    context.restore();
-                }                
             });
         });
     }
-    
+
     /////BACKGROUND/Margins-2/////    
     if(konamistate < 0) {
         context.save();
@@ -1967,7 +1087,7 @@ function animateObjects() {
         context.fillRect(0,canvas.height-background.y,canvas.width,background.y);
         context.restore();
     }
-    
+
     /////CURSOR/2/////
     if(settings.cursorascircle && client.chosenInputMethod == "mouse" && (hardware.mouse.isMoving || hardware.mouse.isHold) && hardware.mouse.cursor != "none") {
         context.save();
@@ -1986,49 +1106,56 @@ function animateObjects() {
     hardware.mouse.wheelScrolls = false;
     
     /////REPAINT/////
-	if(onlineGame.enabled){
-		if(onlineGame.syncing){
-			teamplaySync("sync-ready");
-		} else if(!onlineGame.stop){
-			var teamplayResttime = Math.max(onlineGame.animateInterval-(Date.now()-teamplayStarttime),0);
-			if(onlineGame.animateTimeout !== undefined && onlineGame.animateTimeout !== null) {
-				window.clearTimeout(onlineGame.animateTimeout);
-			}
-            onlineGame.nextAnimate = Date.now()+teamplayResttime;
-			onlineGame.animateTimeout = window.setTimeout(animateObjects, teamplayResttime);
-		}
-    } else {
-		window.requestAnimationFrame(animateObjects);
-	}
+    window.requestAnimationFrame(getObjects);
 
-}	
+}
+
+
+function actionSync (objname, index, params, notification) {
+    if(onlineGame.enabled) {
+        teamplaySync ("action", objname, index, params, notification);
+    } else {
+        switch (objname) {
+            case "trains":
+                animateWorker.postMessage({k: "train", i: index, params: params});
+                if(notification !== null) {
+                    var notifyArr = [];
+                    notification.forEach(function(elem){
+                        notifyArr.push(getString( ...elem.getString ));
+                    });
+                    var notifyStr = formatJSString( ...notifyArr );
+                    notify(notifyStr, false, 1000, null,null,client.y);
+                }
+                break;
+            }
+    }
+}
 
 function teamplaySync (mode, objname, index, params, notification) {
-	switch (mode) {
-	case "action":
-		var output = {};
-		output.objname = objname;
-		output.index = index;
-		output.params = params;	
-		output.notification = notification;
-		onlineConnection.send({mode: "action", gameId: onlineGame.id, message: JSON.stringify(output)});
-		break;
-	case "sync-ready":
-		onlineConnection.send({mode: "sync-ready"});
-		break;
-	}
+    switch (mode) {
+    case "action":
+        var output = {};
+        output.objname = objname;
+        output.index = index;
+        output.params = params;    
+        output.notification = notification;
+        onlineConnection.send({mode: "action", gameId: onlineGame.id, message: JSON.stringify(output)});
+        break;
+    case "sync-ready":
+        onlineConnection.send({mode: "sync-ready"});
+        break;
+    }
 }
 
 /**************
 Variablen-Namen
 **************/
-
+var animateWorker = new Worker("./src/jonathan_herrmann_engel/js/scripting_worker_animate.js");
 var settings = {};
 
 var frameNo = 0;
 var canvas;
 var context;
-var resized = false;
 
 var movingTimeOut;
 var clickTimeOut;
@@ -2043,12 +1170,14 @@ var konamiTimeOut;
 var pics = [{id: 0, extension: "png"},{id: 1, extension: "png"},{id: 2, extension: "png"},{id: 3, extension: "png"},{id: 4, extension: "png"},{id: 5, extension: "png"},{id: 6, extension: "png"},{id: 7, extension: "png"},{id: 8, extension: "png"},{id: 9, extension: "jpg"},{id: 10, extension: "png"},{id: 11, extension: "png"},{id: 12, extension: "png"},{id: 13, extension: "png"},{id: 14, extension: "png"},{id: 15, extension: "png"},{id: 16, extension: "png"},{id: 17, extension: "png"}];
 
 var background = {src: 9, secondLayer: 10};
+var oldbackground;
 
-var rotationPoints = {inner:{narrow:{x:[0,0,0,0],y:[0,0,0,0]}, wide:{x:[0,0,0,0],y:[0,0,0,0]}},outer:{narrow:{x:[0,0,0,0],y:[0,0,0,0]}, altState3:{x:[0,0],y:[0,0]} },inner2outer:{left:{x:[0,0],y:[0,0]}, right:{x:[0,0],y:[0,0]}}};
-var trains =  [{src: 1, fac: 0.051, speedFac: (1/500), accelerationSpeedStartFac: 0.02, accelerationSpeedFac: 1.008, circle: rotationPoints.inner.wide, circleFamily: rotationPoints.inner, standardDirectionStartValue: {switches: true, noSwicthes: true}, bogieDistance: 0.15, state: 1, cars:[{src: 2, fac: 0.060, bogieDistance: 0.15},{src: 2, fac: 0.060, bogieDistance: 0.15},{src: 2, fac: 0.060, bogieDistance: 0.15},{src: 3, fac: 0.044, bogieDistance: 0.15}]},{src: 4,fac: 0.093, speedFac: (1/250), accelerationSpeedStartFac: 0.035, accelerationSpeedFac: 1.013, circle: rotationPoints.outer.narrow, circleFamily: rotationPoints.outer, standardDirectionStartValue: {switches: true, noSwicthes: false}, bogieDistance: 0.15, state: 3, cars:[{src: 5, fac: 0.11, bogieDistance: 0.15},{src: 6, fac: 0.11, bogieDistance: 0.15}, {src: 7, fac: 0.093, bogieDistance: 0.15}]},{src: 8, fac: 0.068, speedFac: (1/375), accelerationSpeedStartFac: 0.04, accelerationSpeedFac: 1.01, circle: rotationPoints.inner.narrow, circleFamily: rotationPoints.inner, standardDirectionStartValue: {switches: false, noSwicthes: true}, bogieDistance: 0.15, state: 1, cars:[]}];
+var rotationPoints;
+var trains;
+var trainParams;
 var switches = {inner2outer: {left: {turned: false, angles: {normal: 1.01*Math.PI, turned: 0.941*Math.PI}}, right: {turned: false, angles: {normal: 1.5*Math.PI, turned: 1.56*Math.PI}}}, outer2inner: {left: {turned: false, angles: {normal: 0.25*Math.PI, turned: 2.2*Math.PI}}, right: {turned: false, angles: {normal: 0.27*Math.PI, turned: 0.35*Math.PI}}}, innerWide: {left: {turned: true, angles: {normal: 1.44*Math.PI, turned: 1.37*Math.PI}}, right: {turned: false, angles: {normal: 1.02*Math.PI, turned: 1.1*Math.PI}}}, outerAltState3: {left: {turned: false, angles: {normal: 1.75*Math.PI, turned: 1.85*Math.PI}}, right: {turned: false, angles: {normal: 0.75*Math.PI, turned: 0.65*Math.PI}}}};
-var trainParams = {selected: Math.floor(Math.random()*trains.length), margin: 25};
-              
+
+
 var cars = [{src: 16, fac: 0.02, speed: 0.0008, startFrameFac: 0.65, angles: {start: Math.PI,normal: 0}},{src: 17, fac: 0.02, speed: 0.001, startFrameFac: 0.335, angles: {start: 0, normal: Math.PI}},{src: 0, fac: 0.0202, speed: 0.00082, startFrameFac: 0.65, angles: {start: Math.PI, normal: 0}}];
 var carPaths = [{start: [{type: "curve_right", x:[0.29,0.29],y:[0.38,0.227]}], normal: [{type: "curve_hright", x:[0.29,0.29],y:[0.227,0.347]},{type: "linear_vertical", x:[0,0], y: [0,0]},{type: "curve_hright2", x:[0,0], y: [0.282,0.402]},{type: "curve_l2r", x:[0,0.25], y: [0.402,0.412]},{type: "linear", x: [0.25,0.225], y: [0.412,0.412]},{type: "curve_right", x: [0.225,0.225], y: [0.412,0.227]},{type: "linear", x:[0.225,0.29], y:[0.227,0.227]}]},{start: [{type: "curve_left", x:[0.26,0.26], y: [0.3,0.198]},{type: "curve_r2l", x:[0.26,0.216], y: [0.198,0.197]}], normal: [{type: "curve_left", x:[0.216,0.216], y: [0.197,0.419]},{type: "linear", x:[0.216,0.246], y:[0.419,419]},{type: "curve_r2l", x:[0.246,0.286], y:[0.419,0.43]},{type: "linear", x:[0.286,0.31], y:[0.43,0.43]},{type: "curve_hleft", x:[0.31,0.31], y: [0.43,0.33]},{type: "linear_vertical", x:[0,0], y: [0,0]},{type: "curve_hleft2", x:[0,0], y: [0.347,0.197]},{type: "linear", x:[0,0.216], y:[0.197,0.197]},{type: "curve_left", x:[0.216,0.216], y: [0.197,0.419]},{type: "linear", x:[0.216,0.246], y:[0.419,419]},{type: "curve_r2l", x:[0.246,0.276], y:[0.419,0.434]},{type: "linear", x:[0.276,0.38], y:[0.434,434]},{type: "curve_l2r", x:[0.38,0.46], y:[0.434,0.419]},{type: "linear", x:[0.46,0.631], y:[0.419,0.419]},{type: "curve_r2l", x:[0.631,0.665], y:[0.419,0.43]},{type: "curve_left", x:[0.665,0.665], y: [0.43,0.322]},{type: "curve_l2r", x:[0.665,0.59], y: [0.322,0.39]},{type: "linear", x:[0.59,0.339], y:[0.39,0.39]},{type: "curve_hright", x:[0.339,0.339], y: [0.39,0.32]},{type: "linear_vertical", x:[0,0], y: [0,0]},{type: "curve_hleft2", x:[0,0], y: [0.347,0.197]},{type: "linear", x:[0,0.216], y:[0.197,0.197]}]},{start: [{type: "curve_right", x:[0.2773,0.2773],y:[0.38,0.227]},{type: "linear", x:[0.2773,0.29],y:[0.227,0.227]}], normal: [{type: "curve_hright", x:[0.29,0.29],y:[0.227,0.347]},{type: "linear_vertical", x:[0,0], y: [0,0]},{type: "curve_hleft2", x:[0,0], y: [0.299,0.419]},{type: "linear", x:[0,0.631], y:[0.419,0.419]},{type: "curve_r2l", x:[0.631,0.665], y:[0.419,0.43]},{type: "curve_left", x:[0.665,0.665], y: [0.43,0.322]},{type: "curve_l2r", x:[0.665,0.59], y: [0.322,0.39]},{type: "linear", x:[0.59,0.339], y:[0.39,0.39]},{type: "curve_l2r", x:[0.339,0.25], y: [0.39,0.412]},{type: "linear", x: [0.25,0.225], y: [0.412,0.412]},{type: "curve_right", x: [0.225,0.225], y: [0.412,0.227]},{type: "linear", x:[0.225,0.29], y:[0.227,0.227]}]}]; 
 var carWays = [];
@@ -2064,18 +1193,66 @@ var client = {devicePixelRatio: 1};
 var onlineGame = {animateInterval: 40, syncInterval: 20000, excludeFromSync: {"t": ["src", "fac", "speedFac", "accelerationSpeedStartFac", "accelerationSpeedFac", "bogieDistance", "width", "height", "speed", "cars"], "tc": ["src", "fac", "bogieDistance", "width", "height"]}};
 var onlineConnection = {serverURI: getServerLink("wss:") + "/multiplay"};
 
+var resizeTimeout;
+var resized = false;
+
 var debug = false;
 
 /******************************************
 *         Window Event Listeners          *
 ******************************************/
-
-window.onresize = function() {
-     
+function resize() {
     resized = true;
+    oldbackground = copyJSObject(background);
+    extendedMeasureViewspace();
+    placeBackground();
+    
+    animateWorker.postMessage({k: "resize", background: background,oldbackground: oldbackground});   
+    
+    carWays.forEach(function(way){
+        Object.keys(way).forEach(function(cType) {
+            way[cType].forEach(function(point){
+                point.x*=background.width/oldbackground.width;
+                point.y*=background.height/oldbackground.height;
+            });
+        });
+    });
+    cars.forEach(function(car){
+        car.speed *= background.width/oldbackground.width;
+        car.x *= background.width/oldbackground.width;
+        car.y *= background.height/oldbackground.height;
+        car.width *= background.width / oldbackground.width;
+        car.height *= background.height / oldbackground.height;
+    });
 
-};
+    taxOffice.params.fire.x *= background.width/oldbackground.width;
+    taxOffice.params.fire.y *= background.height/oldbackground.height;
+    taxOffice.params.fire.size *= background.width/oldbackground.width;
+    taxOffice.params.smoke.x *= background.width/oldbackground.width;
+    taxOffice.params.smoke.y *= background.height/oldbackground.height;
+    taxOffice.params.smoke.size *= background.width/oldbackground.width;
+    for (var i = 0; i <  taxOffice.params.number; i++) {            
+        taxOffice.fire[i].x *= background.width/oldbackground.width;
+        taxOffice.fire[i].y *= background.height/oldbackground.height;
+        taxOffice.fire[i].size *= background.width/oldbackground.width;
+        taxOffice.smoke[i].x *= background.width/oldbackground.width;
+        taxOffice.smoke[i].y *= background.height/oldbackground.height;
+        taxOffice.smoke[i].size *= background.width/oldbackground.width;
+    }
+    taxOffice.params.bluelights.cars.forEach(function(car){
+        car.x[0] *= background.width/oldbackground.width;
+        car.x[1] *= background.width/oldbackground.width;
+        car.y[0] *= background.height/oldbackground.height;
+        car.y[1] *= background.height/oldbackground.height;
+        car.size *= background.width/oldbackground.width;
+    });
 
+    placeClassicUIElements();
+
+    if(typeof placeOptions == "function") {
+        placeOptions("resize");
+    }
+}
 window.onload = function() {
      
     function styleTheProcentCounter() {
@@ -2104,7 +1281,7 @@ window.onload = function() {
             client.chosenInputMethod = "mouse";
             onMouseMove(event);
         }
- 		setCurrentHardwareConfig("input",client.chosenInputMethod);
+         setCurrentHardwareConfig("input",client.chosenInputMethod);
    }    
 
     function initialDisplay() {
@@ -2113,7 +1290,7 @@ window.onload = function() {
             cars.forEach(function(car, i){
                 car.speed *= background.width;
                 car.collStop = true;
-				car.collStopNo = [];
+                car.collStopNo = [];
                 if(i === 0){
                     carParams.lowestSpeedNo = i;
                 } else if (car.speed < cars[carParams.lowestSpeedNo].speed) {
@@ -2156,99 +1333,12 @@ window.onload = function() {
                 });
             });
         }
-
-        function placeTrainsAtInitialPositions() {
-  
-            trains.forEach(function(train){
-                train.standardDirection = (onlineGame.enabled || settings.showSwitches) ? train.standardDirectionStartValue.switches : train.standardDirectionStartValue.noSwicthes;
-                delete train.standardDirectionStartValue;
-            
-                train.width = train.fac * background.width;
-                train.height = train.fac *(pics[train.src].height * (background.width / pics[train.src].width)); 
-                train.move = train.switchCircles = false;
-                train.front = {};
-                train.back = {};
-                train.front.state = train.back.state = train.state;
-           
-                var currentTrainMargin = train.width/trainParams.margin;
-                var currentTrainWidth = train.width;
-            
-                train.cars.forEach(function(car){
-                    car.width = car.fac * background.width;
-                    car.height = car.fac *(pics[car.src].height * (background.width / pics[car.src].width));
-                    currentTrainWidth += car.width + currentTrainMargin;
-                    car.front = {};
-                    car.back = {};
-                    car.front.state = car.back.state = train.state;
-                });
-                if(train.state == 1){
-                    train.front.angle = train.back.angle = train.displayAngle = Math.asin((train.circle.y[1]-train.circle.y[0])/(train.circle.x[1]-train.circle.x[0]));
-                    var hypotenuse = Math.sqrt(Math.pow(train.circle.x[1] - train.circle.x[0],2)+Math.pow((train.circle.y[1]) - train.circle.y[0],2),2);
-                    train.front.x = background.x + train.circle.x[0] + (hypotenuse/2)*Math.cos(train.displayAngle) + (currentTrainWidth/2-train.width*train.bogieDistance)*Math.cos(train.displayAngle);
-                    train.front.y = background.y + train.circle.y[0] + (hypotenuse/2)*Math.sin(train.displayAngle) + (currentTrainWidth/2-train.width*train.bogieDistance)*Math.sin(train.displayAngle);
-                    train.back.x = background.x + train.circle.x[0] + (hypotenuse/2)*Math.cos(train.displayAngle) + (currentTrainWidth/2-train.width+train.width*train.bogieDistance)*Math.cos(train.displayAngle);
-                    train.back.y = background.y + train.circle.y[0] + (hypotenuse/2)*Math.sin(train.displayAngle) + (currentTrainWidth/2-train.width+train.width*train.bogieDistance)*Math.sin(train.displayAngle);
-                    train.x = background.x + train.circle.x[0] + (hypotenuse/2)*Math.cos(train.displayAngle) + (currentTrainWidth/2-train.width/2)*Math.cos(train.displayAngle);
-                    train.y = background.y + train.circle.y[0] + (hypotenuse/2)*Math.sin(train.displayAngle) + (currentTrainWidth/2-train.width/2)*Math.sin(train.displayAngle);
-                    for(var j = 0; j < train.cars.length; j++){
-                        train.cars[j].displayAngle = train.displayAngle;
-                        train.cars[j].front.angle = train.front.angle;
-                        train.cars[j].back.angle = train.back.angle; 
-                        if(j >= 1){
-                            train.cars[j].front.x = train.cars[j-1].x - Math.cos(train.cars[j].displayAngle)*(train.cars[j].width*train.bogieDistance +currentTrainMargin+train.cars[j-1].width/2);
-                            train.cars[j].front.y = train.cars[j-1].y - Math.sin(train.cars[j].displayAngle)*(train.cars[j].width*train.bogieDistance +currentTrainMargin+train.cars[j-1].width/2);
-                            train.cars[j].back.x = train.cars[j-1].x - Math.cos(train.cars[j].displayAngle)*(train.cars[j].width*(1-train.bogieDistance)+currentTrainMargin+train.cars[j-1].width/2);
-                            train.cars[j].back.y = train.cars[j-1].y - Math.sin(train.cars[j].displayAngle)*(train.cars[j].width*(1-train.bogieDistance)+currentTrainMargin+train.cars[j-1].width/2);
-                            train.cars[j].x = train.cars[j-1].x - Math.cos(train.cars[j].displayAngle)*(train.cars[j].width/2+currentTrainMargin+train.cars[j-1].width/2);
-                            train.cars[j].y = train.cars[j-1].y - Math.sin(train.cars[j].displayAngle)*(train.cars[j].width/2+currentTrainMargin+train.cars[j-1].width/2);
-                        } else {
-                            train.cars[j].front.x = train.x - Math.cos(train.cars[j].displayAngle)*(train.cars[j].width*train.bogieDistance +currentTrainMargin+train.width/2);
-                            train.cars[j].front.y = train.y - Math.sin(train.cars[j].displayAngle)*(train.cars[j].width*train.bogieDistance +currentTrainMargin+train.width/2);
-                            train.cars[j].back.x = train.x - Math.cos(train.cars[j].displayAngle)*(train.cars[j].width*(1-train.bogieDistance)+currentTrainMargin+train.width/2);
-                            train.cars[j].back.y = train.y - Math.sin(train.cars[j].displayAngle)*(train.cars[j].width*(1-train.bogieDistance)+currentTrainMargin+train.width/2);
-                            train.cars[j].x = train.x - Math.cos(train.cars[j].displayAngle)*(train.cars[j].width/2+currentTrainMargin+train.width/2);
-                            train.cars[j].y = train.y - Math.sin(train.cars[j].displayAngle)*(train.cars[j].width/2+currentTrainMargin+train.width/2);
-                        }
-                    }
-                } else if(train.state == 3){
-                    train.front.angle = train.back.angle = train.displayAngle = Math.PI+Math.asin((train.circle.y[2]-train.circle.y[3])/(train.circle.x[2]-train.circle.x[3]));
-                    var hypotenuse = Math.sqrt((Math.pow(((train.circle.x[2]) - train.circle.x[3]),2)+(Math.pow(((train.circle.y[2]) - train.circle.y[3]),2))),2);
-                    train.front.x = background.x + train.circle.x[2] - (hypotenuse/2)*Math.cos(train.displayAngle-Math.PI) - (currentTrainWidth/2-train.width*train.bogieDistance)*Math.cos(train.displayAngle-Math.PI);
-                    train.front.y = background.y + train.circle.y[2] - (hypotenuse/2)*Math.sin(train.displayAngle-Math.PI) - (currentTrainWidth/2-train.width*train.bogieDistance)*Math.sin(train.displayAngle-Math.PI);
-                    train.back.x = background.x + train.circle.x[2] - (hypotenuse/2)*Math.cos(train.displayAngle-Math.PI) - (currentTrainWidth/2-train.width*(1-train.bogieDistance))*Math.cos(train.displayAngle-Math.PI);
-                    train.back.y = background.y + train.circle.y[2] - (hypotenuse/2)*Math.sin(train.displayAngle-Math.PI) - (currentTrainWidth/2-train.width*(1-train.bogieDistance))*Math.sin(train.displayAngle-Math.PI);
-                    train.x = background.x + train.circle.x[2] - (hypotenuse/2)*Math.cos(train.displayAngle-Math.PI) - (currentTrainWidth/2-train.width/2)*Math.cos(train.displayAngle-Math.PI);
-                    train.y = background.y + train.circle.y[2] - (hypotenuse/2)*Math.sin(train.displayAngle-Math.PI) - (currentTrainWidth/2-train.width/2)*Math.sin(train.displayAngle-Math.PI);
-                    for(var j = 0; j < train.cars.length; j++){
-                        train.cars[j].displayAngle = train.displayAngle;
-                        train.cars[j].front.angle = train.front.angle;
-                        train.cars[j].back.angle = train.back.angle; 
-                        if(j >= 1){
-                            train.cars[j].front.x = train.cars[j-1].x + Math.cos(train.cars[j].displayAngle-Math.PI)*(train.cars[j].width*train.bogieDistance+currentTrainMargin+train.cars[j-1].width/2);
-                            train.cars[j].front.y = train.cars[j-1].y + Math.sin(train.cars[j].displayAngle-Math.PI)*(train.cars[j].width*train.bogieDistance+currentTrainMargin+train.cars[j-1].width/2);
-                            train.cars[j].back.x = train.cars[j-1].x + Math.cos(train.cars[j].displayAngle-Math.PI)*(train.cars[j].width*(1-train.bogieDistance)+currentTrainMargin+train.cars[j-1].width/2);
-                            train.cars[j].back.y = train.cars[j-1].y + Math.sin(train.cars[j].displayAngle-Math.PI)*(train.cars[j].width*(1-train.bogieDistance)+currentTrainMargin+train.cars[j-1].width/2);
-                            train.cars[j].x = train.cars[j-1].x + Math.cos(train.cars[j].displayAngle-Math.PI)*(train.cars[j].width/2+currentTrainMargin+train.cars[j-1].width/2);
-                            train.cars[j].y = train.cars[j-1].y + Math.sin(train.cars[j].displayAngle-Math.PI)*(train.cars[j].width/2+currentTrainMargin+train.cars[j-1].width/2);
-                        } else {
-                            train.cars[j].front.x = train.x + Math.cos(train.cars[j].displayAngle-Math.PI)*(train.cars[j].width*train.bogieDistance+currentTrainMargin+train.width/2);
-                            train.cars[j].front.y = train.y + Math.sin(train.cars[j].displayAngle-Math.PI)*(train.cars[j].width*train.bogieDistance+currentTrainMargin+train.width/2);
-                            train.cars[j].back.x = train.x + Math.cos(train.cars[j].displayAngle-Math.PI)*(train.cars[j].width*(1-train.bogieDistance)+currentTrainMargin+train.width/2);
-                            train.cars[j].back.y = train.y + Math.sin(train.cars[j].displayAngle-Math.PI)*(train.cars[j].width*(1-train.bogieDistance)+currentTrainMargin+train.width/2);
-                            train.cars[j].x = train.x + Math.cos(train.cars[j].displayAngle-Math.PI)*(train.cars[j].width/2+currentTrainMargin+train.width/2);
-                            train.cars[j].y = train.y + Math.sin(train.cars[j].displayAngle-Math.PI)*(train.cars[j].width/2+currentTrainMargin+train.width/2);
-                        }
-                    }
-                }
-                delete train.state;
-            });
-        }
-
+        
         function placeCarsAtInitialPositions() {
             for (var i = 0; i < cars.length; i++){
                 cars[i].width = cars[i].fac * background.width;
                 cars[i].height = cars[i].fac * (pics[cars[i].src].height * (background.width / pics[cars[i].src].width)); 
-				if(i === 0){
+                if(i === 0){
                     carParams.thickestCar = i;
                 } else if (cars[i].height > cars[carParams.thickestCar].height) {
                     carParams.thickestCar = i;
@@ -2532,14 +1622,11 @@ window.onload = function() {
             }
             return ((currentObject.state === 0 || currentObject.state == -1)  && stateNullAgain) ? obj : defineCarWays(cType,isFirst,i,++j,obj, currentObject, stateNullAgain);
         }
-		
+        
         context.clearRect(0, 0, canvas.width, canvas.height);
 
         placeBackground();
-
-        defineTrainParams();
-        placeTrainsAtInitialPositions();
-        
+       
         defineCarParams();
         placeCarsAtInitialPositions();
         
@@ -2575,336 +1662,399 @@ window.onload = function() {
             taxOffice.params.bluelights.cars[i].y[1] *= background.height;
             taxOffice.params.bluelights.cars[i].size *= background.width;
         }
-        
-        placeClassicUIElements();
-        
-        if(typeof placeOptions == "function") {        
-            placeOptions("load");
-        }
      
-        animateObjects();
-        
-    }			
-	function resetForElem(parent, elem, to) {
-		if (to == undefined) {
-			to = "";
-		}
-		parent.childNodes.forEach(
-			function(currentElem){
-				if(currentElem.nodeName.substr(0,1) != "#"){
-					currentElem.style.display = currentElem == elem ? to : "none";
-				}
-			}
-		);
-	}
-	
+        animateWorker.onerror = function(message) {
+            notify(getString("appScreenIsFail", "!", "upper"), true, 60000, function(){followLink("error#animate", "_blank", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
+        }
+        animateWorker.onmessage = function(message) {
+            if(message.data.k == "getTrainPics") {
+                trains = message.data.trains;
+                var trainPics = [];
+                for(var i = 0; i < trains.length; i++) {
+                    trainPics[i] = {};
+                    trainPics[i].height = pics[trains[i].src].height;
+                    trainPics[i].width = pics[trains[i].src].width;
+                    trainPics[i].cars = [];
+
+                    for(var j = 0; j < trains[i].cars.length; j++) {
+                        trainPics[i].cars[j] = {};
+                        trainPics[i].cars[j].height = pics[trains[i].cars[j].src].height;
+                        trainPics[i].cars[j].width = pics[trains[i].cars[j].src].width;
+                    };
+                }
+                animateWorker.postMessage({k: "setTrainPics", trainPics: trainPics});
+            } else if(message.data.k == "setTrainParams") {
+                trainParams = message.data.trainParams;
+            } else if(message.data.k == "ready") {
+                trains = message.data.trains;
+                placeClassicUIElements();
+                if(typeof placeOptions == "function") {        
+                    placeOptions("load");
+                }
+                window.onresize = function(){
+                    if(resizeTimeout !== undefined && resizeTimeout !== null) {
+                        clearTimeout(resizeTimeout);
+                    }
+                    resizeTimeout = window.setTimeout(resize, 20);
+                };
+                resize();
+                drawObjects();
+            } else if(message.data.k == "setTrains") {
+                message.data.trains.forEach(function(train,i){
+                    trains[i].x = train.x;
+                    trains[i].y = train.y;
+                    trains[i].width = train.width;
+                    trains[i].height = train.height;
+                    trains[i].displayAngle = train.displayAngle;
+                    trains[i].circleFamily = train.circleFamily;
+                    trains[i].move = train.move;
+                    trains[i].lastDirectionChange = train.lastDirectionChange;
+                    trains[i].speedInPercent = train.speedInPercent;
+                    trains[i].currentSpeedInPercent = train.currentSpeedInPercent;
+                    trains[i].accelerationSpeed = train.accelerationSpeed;
+                    trains[i].accelerationSpeedCustom = train.accelerationSpeedCustom;
+                    trains[i].standardDirection = train.standardDirection;
+                    train.cars.forEach(function(car,j){
+                        trains[i].cars[j].x = car.x;
+                        trains[i].cars[j].y = car.y;
+                        trains[i].cars[j].width = car.width;
+                        trains[i].cars[j].height = car.height;
+                        trains[i].cars[j].displayAngle = car.displayAngle;
+                    });
+                });
+                drawObjects();
+            } else if(message.data.k == "resized") {
+                resized = false; 
+            } else if(message.data.k == "switches") {
+                switches = message.data.switches;
+            } else if(message.data.k == "sync-ready") {
+                trains = message.data.trains;
+                rotationPoints = message.data.rotationPoints;
+                teamplaySync("sync-ready");
+            } else if(message.data.k == "debug") {
+                console.log(message.data);
+            }
+        }
+        animateWorker.postMessage({k: "start", background: background, switches: switches, online: onlineGame.enabled, onlineInterval: onlineGame.animateInterval});
+    }
+    function resetForElem(parent, elem, to) {
+        if (to == undefined) {
+            to = "";
+        }
+        parent.childNodes.forEach(
+            function(currentElem){
+                if(currentElem.nodeName.substr(0,1) != "#"){
+                    currentElem.style.display = currentElem == elem ? to : "none";
+                }
+            }
+        );
+    }
+    
     settings = getSettings();
     canvas = document.querySelector("canvas");
     context = canvas.getContext("2d");
     
     document.addEventListener("keydown", onKeyDown);
-	if(getQueryString("mode") == "multiplay") {
-		if ("WebSocket" in window) {
-			onlineGame.enabled = true;
-		} else {
-			onlineGame.enabled = false;
-			notify(getString("appScreenTeamplayNoWebsocket", "!", "upper"), true, 6000, null, null, client.y);
-		}
-	} else {
-		onlineGame.enabled = false;
-	}
-	
-	if(onlineGame.enabled){
-		var loadingAnimElem = document.querySelector("#branding img");
-		var loadingAnimElemDefaultFilter = "blur(1px) saturate(5) sepia(1) hue-rotate({{0}}deg)";
-		loadingAnimElem.style.transition = "filter 0.08s";
-		loadingAnimElem.style.filter = formatJSString(loadingAnimElemDefaultFilter, Math.random()*260+100);
-		var loadingAnimElemChangingFilter = window.setInterval(function(){
-			loadingAnimElem.style.filter = formatJSString(loadingAnimElemDefaultFilter, Math.random()*260+100);
-		}, 10);
-		window.set 
-		var parent = document.querySelector("#content");
-		var elem = parent.querySelector("#game");
-		resetForElem(parent, elem, "block");
-		var parent = document.querySelector("#game");
-		var elem = parent.querySelector("#game-gameplay");
-		resetForElem(parent, elem);
-		onlineConnection.connect = (function(host) {
-			function hideLoadingAnimation(){
-				try{
-					document.styleSheets[0].insertRule(".pace, .pace-progress {display: none !important;}");
-				} catch (e){
-					if(debug){
-						console.log(e);
-					}
-					var elem = document.querySelector("head");
-					var elemStyle = document.createElement("style");
-					elemStyle.textContent = ".pace, .pace-progress {display: none !important;}";
-					elem.appendChild(elemStyle);
-				}
-				window.clearInterval(loadingAnimElemChangingFilter);
-				document.querySelector("#branding").style.display = "none";	
-				canvas.style.opacity = 1;
-			}
-			function showStartGame(){
-				hideLoadingAnimation();
-				onlineGame.stop = false;
-				onlineGame.stopRequestByMe = false;
-				document.addEventListener("visibilitychange", pauseGameIfBackground);
-				window.addEventListener("beforeunload", function () {
-					document.removeEventListener("visibilitychange", pauseGameIfBackground);
-					if(onlineGame.stopRequestByMe) {
-						onlineConnection.send({mode: "resume"});
-					}
-				});
-				var parent = document.querySelector("#content");
-				var elem = parent.querySelector("#game");
-				resetForElem(parent, elem, "block");
-				var parent = document.querySelector("#game");
-				var elem = parent.querySelector("#game-start");
-				resetForElem(parent, elem);
-				elem.querySelector("#game-start-button").onclick = function(){
-					onlineConnection.send({mode:"start"});
-				};
-			}			
-			function showNewGameLink(){
-				hideLoadingAnimation();
-				var parent = document.querySelector("#content");
-				var elem = parent.querySelector("#setup");
-				resetForElem(parent, elem, "block");
-				var parent = document.querySelector("#setup-inner-content");
-				var elem = parent.querySelector("#setup-create");
-				resetForElem(parent, elem);
-				var elem = document.querySelector("#setup #setup-create #setup-create-link");
-				elem.addEventListener("click",function(){followLink("?mode=multiplay", "_self", LINK_STATE_INTERNAL_HTML)});
-				var elem = document.querySelector("#setup #setup-create #setup-create-escape");
-				elem.addEventListener("click",function(){followLink("?", "_self", LINK_STATE_INTERNAL_HTML)});
-			}
-			function getPlayerNameFromInput(){
-				var elem = document.querySelector("#setup-init-name");
-				var name = elem.value;
-				var nameCheck = name.replace(/[^a-zA-Z0-9]/g, "");
-				if(name.length > 0 && name == nameCheck){
-					window.sessionStorage.setItem("playername", name);
-					return name;
-				} else {
-					elem.value = nameCheck;
-				}
-				return false;
-			}
-			function sendPlayerName(name){
-				onlineConnection.send({mode:"init", message: name});
-			}
-			function sendSyncRequest(){
-				if(!onlineGame.stop){
-					var output = {};
-					var number = 0;
-					number += trains.length;
-					trains.forEach(function(train){
-						number += train.cars.length
-					});
-					number++; //Switches
-					var obj = {"number": number};
-					onlineConnection.send({mode: "sync-request", message: JSON.stringify(obj)});
-				} else {
-					window.setTimeout(sendSyncRequest, onlineGame.syncInterval);
-				}			
-			}
-			function sendSyncData(){
-				var task = {};
-				task.o = "s";
-				var obj = copyJSObject(switches);
-				task.d = obj;
-				onlineConnection.send({mode:"sync-task", message: JSON.stringify(task)});	
-				for(var i = 0; i < trains.length; i++){
-					task = {};
-					task.o = "t";
-					task.i = i;
-					obj = copyJSObject(trains[i]);
-					obj.front.x = (obj.front.x-background.x) / background.width;
-					obj.back.x = (obj.back.x-background.x) / background.width;
-					obj.x = (obj.x-background.x) / background.width;				
-					obj.front.y = (obj.front.y - background.y) / background.height;
-					obj.back.y = (obj.back.y-background.y) / background.height;
-					obj.y = (obj.y-background.y) / background.height;
-					obj.width = obj.width / background.width;
-					obj.height = obj.height / background.height;
-					onlineGame.excludeFromSync[task.o].forEach(function(key){
-						delete obj[key];
-					});
-					if(obj.circleFamily != null){
-						Object.keys(rotationPoints).forEach(function(key){
-							if(trains[i].circleFamily == rotationPoints[key]) {
-								obj.circleFamily = key;
-							}
-						});
-						Object.keys(rotationPoints[obj.circleFamily]).forEach(function(key){
-							if(trains[i].circle == rotationPoints[obj.circleFamily][key]) {
-								obj.circle = key;
-							}
-						});
-					} else {
-						delete obj.circle;
-					}
-					task.d = obj;
-					onlineConnection.send({mode:"sync-task", message: JSON.stringify(task)});	
-					for(var j = 0; j < trains[i].cars.length; j++){
-						task = {};
-						task.o = "tc";
-						task.i = [i,j];
-						obj = copyJSObject(trains[i].cars[j]);
-						obj.front.x = (obj.front.x-background.x) / background.width;
-						obj.back.x = (obj.back.x-background.x) / background.width;
-						obj.x = (obj.x-background.x) / background.width;				
-						obj.front.y = (obj.front.y - background.y) / background.height;
-						obj.back.y = (obj.back.y-background.y) / background.height;
-						obj.y = (obj.y-background.y) / background.height;
-						obj.width = obj.width / background.width;
-						obj.height = obj.height / background.height;
-						onlineGame.excludeFromSync[task.o].forEach(function(key){
-							delete obj[key];
-						});
-						task.d = obj;
-						onlineConnection.send({mode:"sync-task", message: JSON.stringify(task)});	
-					}
-				}
-			}
-			function pauseGameIfBackground() {
-				if (document.hidden) {
-					onlineGame.stopRequestByMe = true;
-					onlineConnection.send({mode: "pause"});
-				} else {
-					onlineGame.stopRequestByMe = false;
-					onlineConnection.send({mode: "resume"});
-				}
-			}
-			onlineConnection.socket = new WebSocket(host);
-			onlineConnection.socket.onopen = function () {
-				onlineConnection.send({mode:"hello", message: APP_DATA.version.major+APP_DATA.version.minor/10});
-			};
-			onlineConnection.socket.onclose = function () {
-				showNewGameLink();
-				notify(getString("appScreenTeamplayConnectionError", "."), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
-			};
-			onlineConnection.socket.onmessage = function (message) {
-			var json = JSON.parse(message.data);
-				if(debug){
-					console.log(json);
-				}
-				switch (json.mode) {
-					case "hello":
-						if(json.errorLevel < 2) {
-							if(json.errorLevel == 1){
-								notify(getString("appScreenTeamplayUpdateNote", "!"), false, 900, null,null,client.y);
-							}
-							var parent = document.querySelector("#content");
-							var elem = parent.querySelector("#setup");
-							resetForElem(parent, elem, "block");
-							if(window.sessionStorage.getItem("playername") != null){
-								sendPlayerName(window.sessionStorage.getItem("playername"));
-							} else {
-								hideLoadingAnimation();
-								var parent = document.querySelector("#setup-inner-content");
-								var elem = parent.querySelector("#setup-init");
-								resetForElem(parent, elem);
-								elem.querySelector("#setup-init-button").addEventListener("click", function(event) {
-										var name = getPlayerNameFromInput();
-										if(name !== false) {
-											sendPlayerName(name);
-										}
-								});
-								elem.querySelector("#setup-init-name").addEventListener("keyup", function(event) {
-									if(event.key === "Enter") {
-										var name = getPlayerNameFromInput();
-										if(name !== false) {
-											sendPlayerName(name);
-										}
-									}
-								}); 
-							}
-						} else {
-							notify(getString("appScreenTeamplayUpdateError", "!"), true, 6000, null,null,client.y);
-						}
-					break;
-					case "init":
-						if(json.errorLevel === 0){
-							onlineGame.sessionId = json.sessionId;
-							if(onlineGame.gameKey == "" || onlineGame.gameId == ""){
-								onlineConnection.send({mode:"connect"}); 
-							} else {
-								onlineConnection.send({mode:"join",gameKey:onlineGame.gameKey,gameId:onlineGame.gameId}); 
-							}
-						} else {
-							showNewGameLink();
-							notify(getString("appScreenTeamplayConnectionError", "."), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
-						}
-					break;
-					case "connect":
-						if(json.errorLevel === 0){
-							onlineGame.locomotive = true;
-							onlineGame.gameKey = json.gameKey;
-							onlineGame.gameId = json.gameId;
-							hideLoadingAnimation();
-							var parent = document.querySelector("#setup-inner-content");
-							var elem = parent.querySelector("#setup-start");
-							resetForElem(parent, elem)
-							elem.querySelector("#setup-start-gamelink").textContent = getShareLink(onlineGame.gameId, onlineGame.gameKey);
-							elem.querySelector("#setup-start-button").onclick = function(){copy("#setup #setup-start #setup-start-gamelink")};
-						} else {
-							showNewGameLink();
-							notify(getString("appScreenTeamplayCreateError", "!"), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
-						}
-					break;
-					case "join":
-						if(json.sessionId == onlineGame.sessionId) {
-							if(json.errorLevel === 0){
-								onlineGame.locomotive = false;
-								showStartGame();
-							} else {
-								showNewGameLink();
-								notify(getString("appScreenTeamplayJoinError", "!"), true, 6000, function(){followLink("error#tp-join", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
-							}
-						} else {
-							if(json.errorLevel === 0){
-								showStartGame();
-							} else {
-								showNewGameLink();
-								notify(getString("appScreenTeamplayJoinTeammateError", "!"), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
-							}
-						}
-					break;
-					case "start":
-						if(json.errorLevel < 2){
-							switch(json.message){
-								case "wait":
-									if(json.sessionId == onlineGame.sessionId) {
-										var parent = document.querySelector("#game");
-										var elem = parent.querySelector("#game-wait");
-										resetForElem(parent, elem);
-									} else {
-										notify(getString("appScreenTeamplayTeammateReady", "?"), false, 1000, null,null,client.y);
-									}
-								break;
-								case "run":
-									onlineGame.syncing = false;
-									if(onlineGame.locomotive){
-										window.setTimeout(sendSyncRequest, onlineGame.syncInterval);
-									}
-									var parent = document.querySelector("#game");
-									var elem = parent.querySelector("#game-gameplay");
-									resetForElem(parent, elem);
-								break;
-							}
-						} else {
-							showNewGameLink();
-							notify(getString("appScreenTeamplayStartError", "!"), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
-						}
-					break;
-					case "action":
-						var json = JSON.parse(message.data);
-						var input = JSON.parse(json.message);
+    if(getQueryString("mode") == "multiplay") {
+        if ("WebSocket" in window) {
+            onlineGame.enabled = true;
+        } else {
+            onlineGame.enabled = false;
+            notify(getString("appScreenTeamplayNoWebsocket", "!", "upper"), true, 6000, null, null, client.y);
+        }
+    } else {
+        onlineGame.enabled = false;
+    }
+    
+    if(onlineGame.enabled){
+        var loadingAnimElem = document.querySelector("#branding img");
+        var loadingAnimElemDefaultFilter = "blur(1px) saturate(5) sepia(1) hue-rotate({{0}}deg)";
+        loadingAnimElem.style.transition = "filter 0.08s";
+        loadingAnimElem.style.filter = formatJSString(loadingAnimElemDefaultFilter, Math.random()*260+100);
+        var loadingAnimElemChangingFilter = window.setInterval(function(){
+            loadingAnimElem.style.filter = formatJSString(loadingAnimElemDefaultFilter, Math.random()*260+100);
+        }, 10);
+        window.set 
+        var parent = document.querySelector("#content");
+        var elem = parent.querySelector("#game");
+        resetForElem(parent, elem, "block");
+        var parent = document.querySelector("#game");
+        var elem = parent.querySelector("#game-gameplay");
+        resetForElem(parent, elem);
+        onlineConnection.connect = (function(host) {
+            function hideLoadingAnimation(){
+                try{
+                    document.styleSheets[0].insertRule(".pace, .pace-progress {display: none !important;}");
+                } catch (e){
+                    if(debug){
+                        console.log(e);
+                    }
+                    var elem = document.querySelector("head");
+                    var elemStyle = document.createElement("style");
+                    elemStyle.textContent = ".pace, .pace-progress {display: none !important;}";
+                    elem.appendChild(elemStyle);
+                }
+                window.clearInterval(loadingAnimElemChangingFilter);
+                document.querySelector("#branding").style.display = "none";    
+                canvas.style.opacity = 1;
+            }
+            function showStartGame(){
+                hideLoadingAnimation();
+                onlineGame.stop = false;
+                onlineGame.stopRequestByMe = false;
+                document.addEventListener("visibilitychange", pauseGameIfBackground);
+                window.addEventListener("beforeunload", function () {
+                    document.removeEventListener("visibilitychange", pauseGameIfBackground);
+                    if(onlineGame.stopRequestByMe) {
+                        onlineConnection.send({mode: "resume"});
+                    }
+                });
+                var parent = document.querySelector("#content");
+                var elem = parent.querySelector("#game");
+                resetForElem(parent, elem, "block");
+                var parent = document.querySelector("#game");
+                var elem = parent.querySelector("#game-start");
+                resetForElem(parent, elem);
+                elem.querySelector("#game-start-button").onclick = function(){
+                    onlineConnection.send({mode:"start"});
+                };
+            }            
+            function showNewGameLink(){
+                hideLoadingAnimation();
+                var parent = document.querySelector("#content");
+                var elem = parent.querySelector("#setup");
+                resetForElem(parent, elem, "block");
+                var parent = document.querySelector("#setup-inner-content");
+                var elem = parent.querySelector("#setup-create");
+                resetForElem(parent, elem);
+                var elem = document.querySelector("#setup #setup-create #setup-create-link");
+                elem.addEventListener("click",function(){followLink("?mode=multiplay", "_self", LINK_STATE_INTERNAL_HTML)});
+                var elem = document.querySelector("#setup #setup-create #setup-create-escape");
+                elem.addEventListener("click",function(){followLink("?", "_self", LINK_STATE_INTERNAL_HTML)});
+            }
+            function getPlayerNameFromInput(){
+                var elem = document.querySelector("#setup-init-name");
+                var name = elem.value;
+                var nameCheck = name.replace(/[^a-zA-Z0-9]/g, "");
+                if(name.length > 0 && name == nameCheck){
+                    window.sessionStorage.setItem("playername", name);
+                    return name;
+                } else {
+                    elem.value = nameCheck;
+                }
+                return false;
+            }
+            function sendPlayerName(name){
+                onlineConnection.send({mode:"init", message: name});
+            }
+            function sendSyncRequest(){
+                if(!onlineGame.stop){
+                    var output = {};
+                    var number = 0;
+                    number += trains.length;
+                    trains.forEach(function(train){
+                        number += train.cars.length
+                    });
+                    number++; //Switches
+                    var obj = {"number": number};
+                    onlineConnection.send({mode: "sync-request", message: JSON.stringify(obj)});
+                }         
+            }
+            function sendSyncData(){
+                var task = {};
+                task.o = "s";
+                var obj = copyJSObject(switches);
+                task.d = obj;
+                onlineConnection.send({mode:"sync-task", message: JSON.stringify(task)});    
+                for(var i = 0; i < trains.length; i++){
+                    task = {};
+                    task.o = "t";
+                    task.i = i;
+                    obj = copyJSObject(trains[i]);
+                    obj.front.x = (obj.front.x-background.x) / background.width;
+                    obj.back.x = (obj.back.x-background.x) / background.width;
+                    obj.x = (obj.x-background.x) / background.width;                
+                    obj.front.y = (obj.front.y - background.y) / background.height;
+                    obj.back.y = (obj.back.y-background.y) / background.height;
+                    obj.y = (obj.y-background.y) / background.height;
+                    obj.width = obj.width / background.width;
+                    obj.height = obj.height / background.height;
+                    onlineGame.excludeFromSync[task.o].forEach(function(key){
+                        delete obj[key];
+                    });
+                    if(obj.circleFamily != null){
+                        Object.keys(rotationPoints).forEach(function(key){
+                            if(trains[i].circleFamily == rotationPoints[key]) {
+                                obj.circleFamily = key;
+                            }
+                        });
+                        Object.keys(rotationPoints[obj.circleFamily]).forEach(function(key){
+                            if(trains[i].circle == rotationPoints[obj.circleFamily][key]) {
+                                obj.circle = key;
+                            }
+                        });
+                    } else {
+                        delete obj.circle;
+                    }
+                    task.d = obj;
+                    onlineConnection.send({mode:"sync-task", message: JSON.stringify(task)});    
+                    for(var j = 0; j < trains[i].cars.length; j++){
+                        task = {};
+                        task.o = "tc";
+                        task.i = [i,j];
+                        obj = copyJSObject(trains[i].cars[j]);
+                        obj.front.x = (obj.front.x-background.x) / background.width;
+                        obj.back.x = (obj.back.x-background.x) / background.width;
+                        obj.x = (obj.x-background.x) / background.width;                
+                        obj.front.y = (obj.front.y - background.y) / background.height;
+                        obj.back.y = (obj.back.y-background.y) / background.height;
+                        obj.y = (obj.y-background.y) / background.height;
+                        obj.width = obj.width / background.width;
+                        obj.height = obj.height / background.height;
+                        onlineGame.excludeFromSync[task.o].forEach(function(key){
+                            delete obj[key];
+                        });
+                        task.d = obj;
+                        onlineConnection.send({mode:"sync-task", message: JSON.stringify(task)});    
+                    }
+                }
+            }
+            function pauseGameIfBackground() {
+                if (document.hidden) {
+                    onlineGame.stopRequestByMe = true;
+                    onlineConnection.send({mode: "pause"});
+                } else {
+                    onlineGame.stopRequestByMe = false;
+                    onlineConnection.send({mode: "resume"});
+                }
+            }
+            onlineConnection.socket = new WebSocket(host);
+            onlineConnection.socket.onopen = function () {
+                onlineConnection.send({mode:"hello", message: APP_DATA.version.major+APP_DATA.version.minor/10});
+            };
+            onlineConnection.socket.onclose = function () {
+                showNewGameLink();
+                notify(getString("appScreenTeamplayConnectionError", "."), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
+            };
+            onlineConnection.socket.onmessage = function (message) {
+            var json = JSON.parse(message.data);
+                if(debug){
+                    console.log(json);
+                }
+                switch (json.mode) {
+                    case "hello":
+                        if(json.errorLevel < 2) {
+                            if(json.errorLevel == 1){
+                                notify(getString("appScreenTeamplayUpdateNote", "!"), false, 900, null,null,client.y);
+                            }
+                            var parent = document.querySelector("#content");
+                            var elem = parent.querySelector("#setup");
+                            resetForElem(parent, elem, "block");
+                            if(window.sessionStorage.getItem("playername") != null){
+                                sendPlayerName(window.sessionStorage.getItem("playername"));
+                            } else {
+                                hideLoadingAnimation();
+                                var parent = document.querySelector("#setup-inner-content");
+                                var elem = parent.querySelector("#setup-init");
+                                resetForElem(parent, elem);
+                                elem.querySelector("#setup-init-button").addEventListener("click", function(event) {
+                                        var name = getPlayerNameFromInput();
+                                        if(name !== false) {
+                                            sendPlayerName(name);
+                                        }
+                                });
+                                elem.querySelector("#setup-init-name").addEventListener("keyup", function(event) {
+                                    if(event.key === "Enter") {
+                                        var name = getPlayerNameFromInput();
+                                        if(name !== false) {
+                                            sendPlayerName(name);
+                                        }
+                                    }
+                                }); 
+                            }
+                        } else {
+                            notify(getString("appScreenTeamplayUpdateError", "!"), true, 6000, null,null,client.y);
+                        }
+                    break;
+                    case "init":
+                        if(json.errorLevel === 0){
+                            onlineGame.sessionId = json.sessionId;
+                            if(onlineGame.gameKey == "" || onlineGame.gameId == ""){
+                                onlineConnection.send({mode:"connect"}); 
+                            } else {
+                                onlineConnection.send({mode:"join",gameKey:onlineGame.gameKey,gameId:onlineGame.gameId}); 
+                            }
+                        } else {
+                            showNewGameLink();
+                            notify(getString("appScreenTeamplayConnectionError", "."), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
+                        }
+                    break;
+                    case "connect":
+                        if(json.errorLevel === 0){
+                            onlineGame.locomotive = true;
+                            onlineGame.gameKey = json.gameKey;
+                            onlineGame.gameId = json.gameId;
+                            hideLoadingAnimation();
+                            var parent = document.querySelector("#setup-inner-content");
+                            var elem = parent.querySelector("#setup-start");
+                            resetForElem(parent, elem)
+                            elem.querySelector("#setup-start-gamelink").textContent = getShareLink(onlineGame.gameId, onlineGame.gameKey);
+                            elem.querySelector("#setup-start-button").onclick = function(){copy("#setup #setup-start #setup-start-gamelink")};
+                        } else {
+                            showNewGameLink();
+                            notify(getString("appScreenTeamplayCreateError", "!"), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
+                        }
+                    break;
+                    case "join":
+                        if(json.sessionId == onlineGame.sessionId) {
+                            if(json.errorLevel === 0){
+                                onlineGame.locomotive = false;
+                                showStartGame();
+                            } else {
+                                showNewGameLink();
+                                notify(getString("appScreenTeamplayJoinError", "!"), true, 6000, function(){followLink("error#tp-join", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
+                            }
+                        } else {
+                            if(json.errorLevel === 0){
+                                showStartGame();
+                            } else {
+                                showNewGameLink();
+                                notify(getString("appScreenTeamplayJoinTeammateError", "!"), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
+                            }
+                        }
+                    break;
+                    case "start":
+                        if(json.errorLevel < 2){
+                            switch(json.message){
+                                case "wait":
+                                    if(json.sessionId == onlineGame.sessionId) {
+                                        var parent = document.querySelector("#game");
+                                        var elem = parent.querySelector("#game-wait");
+                                        resetForElem(parent, elem);
+                                    } else {
+                                        notify(getString("appScreenTeamplayTeammateReady", "?"), false, 1000, null,null,client.y);
+                                    }
+                                break;
+                                case "run":
+                                    onlineGame.syncing = false;
+                                    if(onlineGame.locomotive){
+                                         onlineGame.syncRequest = window.setTimeout(sendSyncRequest, onlineGame.syncInterval);
+                                    }
+                                    var parent = document.querySelector("#game");
+                                    var elem = parent.querySelector("#game-gameplay");
+                                    resetForElem(parent, elem);
+                                break;
+                            }
+                        } else {
+                            showNewGameLink();
+                            notify(getString("appScreenTeamplayStartError", "!"), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
+                        }
+                    break;
+                    case "action":
+                        var json = JSON.parse(message.data);
+                        var input = JSON.parse(json.message);
                         var notifyArr = [];
-						if(typeof input.notification == "object" && Array.isArray(input.notification)){
+                        if(typeof input.notification == "object" && Array.isArray(input.notification)){
                             input.notification.forEach(function(elem){
                                 if(typeof elem == "object" && Array.isArray(elem.getString)) {
                                      notifyArr.push(getString( ...elem.getString ));
@@ -2913,152 +2063,143 @@ window.onload = function() {
                                 }
                             });
                             var notifyStr = formatJSString( ...notifyArr );
-							if(onlineGame.sessionId != json.sessionId){
-								notifyStr = json.sessionName + ": " + notifyStr;
-							}
-							notify(notifyStr, false, 1000, null,null,client.y)
-						}
-						var obj;
-						switch (input.objname){
-						case "trains":
-							obj = trains[input.index];
-						break;
-						case "switches":
-							obj = switches[input.index[0]][input.index[1]]
-							classicUI.switches.lastStateChangeKey = input.index[0];
-							classicUI.switches.lastStateChangeSide = input.index[1];
-							classicUI.switches.lastStateChange = frameNo;
-						break;
-						}
-						var counter = 0;
-						input.params.forEach(function(param){
-							obj[Object.keys(param)[0]] = Object.values(param)[0];
-						});
-					break;
-					case "sync-request":
-						var json = JSON.parse(message.data);
-						var json_message = JSON.parse(json.message);
-						onlineGame.syncingTimeout = window.setTimeout(function(){
-							onlineGame.syncing = false;
-							onlineConnection.send({mode: "sync-cancel"});
-						},1000);
-						onlineGame.syncingCounter = 0;
-						onlineGame.syncingCounterFinal = parseInt(json_message.number,10);
-						onlineGame.syncing = true;
-					break;
-					case "sync-ready":
-						if(onlineGame.locomotive){
-							sendSyncData();
-						}
-					break;
-					case "sync-task":
-						if(onlineGame.syncing) {
-							onlineGame.syncingCounter++;
-							var json = JSON.parse(message.data);
-							var task = JSON.parse(json.message);
-							switch(task.o){
-								case "t":
-									Object.keys(task.d).forEach(function(key){
-										trains[task.i][key] = task.d[key];
-									});
-									trains[task.i].front.x = background.x+(trains[task.i].front.x * background.width);
-									trains[task.i].back.x = background.x+(trains[task.i].back.x * background.width);
-									trains[task.i].x = background.x+(trains[task.i].x * background.width);
-									trains[task.i].front.y = background.y+(trains[task.i].front.y * background.height);
-									trains[task.i].back.y = background.y+(trains[task.i].back.y * background.height);
-									trains[task.i].y = background.y+(trains[task.i].y * background.height);
-									if(trains[task.i].circleFamily != null){
-										trains[task.i].circle = rotationPoints[trains[task.i].circleFamily][trains[task.i].circle];
-										trains[task.i].circleFamily = rotationPoints[trains[task.i].circleFamily];
-									}
-									defineTrainSpeed(trains[task.i]);
-								break;
-								case "tc":
-									Object.keys(task.d).forEach(function(key){
-										trains[task.i[0]].cars[task.i[1]][key] = task.d[key];
-									});
-									trains[task.i[0]].cars[task.i[1]].front.x = background.x+(trains[task.i[0]].cars[task.i[1]].front.x * background.width);
-									trains[task.i[0]].cars[task.i[1]].back.x = background.x+(trains[task.i[0]].cars[task.i[1]].back.x * background.width);
-									trains[task.i[0]].cars[task.i[1]].x = background.x+(trains[task.i[0]].cars[task.i[1]].x * background.width);
-									trains[task.i[0]].cars[task.i[1]].front.y = background.y+(trains[task.i[0]].cars[task.i[1]].front.y * background.height);
-									trains[task.i[0]].cars[task.i[1]].back.y = background.y+(trains[task.i[0]].cars[task.i[1]].back.y * background.height);
-									trains[task.i[0]].cars[task.i[1]].y = background.y+(trains[task.i[0]].cars[task.i[1]].y * background.height);
-								break;
-								case "s":
-									Object.keys(task.d).forEach(function(key){
-										Object.keys(switches[key]).forEach(function(currentKey){
-											switches[key][currentKey].turned = task["d"][key][currentKey].turned;
-										});
-									});
-								break;
-							}
-							if(onlineGame.syncingCounter == onlineGame.syncingCounterFinal){
-								window.clearTimeout(onlineGame.syncingTimeout);
-								onlineConnection.send({mode: "sync-done"});
-							}
-						}
-					break;
-					case "sync-done":
-						onlineGame.syncing = false;
-						if(onlineGame.locomotive){
-							window.setTimeout(sendSyncRequest, onlineGame.syncInterval);
-						}
-						if(!onlineGame.stop){
-							animateObjects();
-						}
-					break;
-					case "pause":
-						onlineGame.stop = true;
-						notify(getString("appScreenTeamplayGamePaused", "."), true, 900, null, null, client.y);
-					break;
-					case "resume":
-						if(onlineGame.stop){
-							onlineGame.stop = false;
-							notify(getString("appScreenTeamplayGameResumed", "."), true, 900, null, null, client.y);
-							animateObjects();
-						}
-					break;
-					case "leave":
-						if(json.errorLevel == 2){
-							showNewGameLink();
-							notify(getString("appScreenTeamplayTeammateLeft", "."), true, 900, null, null, client.y);
-						} else {
-							notify(json.sessionName + ": " + getString("appScreenTeamplaySomebodyLeft", "."), true, 900, null, null, client.y);
-						}
-					break;
-					case "unknown":
-						notify(getString("appScreenTeamplayUnknownRequest", "."), true, 2000, null, null, client.y);
-					break;
-				}
-			};
-			onlineConnection.socket.onerror = function (error) {
-				showNewGameLink();
-				notify(getString("appScreenTeamplayConnectionError", "!"), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
-			};
-		});
-		onlineConnection.send = (function(obj) {
-			onlineConnection.socket.send(JSON.stringify(obj));
-		});
-		onlineGame.gameKey = getQueryString("key");
-		onlineGame.gameId = getQueryString("id");
-		document.getElementById("setup").addEventListener("mousemove", function(event) {
-			document.getElementById("setup-ball").style.left = event.pageX + "px";
-			document.getElementById("setup-ball").style.top = event.pageY + "px";
-		});  
-		document.getElementById("setup").addEventListener("mouseout", function(event) {
-			document.getElementById("setup-ball").style.left = "-1vw";
-			document.getElementById("setup-ball").style.top = "-1vw";
-		});
-		onlineConnection.connect(onlineConnection.serverURI);
-	} else {
-		document.querySelectorAll("#content > *:not(#game), #game > *:not(#game-gameplay)").forEach(function(elem) {
-			elem.style.display = "none";
-		});
-		document.querySelectorAll("#content > #game, #game > #game-gameplay").forEach(function(elem) {
-			elem.style.display = "block";
-		});
-		Pace.on("hide", function(){
-			var timeWait = 0.5;
+                            if(onlineGame.sessionId != json.sessionId){
+                                notifyStr = json.sessionName + ": " + notifyStr;
+                            }
+                            notify(notifyStr, false, 1000, null,null,client.y)
+                        }
+                        var obj;
+                        switch (input.objname){
+                            case "trains":
+                                 animateWorker.postMessage({k: "train", i: input.index, params: input.params});
+                            break;
+                            case "switches":
+                                obj = switches[input.index[0]][input.index[1]]
+                                classicUI.switches.lastStateChangeKey = input.index[0];
+                                classicUI.switches.lastStateChangeSide = input.index[1];
+                                classicUI.switches.lastStateChange = frameNo;
+                                input.params.forEach(function(param){
+                                    obj[Object.keys(param)[0]] = Object.values(param)[0];
+                                });
+                                animateWorker.postMessage({k: "switches", switches: switches});
+                            break;
+                        }
+                    break;
+                    case "sync-request":
+                        var json = JSON.parse(message.data);
+                        var json_message = JSON.parse(json.message);
+                        onlineGame.syncingTimeout = window.setTimeout(function(){
+                            onlineGame.syncing = false;
+                            onlineConnection.send({mode: "sync-cancel"});
+                        },1000);
+                        onlineGame.syncingCounter = 0;
+                        onlineGame.syncingCounterFinal = parseInt(json_message.number,10);
+                        onlineGame.syncing = true;
+                        animateWorker.postMessage({k: "sync-request"});
+                    break;
+                    case "sync-ready":
+                        if(onlineGame.locomotive){
+                            sendSyncData();
+                        }
+                    break;
+                    case "sync-task":
+                        if(onlineGame.syncing) {
+                            onlineGame.syncingCounter++;
+                            var json = JSON.parse(message.data);
+                            var task = JSON.parse(json.message);
+                            switch(task.o){
+                                case "t":
+                                    animateWorker.postMessage({k: "sync-t", i: task.i, d: task.d});
+                                break;
+                                case "tc":
+                                    animateWorker.postMessage({k: "sync-tc", i: task.i, d: task.d});
+                                break;
+                                case "s":
+                                    Object.keys(task.d).forEach(function(key){
+                                        Object.keys(switches[key]).forEach(function(currentKey){
+                                            switches[key][currentKey].turned = task["d"][key][currentKey].turned;
+                                        });
+                                    });
+                                    animateWorker.postMessage({k: "switches", switches: switches});
+                                break;
+                            }
+                            if(onlineGame.syncingCounter == onlineGame.syncingCounterFinal){
+                                window.clearTimeout(onlineGame.syncingTimeout);
+                                onlineConnection.send({mode: "sync-done"});
+                            }
+                        }
+                    break;
+                    case "sync-done":
+                        onlineGame.syncing = false;
+                        if(!onlineGame.stop){
+                            if(onlineGame.locomotive){
+                                onlineGame.syncRequest = window.setTimeout(sendSyncRequest, onlineGame.syncInterval);
+                            }
+                            animateWorker.postMessage({k: "resume"});
+                        }
+                    break;
+                    case "pause":
+                        if(onlineGame.syncRequest !== undefined && onlineGame.syncRequest !== null) {
+                            clearTimeout(onlineGame.syncRequest);
+                        }
+                        onlineGame.stop = true;
+                        animateWorker.postMessage({k: "pause"});
+                        notify(getString("appScreenTeamplayGamePaused", "."), true, 900, null, null, client.y);
+                    break;
+                    case "resume":
+                        if(onlineGame.stop){
+                            if(onlineGame.syncRequest !== undefined && onlineGame.syncRequest !== null) {
+                                clearTimeout(onlineGame.syncRequest);
+                            }
+                            if(onlineGame.locomotive){
+                                onlineGame.syncRequest = window.setTimeout(sendSyncRequest, onlineGame.syncInterval);
+                            }
+                            onlineGame.stop = false;
+                            notify(getString("appScreenTeamplayGameResumed", "."), true, 900, null, null, client.y);
+                            animateWorker.postMessage({k: "resume"});
+                        }
+                    break;
+                    case "leave":
+                        if(json.errorLevel == 2){
+                            showNewGameLink();
+                            notify(getString("appScreenTeamplayTeammateLeft", "."), true, 900, null, null, client.y);
+                        } else {
+                            notify(json.sessionName + ": " + getString("appScreenTeamplaySomebodyLeft", "."), true, 900, null, null, client.y);
+                        }
+                    break;
+                    case "unknown":
+                        notify(getString("appScreenTeamplayUnknownRequest", "."), true, 2000, null, null, client.y);
+                    break;
+                }
+            };
+            onlineConnection.socket.onerror = function (error) {
+                showNewGameLink();
+                notify(getString("appScreenTeamplayConnectionError", "!"), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML)}, getString("appScreenFurtherInformation"), client.y);
+            };
+        });
+        onlineConnection.send = (function(obj) {
+            onlineConnection.socket.send(JSON.stringify(obj));
+        });
+        onlineGame.gameKey = getQueryString("key");
+        onlineGame.gameId = getQueryString("id");
+        document.getElementById("setup").addEventListener("mousemove", function(event) {
+            document.getElementById("setup-ball").style.left = event.pageX + "px";
+            document.getElementById("setup-ball").style.top = event.pageY + "px";
+        });  
+        document.getElementById("setup").addEventListener("mouseout", function(event) {
+            document.getElementById("setup-ball").style.left = "-1vw";
+            document.getElementById("setup-ball").style.top = "-1vw";
+        });
+        onlineConnection.connect(onlineConnection.serverURI);
+    } else {
+        document.querySelectorAll("#content > *:not(#game), #game > *:not(#game-gameplay)").forEach(function(elem) {
+            elem.style.display = "none";
+        });
+        document.querySelectorAll("#content > #game, #game > #game-gameplay").forEach(function(elem) {
+            elem.style.display = "block";
+        });
+        Pace.on("hide", function(){
+            var timeWait = 0.5;
             var timeLoad = 0.5;
             var toDestroy = document.querySelectorAll(".pace");
             for (var i = 0; i < toDestroy.length; i++) {
@@ -3088,8 +2229,8 @@ window.onload = function() {
                         canvas.style.opacity = "1";
                     }, timeLoad*1000);
             }, timeWait*1000);
-		});
-	}
+        });
+    }
     hardware.lastInputMouse = hardware.lastInputTouch = 0;
     canvas.addEventListener("touchstart",chooseInputMethod);
     canvas.addEventListener("mousemove",chooseInputMethod);

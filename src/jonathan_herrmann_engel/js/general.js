@@ -309,8 +309,8 @@ function setSettings(settings, asObject){
 //WINDOW
 function measureViewspace(a) {
 
-    var b = [{hasTouch: ("ontouchstart" in document.documentElement)},{isSmallDevice: (window.innerWidth <= 750 || (window.innerWidth <= 1080 && window.innerHeight > window.innerWidth))},{isTinyDevice: (Math.max(window.innerWidth,window.innerHeight) <= 700 || Math.min(window.innerWidth,window.innerHeight) <= 275)}];
-    return a == -1? b:a<b.length ? b[a]: false;
+    var b = [{hasTouch: ("ontouchstart" in document.documentElement)},{isSmallDevice: (window.innerHeight < 290 || window.innerWidth < 750)},{isTinyDevice: (window.innerHeight < 250 || window.innerWidth < 600)}];
+    return a == -1 ? b : (a < b.length && a >= 0 ? b[a] : false);
 
 } 
 

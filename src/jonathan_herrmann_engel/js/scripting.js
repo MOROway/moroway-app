@@ -2037,8 +2037,11 @@ window.onload = function() {
                                 break;
                                 case "run":
                                     onlineGame.syncing = false;
+                                    if(onlineGame.syncRequest !== undefined && onlineGame.syncRequest !== null) {
+                                        clearTimeout(onlineGame.syncRequest);
+                                    }
                                     if(onlineGame.locomotive){
-                                         onlineGame.syncRequest = window.setTimeout(sendSyncRequest, onlineGame.syncInterval);
+                                        onlineGame.syncRequest = window.setTimeout(sendSyncRequest, onlineGame.syncInterval);
                                     }
                                     var parent = document.querySelector("#game");
                                     var elem = parent.querySelector("#game-gameplay");
@@ -2132,6 +2135,9 @@ window.onload = function() {
                     case "sync-done":
                         onlineGame.syncing = false;
                         if(!onlineGame.stop){
+                            if(onlineGame.syncRequest !== undefined && onlineGame.syncRequest !== null) {
+                                clearTimeout(onlineGame.syncRequest);
+                            }
                             if(onlineGame.locomotive){
                                 onlineGame.syncRequest = window.setTimeout(sendSyncRequest, onlineGame.syncInterval);
                             }

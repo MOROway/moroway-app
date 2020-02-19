@@ -900,7 +900,6 @@ function drawObjects() {
                     }
                 } else if((hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls && !(hardware.mouse.wheelY > y && hardware.mouse.wheelX < x )) || (!(hardware.mouse.moveY > y && hardware.mouse.moveX < x ))) {
                     var angle;
-                    var minAngle = 10;
                     var oldAngle = classicUI.transformer.input.angle;
                     if(hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls && !(hardware.mouse.wheelY > y && hardware.mouse.wheelX < x)) {
                         angle = classicUI.transformer.input.angle * (hardware.mouse.wheelScrollY < 0 ? 1.1 : 0.9);
@@ -916,9 +915,9 @@ function drawObjects() {
                     classicUI.transformer.input.angle = angle >= 0 ? angle <= classicUI.transformer.input.maxAngle ? angle : classicUI.transformer.input.maxAngle : 0;
                     var cAngle = classicUI.transformer.input.angle/classicUI.transformer.input.maxAngle*100;
                     if (hardware.mouse.wheelScrollY < 0 && hardware.mouse.wheelScrolls && !(hardware.mouse.wheelY > y && hardware.mouse.wheelX < x) && cAngle === 0){
-                        cAngle = minAngle;
+                        cAngle = classicUI.transformer.input.minAngle;
                         classicUI.transformer.input.angle = cAngle*classicUI.transformer.input.maxAngle/100;
-                    } else if(classicUI.transformer.input.angle < 0.95*oldAngle && cAngle < minAngle) {
+                    } else if(classicUI.transformer.input.angle < 0.95*oldAngle && cAngle < classicUI.transformer.input.minAngle) {
                         cAngle = classicUI.transformer.input.angle = 0;
                     }
                     if(cAngle > 0 && trains[trainParams.selected].accelerationSpeed > 0 && trains[trainParams.selected].speedInPercent != cAngle) {
@@ -1185,7 +1184,7 @@ var carParams = {init: true, wayNo: 7};
 
 var taxOffice = {params: {number: 45, frameNo: 6, frameProbability: 0.6, fire: {x: 0.07, y: 0.06, size: 0.000833, color:{red: {red: 200, green: 0, blue: 0, alpha: 0.4}, yellow: {red: 255, green: 160, blue: 0, alpha: 1}, probability: 0.8}}, smoke: {x: 0.07, y: 0.06, size: 0.02, color: {red: 130, green: 120, blue: 130, alpha: 0.3}}, bluelights: {frameNo: 16, cars: [{frameNo: 0, x: [-0.0105, -0.0026], y: [0.177, 0.0047], size: 0.001},{frameNo: 3, x: [0.0275, -0.00275], y: [0.1472, 0.0092], size: 0.001},{frameNo: 5, x: [0.056, 0.0008], y: [0.18, 0.015], size: 0.001}]}}};
 
-var classicUI = {trainSwitch: {src: 11, selectedTrainDisplay: {}}, transformer: {src:13, asrc: 12, angle:(Math.PI/5),input:{src:14,angle:0,maxAngle:1.5*Math.PI},directionInput:{src:15,}}, switches: {}};
+var classicUI = {trainSwitch: {src: 11, selectedTrainDisplay: {}}, transformer: {src:13, asrc: 12, angle:(Math.PI/5),input:{src:14,angle:0,minAngle: 10,maxAngle:1.5*Math.PI},directionInput:{src:15,}}, switches: {}};
 
 var hardware = {mouse: {moveX:0, moveY:0,downX:0, downY:0, downTime: 0,upX:0, upY:0, upTime: 0, isMoving: false, isHold: false, cursor: "default"}};
 var client = {devicePixelRatio: 1};
@@ -1750,6 +1749,39 @@ window.onload = function() {
         );
     }
     
+    function stopPace() {
+        var timeWait = 0.5;
+        var timeLoad = 0.5;
+        var toDestroy = document.querySelectorAll(".pace");
+        for (var i = 0; i < toDestroy.length; i++) {
+                toDestroy[i].style.transition = "opacity "+ timeWait + "s";
+                toDestroy[i].style.opacity = "0";
+        }
+        setTimeout(function(){
+                var toHide = document.querySelectorAll("#branding");
+                for (var i = 0; i < toHide.length; i++) {
+                    toHide[i].style.transition = "opacity "+ timeLoad + "s";
+                    toHide[i].style.opacity = "0";
+                }
+                setTimeout(function(){
+                    var localAppData = getLocalAppDataCopy();
+                    if(settings.classicUI && !settings.alwaysShowSelectedTrain){ 
+                        notify(formatJSString(getString("appScreenTrainSelected", "."), getString(["appScreenTrainNames",trainParams.selected]), getString("appScreenTrainSelectedAuto", " ")), true,3000,null,null, client.y);
+                    } else if(localAppData !== null && (localAppData.version.major < APP_DATA.version.major || localAppData.version.minor < APP_DATA.version.minor) && typeof appUpdateNotification == "function") { 
+                        appUpdateNotification();
+                    } else if (typeof appReadyNotification == "function") {
+                        appReadyNotification();
+                    }
+                    setLocalAppDataCopy(); 
+                    for (var i = 0; i < toHide.length; i++) {
+                        toHide[i].style.display = "none";
+                    }
+                    canvas.style.transition = "opacity " + timeLoad + "s";
+                    canvas.style.opacity = "1";
+                }, timeLoad*1000);
+        }, timeWait*1000);
+    }
+    
     settings = getSettings();
     canvas = document.querySelector("canvas");
     context = canvas.getContext("2d");
@@ -2204,38 +2236,7 @@ window.onload = function() {
         document.querySelectorAll("#content > #game, #game > #game-gameplay").forEach(function(elem) {
             elem.style.display = "block";
         });
-        Pace.on("hide", function(){
-            var timeWait = 0.5;
-            var timeLoad = 0.5;
-            var toDestroy = document.querySelectorAll(".pace");
-            for (var i = 0; i < toDestroy.length; i++) {
-                    toDestroy[i].style.transition = "opacity "+ timeWait + "s";
-                    toDestroy[i].style.opacity = "0";
-            }
-            setTimeout(function(){
-                    var toHide = document.querySelectorAll("#branding");
-                    for (var i = 0; i < toHide.length; i++) {
-                        toHide[i].style.transition = "opacity "+ timeLoad + "s";
-                        toHide[i].style.opacity = "0";
-                    }
-                    setTimeout(function(){
-                        var localAppData = getLocalAppDataCopy();
-                        if(settings.classicUI && !settings.alwaysShowSelectedTrain){ 
-                            notify(formatJSString(getString("appScreenTrainSelected", "."), getString(["appScreenTrainNames",trainParams.selected]), getString("appScreenTrainSelectedAuto", " ")), true,3000,null,null, client.y);
-                        } else if(localAppData !== null && (localAppData.version.major < APP_DATA.version.major || localAppData.version.minor < APP_DATA.version.minor) && typeof appUpdateNotification == "function") { 
-                            appUpdateNotification();
-                        } else if (typeof appReadyNotification == "function") {
-                            appReadyNotification();
-                        }
-                        setLocalAppDataCopy(); 
-                        for (var i = 0; i < toHide.length; i++) {
-                            toHide[i].style.display = "none";
-                        }
-                        canvas.style.transition = "opacity " + timeLoad + "s";
-                        canvas.style.opacity = "1";
-                    }, timeLoad*1000);
-            }, timeWait*1000);
-        });
+        Pace.on("hide", stopPace);
     }
     hardware.lastInputMouse = hardware.lastInputTouch = 0;
     canvas.addEventListener("touchstart",chooseInputMethod);
@@ -2254,6 +2255,7 @@ window.onload = function() {
             loadNo++;
             if (loadNo == finalPicNo) {
                 Pace.stop();
+                stopPace();
                 initialDisplay();            
             } else {
                 context.clearRect(0, 0, canvas.width, canvas.height);

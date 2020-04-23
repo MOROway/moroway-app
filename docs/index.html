@@ -116,6 +116,7 @@
 					document.querySelector("#linksdiv p:first-of-type").style.transform = document.querySelector("#linksdiv p:last-of-type").style.transform = "matrix(1,0,0,1,0,0)";
 				}
 			}
+			window.addEventListener("load", picStyle);
 			window.addEventListener("resize", picStyle);
 		</script>
 	</head>
@@ -136,8 +137,5 @@
 			</div>
 		</article>
 	</main>
-	<script>
-		picStyle();
-	</script>
 </body>
 </html>

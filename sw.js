@@ -36,8 +36,6 @@ var urlsToCache = [
   'assets/asset15.png',
   'assets/asset16.png',
   'assets/asset17.png',
-  'assets/asset18.png',
-  'assets/asset19.png',
   'assets/helpasset1_bug_report.png',
   'assets/helpasset2_desc.jpg',
   'assets/helpasset3_source.jpg',

@@ -252,7 +252,7 @@ function getSettings (asObject){
 	asObject = asObject == undefined ? false : asObject;
 	
 	var values = {};
-	var dependencies = {"alwaysShowSelectedTrain": ["classicUI"]};
+	var dependencies = {"alwaysShowSelectedTrain": ["classicUI"], "classicUIGreenTrainSwitch": ["classicUI"]};
 	var hardware = {"cursorascircle": [{"input": "mouse"}]};
 	
 	if(typeof(window.localStorage) != "undefined") {
@@ -280,6 +280,9 @@ function getSettings (asObject){
   
     if (typeof values.burnTheTaxOffice != "boolean") 
       values.burnTheTaxOffice = false;
+  
+    if (typeof values.classicUIGreenTrainSwitch != "boolean") 
+      values.classicUIGreenTrainSwitch = true;
   
 	Object.keys(values).forEach(function(value){
 		

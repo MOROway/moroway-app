@@ -2149,17 +2149,14 @@ window.onload = function() {
     function stopPace(showNote) {
         var timeWait = 0.5;
         var timeLoad = 0.5;
-        var toDestroy = document.querySelectorAll(".pace");
-        for (var i = 0; i < toDestroy.length; i++) {
-                toDestroy[i].style.transition = "opacity "+ timeWait + "s";
-                toDestroy[i].style.opacity = "0";
-        }
+        var toDestroy = document.querySelector("body > .pace");
+		if(toDestroy != null) {
+			toDestroy.parentNode.removeChild(toDestroy);
+		}
         setTimeout(function(){
-                var toHide = document.querySelectorAll("#branding");
-                for (var i = 0; i < toHide.length; i++) {
-                    toHide[i].style.transition = "opacity "+ timeLoad + "s";
-                    toHide[i].style.opacity = "0";
-                }
+                var toHide = document.querySelector("#branding");
+                toHide.style.transition = "opacity "+ timeLoad + "s";
+                toHide.style.opacity = "0";
                 setTimeout(function(){
 					if(showNote){
 						var localAppData = getLocalAppDataCopy();
@@ -2172,9 +2169,7 @@ window.onload = function() {
 						}
 					}
                     setLocalAppDataCopy(); 
-                    for (var i = 0; i < toHide.length; i++) {
-                        toHide[i].style.display = "none";
-                    }
+                    toHide.style.display = "none";
                     canvas.style.transition = "opacity " + timeLoad + "s";
                     canvas.style.opacity = "1";
                 }, timeLoad*1000);

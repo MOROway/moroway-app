@@ -11,17 +11,17 @@ function placeOptions(state){
 			document.querySelector("iframe#" + id).style.display = "none";
 	  }
 		
-	  var menu = {container: document.querySelector("#canvas-options"),containerMargin:0,team:document.querySelector("#canvas-team"),single:document.querySelector("#canvas-single"),help:document.querySelector("#canvas-help"), settings:document.querySelector("#canvas-settings")};
+	  var menu = {container: document.querySelector("#canvas-options"),containerMargin:client.width/50,items: {team:document.querySelector("#canvas-team"),single:document.querySelector("#canvas-single"),help:document.querySelector("#canvas-help"), settings:document.querySelector("#canvas-settings"), controlCenter: document.querySelector("#canvas-control-center")}};
 	if(state == "hide") {
 	  menu.container.style.opacity = "0";
 	} else if (state == "show") {
 	  menu.container.style.opacity = "1";
 	} else {
 		  if(state == "load") {
-			menu.help.addEventListener("click", function(){followLink("help", "_blank", LINK_STATE_INTERNAL_HTML);}, false);
-			menu.team.addEventListener("click", function(){followLink("?mode=multiplay", "_self", LINK_STATE_INTERNAL_HTML);}, false);
-			menu.single.addEventListener("click", function(){followLink("?", "_self", LINK_STATE_INTERNAL_HTML);}, false);
-			menu.settings.addEventListener("click", function(){
+			menu.items.help.addEventListener("click", function(){followLink("help", "_blank", LINK_STATE_INTERNAL_HTML);}, false);
+			menu.items.team.addEventListener("click", function(){followLink("?mode=multiplay", "_self", LINK_STATE_INTERNAL_HTML);}, false);
+			menu.items.single.addEventListener("click", function(){followLink("?", "_self", LINK_STATE_INTERNAL_HTML);}, false);
+			menu.items.settings.addEventListener("click", function(){
 				  var id = "settingsimport";
 				  if(window.innerWidth > 500 + parseInt(window.getComputedStyle(document.querySelector("#" + id)).getPropertyValue("width"), 10)){
 					menu.container.style.display = "none";
@@ -36,7 +36,7 @@ function placeOptions(state){
 					var applySettingsNode = document.querySelector("iframe#" + id).contentWindow.document.createElement("BUTTON");
 					applySettingsNode.innerHTML = getString("platformWebSettingsIframeApplyAndClose","","upper"); applySettingsNode.id = "applySettingsInIframe";
 					applySettingsNode.className = " mdl-button mdl-js-button 	mdl-js-ripple-effect";
-					if(menu.help.style.display == "none"){
+					if(menu.items.help.style.display == "none"){
 						var openHelpNode = document.querySelector("iframe#" + id).contentWindow.document.createElement("BUTTON");
 						openHelpNode.innerHTML = getString("generalTitleHelpScreen","","upper"); openHelpNode.id = "openHelpNodeInSettingsIframe"; 
 						openHelpNode.className = " mdl-button mdl-js-button 	mdl-js-ripple-effect";
@@ -59,13 +59,16 @@ function placeOptions(state){
 					followLink("settings", "_self", LINK_STATE_INTERNAL_HTML);
 				  }
 				}, false);
+			menu.items.controlCenter.addEventListener("click", function(){hardware.mouse.rightClick = !hardware.mouse.rightClick;}, false);
 		  }
-		  menu.settings.style.display = "inline";	  
-		  menu.team.style.display = onlineGame.enabled ? "none" : "inline";	  
-		  menu.single.style.display = onlineGame.enabled ? "inline" : "none";	  
-		  menu.help.style.display = "none";
+		  for (var item in menu.items) {
+		  	menu.items[item].style.display = "inline";
+		  	menu.items[item].style.color = "rgb(210, 120, 27)";
+		  	menu.items[item].style.background = "transparent";
+		  }
+		  menu.items.team.style.display = onlineGame.enabled ? "none" : "inline";	  
+		  menu.items.single.style.display = onlineGame.enabled ? "inline" : "none";
 		  if(menu.container.offsetHeight < client.y && 2*background.y > background.height) {
-			  menu.help.style.display = "inline";
 			  menu.containerMargin = (client.y-menu.container.offsetHeight)/2;
 			  menu.container.style.top = "";
 			  menu.container.style.right = client.width/2-menu.container.offsetWidth/2 + "px";
@@ -75,11 +78,20 @@ function placeOptions(state){
 			  menu.container.style.top = "";
 			  menu.container.style.right =  menu.containerMargin + "px";
 			  menu.container.style.bottom =  menu.containerMargin +  "px";
-		  } else {
-			  menu.containerMargin = client.width/50;
+		  } else if (menu.container.offsetWidth + menu.containerMargin * 2 < client.x) {
 			  menu.container.style.bottom = "";
-			  menu.container.style.right = client.x +  menu.containerMargin + "px";
-			  menu.container.style.top = client.y +  menu.containerMargin + "px";
+			  menu.container.style.right = client.x/2-menu.container.offsetWidth/2 + "px";
+			  menu.container.style.top = client.height/2-menu.container.offsetHeight/2 +  "px";
+		  } else {
+			  for (var item in menu.items) {
+				menu.items[item].style.color = "";
+				menu.items[item].style.background = "";
+			  }
+			  menu.items.help.style.display = menu.items.controlCenter.style.display = "none";
+			  menu.container.style.bottom = "";
+			  menu.container.style.right = client.x + menu.containerMargin + "px";
+			  menu.container.style.top = client.y + menu.containerMargin + "px";
+		  
 		  }
 		  menu.container.style.opacity = "1";
 	}

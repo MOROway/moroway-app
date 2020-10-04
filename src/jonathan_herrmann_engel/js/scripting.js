@@ -2623,6 +2623,8 @@ window.onload = function() {
                                 }); 
                             }
                         } else {
+                            document.querySelector("#content").style.display = "none";
+                            window.setTimeout(function(){followLink("error#tp-update", "_self", LINK_STATE_INTERNAL_HTML)},1000);
                             notify(getString("appScreenTeamplayUpdateError", "!"), true, 6000, null,null,client.y);
                         }
                     break;

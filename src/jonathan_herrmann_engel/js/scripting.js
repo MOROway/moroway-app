@@ -414,13 +414,6 @@ function placeClassicUIElements(){
 /******************************************
              draw  functions
 ******************************************/
-function getObjects() {
-    if(!onlineGame.enabled || !onlineGame.syncing) {
-		animateWorker.postMessage({k: "getTrains"});
-	} else {
-		window.requestAnimationFrame(getObjects);
-	}
-}
 function drawObjects() {
     function drawTrains(input1){
         function drawTrain(i) {
@@ -787,7 +780,8 @@ function drawObjects() {
         context.restore();
     }
     
-    /////GENERAL/////  
+    /////GENERAL/////
+	var starttime = Date.now();
     context.clearRect(0, 0, canvas.width, canvas.height);
     frameNo++;
     if(frameNo % 1000000 === 0){
@@ -795,7 +789,7 @@ function drawObjects() {
     }    
     var inPath = false;
     /////CURSOR/1/////
-    if(!settings.cursorascircle || client.chosenInputMethod == "touch") {
+    if(!settings.cursorascircle || !isHardwareAvailable("cursorascircle")) {
         canvas.style.cursor = "default";
     } else {
         canvas.style.cursor = "none";
@@ -1660,7 +1654,7 @@ function drawObjects() {
     }
 
     /////CURSOR/2/////
-    if(settings.cursorascircle && client.chosenInputMethod == "mouse" && (hardware.mouse.isMoving || hardware.mouse.isHold) && hardware.mouse.cursor != "none") {
+    if(settings.cursorascircle && isHardwareAvailable("cursorascircle") && (hardware.mouse.isMoving || hardware.mouse.isHold) && hardware.mouse.cursor != "none") {
         context.save();
         context.translate(hardware.mouse.moveX, hardware.mouse.moveY);
         context.fillStyle = hardware.mouse.isHold && hardware.mouse.cursor == "pointer" ? "rgba(65,56,65," + (Math.random() * (0.3) + 0.6) + ")" : hardware.mouse.isHold ? "rgba(144,64,64," + (Math.random() * (0.3) + 0.6) + ")" : hardware.mouse.cursor == "pointer" ? "rgba(127,111,127," + (Math.random() * (0.3) + 0.6) + ")" : "rgba(255,250,240,0.5)";
@@ -1685,7 +1679,11 @@ function drawObjects() {
     }
 			
     /////REPAINT/////
-    window.requestAnimationFrame(getObjects);
+	if(drawTimeout !== undefined && drawTimeout !== null) {
+		clearTimeout(drawTimeout);
+	}
+    var resttime = Math.max(drawInterval-(Date.now()-starttime),0);
+    drawTimeout = setTimeout(drawObjects, resttime);
 
 }
 
@@ -1738,6 +1736,8 @@ var settings = {};
 var frameNo = 0;
 var canvas;
 var context;
+var drawInterval;
+var drawTimeout;
 
 var movingTimeOut;
 var clickTimeOut;
@@ -2290,6 +2290,7 @@ window.onload = function() {
                     resizeTimeout = window.setTimeout(resize, 20);
                 };
                 resize();
+                drawInterval = message.data.animateInterval;
                 drawObjects();
             } else if(message.data.k == "setTrains") {
                 message.data.trains.forEach(function(train,i){
@@ -2330,7 +2331,6 @@ window.onload = function() {
                         }
                     });
                 });
-                drawObjects();
             } else if(message.data.k == "resized") {
                 resized = false; 
 				if(debug){

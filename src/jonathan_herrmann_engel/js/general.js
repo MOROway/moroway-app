@@ -253,7 +253,7 @@ function getSettings (asObject){
 	
 	var values = {};
 	var dependencies = {"alwaysShowSelectedTrain": ["classicUI"], "classicUIGreenTrainSwitch": ["classicUI"]};
-	var hardware = {"cursorascircle": [{"input": "mouse"}]};
+	var hardware = {"cursorascircle": [{"input": "mouse"},{"browser": ["Edg","Chrome"]}]};
 	
 	if(typeof(window.localStorage) != "undefined") {
     
@@ -309,6 +309,42 @@ function setSettings(settings, asObject){
 
 }
 
+function isSettingActive(a){
+	var settingsComplete = getSettings(true);
+	var isSettingActive = true;
+		if(settingsComplete.dependencies[a] !== null){
+			settingsComplete.dependencies[a].forEach(function(key){
+				isSettingActive = (getSettings())[key];
+			});
+		}
+	return isSettingActive;
+}
+
+function isHardwareAvailable(a){
+		var settingsComplete = getSettings(true);
+        var isHardwareAvailable = true;
+		var hardware = getLastHardwareConfig();
+		if(settingsComplete.hardware[a] !== null){
+			settingsComplete.hardware[a].forEach(function(current){
+				Object.keys(current).forEach(function(key){
+					switch (key) {
+						case "input":
+							if(!(hardware[key] == undefined || current[key] == hardware[key])) {
+                                isHardwareAvailable = false;
+                            }
+						break;
+						case "browser":
+							if(hardware[key] != undefined && hardware[key] != null && !current[key].includes(browser)) {
+                                isHardwareAvailable = false;
+                            }
+						break;
+					}
+				});
+			});
+		}
+	return isHardwareAvailable;
+}
+
 //WINDOW
 function measureViewspace(a) {
 
@@ -344,3 +380,13 @@ const STRINGS = {
 Object.freeze(STRINGS);
 const DEFAULT_LANG = "en";
 const CURRENT_LANG = (typeof(window.localStorage) != "undefined" && typeof window.localStorage.getItem("morowayAppLang") == "string") ? (window.localStorage.getItem("morowayAppLang")) : ((typeof window.navigator.language != "undefined" && STRINGS.hasOwnProperty(window.navigator.language.substr(0,2))) ? window.navigator.language.substr(0,2) : DEFAULT_LANG);
+
+//BROWSER
+var browsers = ["Firefox", "Safari", "Chrome", "Edg"];
+var browser = "Other";
+for(var cBrowser = 0; cBrowser < browsers.length;cBrowser++) {
+    if(window.navigator.userAgent.indexOf(browsers[cBrowser]+"/") !== -1) {
+        browser = browsers[cBrowser];
+    }
+}
+setCurrentHardwareConfig("browser",browser);

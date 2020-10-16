@@ -727,8 +727,9 @@ function animateObjects() {
 	}
 	if(firstRun) {
 		firstRun = false;
-		postMessage({k: "ready", trains: trains});
+		postMessage({k: "ready", trains: trains,animateInterval: animateInterval});
 	}
+	postMessage({k: "setTrains", trains: trains});
 	if(online){
 		if(syncing){
 			postMessage({k: "sync-ready", trains: trains, rotationPoints: rotationPoints});
@@ -819,8 +820,6 @@ onmessage = function(message) {
 		defineTrainParams();
 		postMessage({k: "switches", switches: switches});
 		postMessage({k: "resized"});
-	} else if(message.data.k == "getTrains") {
-		postMessage({k: "setTrains", trains: trains});
 	} else if(message.data.k == "train") {
 		message.data.params.forEach(function(param){
 			trains[message.data.i][Object.keys(param)[0]] = Object.values(param)[0];

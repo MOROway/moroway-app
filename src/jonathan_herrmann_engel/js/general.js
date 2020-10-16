@@ -314,7 +314,9 @@ function isSettingActive(a){
 	var isSettingActive = true;
 		if(settingsComplete.dependencies[a] !== null){
 			settingsComplete.dependencies[a].forEach(function(key){
-				isSettingActive = (getSettings())[key];
+				if(!(getSettings())[key]) {
+					isSettingActive = false;
+				}
 			});
 		}
 	return isSettingActive;

@@ -819,6 +819,7 @@ onmessage = function(message) {
         }   
 		defineTrainParams();
 		postMessage({k: "switches", switches: switches});
+		postMessage({k: "setTrains", trains: trains});
 		postMessage({k: "resized"});
 	} else if(message.data.k == "train") {
 		message.data.params.forEach(function(param){

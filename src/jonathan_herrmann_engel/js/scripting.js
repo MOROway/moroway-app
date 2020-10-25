@@ -23,10 +23,7 @@ function drawImage(pic,x,y,width,height, cxt){
     cxt.drawImage(pic,Math.floor(x),Math.floor(y),Math.floor(width),Math.floor(height));
 }
 
-function measureFontSize(t,f,a,b,c, d, r,resultAsFont){
-    if(resultAsFont == undefined) {
-        resultAsFont = true;
-    }
+function measureFontSize(t,f,a,b,c, d, r){
     context.save();
     var font = (a) + "px " + f;
     context.font = font;
@@ -34,11 +31,9 @@ function measureFontSize(t,f,a,b,c, d, r,resultAsFont){
     context.restore();
     if(twidth != b && (Math.abs(twidth-b) > d && r < 100)){
         a *= (twidth > b) ? (1-c/100) : (1+c/100);
-        return measureFontSize(t,f,a,b,c,d, ++r,resultAsFont);
-    } else if (resultAsFont) {
-        return font;
+        return measureFontSize(t,f,a,b,c,d, ++r);
     } else {
-       return a;
+       return font;
     }
 }
 
@@ -1536,14 +1531,14 @@ function drawObjects() {
         var fontFamily = "sans-serif";
         var maxTextWidth = (background.width-2*translateOffset)/2;
         var maxTextHeight = (background.height-2*translateOffset)/trains.length;
-        var speedTextHeight = Math.min(0.5*maxTextHeight,measureFontSize(getString("appScreenControlCenterSpeedOff"),fontFamily,0.5*(maxTextWidth*0.5)/getString("appScreenControlCenterSpeedOff").length,0.5*(maxTextWidth*0.5), 5, 1.2,0, false));
+        var speedTextHeight = Math.min(0.5*maxTextHeight,getFontSize(measureFontSize(getString("appScreenControlCenterSpeedOff"),fontFamily,0.5*(maxTextWidth*0.5)/getString("appScreenControlCenterSpeedOff").length,0.5*(maxTextWidth*0.5), 5, 1.2,0), "px"));
         contextForeground.fillStyle = "rgb(255,120,120)";
         contextForeground.strokeStyle = colorBorder;
         contextForeground.strokeRect(0,0,maxTextWidth/8,maxTextHeight*trains.length);
         contextForeground.save();
         contextForeground.translate(maxTextWidth/16,maxTextHeight*trains.length/2);
         contextForeground.rotate(-Math.PI/2);
-        var cTextHeight = Math.min(maxTextWidth/12,measureFontSize(getString("appScreenControlCenterClose",null,"upper"),fontFamily,maxTextWidth/12,maxTextHeight*trains.length, 5, 1.2,0, false));
+        var cTextHeight = Math.min(maxTextWidth/12,getFontSize(measureFontSize(getString("appScreenControlCenterClose",null,"upper"),fontFamily,maxTextWidth/12,maxTextHeight*trains.length, 5, 1.2,0), "px"));
         contextForeground.font = cTextHeight +"px "+fontFamily;
         contextForeground.fillText(getString("appScreenControlCenterClose",null,"upper"),-maxTextHeight*trains.length/2+(maxTextHeight*trains.length/2-contextForeground.measureText(getString("appScreenControlCenterClose",null,"upper")).width/2),cTextHeight/6);
         contextForeground.restore();
@@ -1555,7 +1550,7 @@ function drawObjects() {
         }
         for(var cTrain = 0; cTrain < trains.length; cTrain++) {
             var cText = getString(["appScreenTrainNames",cTrain]);
-            var cTextHeight = Math.min(0.625*maxTextHeight,measureFontSize(cText,fontFamily,0.625*maxTextWidth/cText.length,0.625*maxTextWidth, 5, 1.2,0, false));
+            var cTextHeight = Math.min(0.625*maxTextHeight,getFontSize(measureFontSize(cText,fontFamily,0.625*maxTextWidth/cText.length,0.625*maxTextWidth, 5, 1.2,0), "px"));
             contextForeground.font = cTextHeight +"px "+fontFamily;
             contextForeground.fillStyle = colorLight;
             contextForeground.fillText(cText,maxTextWidth/8+0.875*maxTextWidth/2-contextForeground.measureText(cText).width/2,maxTextHeight*cTrain+maxTextHeight/2);

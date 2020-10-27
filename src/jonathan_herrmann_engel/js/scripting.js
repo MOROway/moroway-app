@@ -502,8 +502,10 @@ function drawObjects() {
             collisionCourse(input1, true);
             context.beginPath();
             context.rect(-currentObject.width/2, -currentObject.height/2, currentObject.width, currentObject.height);
+            if(context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY)) {
+                hardware.mouse.cursor = "pointer";
+            }
             if ((hardware.lastInputTouch < hardware.lastInputMouse && context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY) && hardware.mouse.isHold) || (hardware.lastInputTouch > hardware.lastInputMouse && context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY) && hardware.mouse.isHold)) {
-                inPath = true;
                 if(hardware.lastInputTouch < hardware.lastInputMouse) {
                     hardware.mouse.isHold = false;
                 }
@@ -635,8 +637,10 @@ function drawObjects() {
         if(!onlineGame.stop) {
             context.beginPath();
             context.rect(-currentObject.width/2, -currentObject.height/2, currentObject.width, currentObject.height);
+            if(context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY)) {
+                hardware.mouse.cursor = "pointer";
+            }
             if ((hardware.lastInputTouch < hardware.lastInputMouse && context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY) && hardware.mouse.isHold) || (hardware.lastInputTouch > hardware.lastInputMouse && context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY) && hardware.mouse.isHold)) {
-                inPath = true;
                 if(hardware.lastInputTouch < hardware.lastInputMouse) {
                     hardware.mouse.isHold = false;
                 }
@@ -852,12 +856,8 @@ function drawObjects() {
     if(frameNo % 1000000 === 0){
         notify(formatJSString(getString("appScreenAMillionFrames","."),frameNo/1000000), false, 500, null, null, client.y);
     }    
-    var inPath = false;
-    /////CURSOR/1/////
-    if(!settings.cursorascircle || !isHardwareAvailable("cursorascircle")) {
-        canvasForeground.style.cursor = "default";
-    } else {
-        canvasForeground.style.cursor = "none";
+    if(hardware.mouse.cursor != "none") {
+        hardware.mouse.cursor = "default";
     }
     
     /////TRAINS/////
@@ -1169,13 +1169,15 @@ function drawObjects() {
         }
         context.beginPath();
         context.rect(-classicUI.transformer.input.width/2, -classicUI.transformer.input.height/2, classicUI.transformer.input.width, classicUI.transformer.input.height);
+        if (context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY)) {
+            hardware.mouse.cursor = "pointer";
+        }
         if ((context.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY) && hardware.mouse.isHold) || (context.isPointInPath(hardware.mouse.wheelX, hardware.mouse.wheelY) && hardware.mouse.wheelScrollY !== 0 && hardware.mouse.wheelScrolls)) {
             context.restore();
             context.restore();
             if(typeof movingTimeOut !== "undefined"){
                 clearTimeout(movingTimeOut);
             }
-            hardware.mouse.cursor = "pointer";
             var x=classicUI.transformer.x+classicUI.transformer.width/2+ classicUI.transformer.input.diffY*Math.sin(classicUI.transformer.angle);
             var y=classicUI.transformer.y+classicUI.transformer.height/2- classicUI.transformer.input.diffY*Math.cos(classicUI.transformer.angle);
             if(!collisionCourse(trainParams.selected, false)){
@@ -1248,7 +1250,9 @@ function drawObjects() {
                 trains[trainParams.selected].move =  false;
                 hardware.mouse.isHold = false;
             }
-
+            if(classicUI.transformer.input.angle > 0 && classicUI.transformer.input.angle < classicUI.transformer.input.maxAngle) {
+                        hardware.mouse.cursor = "grabbing";
+            }
         } else {
             context.restore();
             context.restore();
@@ -1282,7 +1286,7 @@ function drawObjects() {
 
     /////SWITCHES/////
     var showDuration = 11;
-    if(((hardware.mouse.isHold && !inPath && (clickTimeOut === null || clickTimeOut === undefined)) || frameNo-classicUI.switches.lastStateChange < 3*showDuration)){
+    if(((hardware.mouse.isHold && hardware.mouse.cursor == "default" && (clickTimeOut === null || clickTimeOut === undefined)) || frameNo-classicUI.switches.lastStateChange < 3*showDuration)){
         Object.keys(switches).forEach(function(key) {
             Object.keys(switches[key]).forEach(function(side) {
                 contextForeground.save();
@@ -1329,7 +1333,7 @@ function drawObjects() {
             });
         });
     }
-    if(hardware.mouse.isHold && !inPath && (clickTimeOut === null || clickTimeOut === undefined)){
+    if(hardware.mouse.isHold && hardware.mouse.cursor == "default" && (clickTimeOut === null || clickTimeOut === undefined)){
         Object.keys(switches).forEach(function(key) {
             Object.keys(switches[key]).forEach(function(side) {
                 contextForeground.save();
@@ -1517,6 +1521,7 @@ function drawObjects() {
     
     /////CONTROL CENTER/////
     if(client.realScale == 1 && hardware.mouse.rightClick) {
+        hardware.mouse.cursor = "default";
         var colorLight =  "floralwhite";
         var colorDark =  "rgb(120,120,120)";
         var colorBorder =  "rgba(255,255,255,0.7)";;
@@ -1531,6 +1536,9 @@ function drawObjects() {
         var fontFamily = "sans-serif";
         var maxTextWidth = (background.width-2*translateOffset)/2;
         var maxTextHeight = (background.height-2*translateOffset)/trains.length;
+        if(hardware.mouse.moveX > background.x+translateOffset && hardware.mouse.moveY > background.y+translateOffset && hardware.mouse.moveX < background.x+translateOffset+maxTextWidth/8 && hardware.mouse.moveY < background.y+translateOffset+maxTextHeight*trains.length) {
+            hardware.mouse.cursor = "pointer";
+        }
         var speedTextHeight = Math.min(0.5*maxTextHeight,getFontSize(measureFontSize(getString("appScreenControlCenterSpeedOff"),fontFamily,0.5*(maxTextWidth*0.5)/getString("appScreenControlCenterSpeedOff").length,0.5*(maxTextWidth*0.5), 5, 1.2,0), "px"));
         contextForeground.fillStyle = "rgb(255,120,120)";
         contextForeground.strokeStyle = colorBorder;
@@ -1548,7 +1556,13 @@ function drawObjects() {
             hardware.mouse.rightClickEvent = false; 
             hardware.mouse.rightClickWheelScrolls = false; 
         }
+        
+
         for(var cTrain = 0; cTrain < trains.length; cTrain++) {
+            var noCollisionCTrain = !collisionCourse(cTrain, false);
+            if(noCollisionCTrain && hardware.mouse.moveX > background.x+translateOffset+maxTextWidth && hardware.mouse.moveY > background.y+translateOffset+maxTextHeight*cTrain && hardware.mouse.moveX < background.x+translateOffset+1.75*maxTextWidth && hardware.mouse.moveY < background.y+translateOffset+maxTextHeight*(cTrain+1)) {
+                hardware.mouse.cursor = "pointer";
+            }
             var cText = getString(["appScreenTrainNames",cTrain]);
             var cTextHeight = Math.min(0.625*maxTextHeight,getFontSize(measureFontSize(cText,fontFamily,0.625*maxTextWidth/cText.length,0.625*maxTextWidth, 5, 1.2,0), "px"));
             contextForeground.font = cTextHeight +"px "+fontFamily;
@@ -1558,6 +1572,7 @@ function drawObjects() {
             contextForeground.fillStyle = contextForeground.strokeStyle = colorBorder;
             contextForeground.strokeRect(maxTextWidth/8,maxTextHeight*cTrain,0.875*maxTextWidth,maxTextHeight);
             if(cTrainPercent == 0) {
+                contextForeground.fillStyle = noCollisionCTrain ? colorLight : colorDark;
                 contextForeground.font = speedTextHeight +"px "+fontFamily;
                 contextForeground.fillText(getString("appScreenControlCenterSpeedOff"),maxTextWidth+(maxTextWidth*0.5)/2-contextForeground.measureText(getString("appScreenControlCenterSpeedOff")).width/2,maxTextHeight*cTrain+maxTextHeight/2);
             }
@@ -1569,7 +1584,7 @@ function drawObjects() {
             }
             var isClick = (contextClick && hardware.mouse.upX-background.x-translateOffset > maxTextWidth && hardware.mouse.upX-background.x-translateOffset < maxTextWidth*1.5 && hardware.mouse.upY-background.y-translateOffset > maxTextHeight*cTrain && hardware.mouse.upY-background.y-translateOffset < maxTextHeight*cTrain+maxTextHeight);
             var isHold = (hardware.mouse.rightClickHold && hardware.mouse.downX-background.x-translateOffset > maxTextWidth && hardware.mouse.downX-background.x-translateOffset < maxTextWidth*1.5 && hardware.mouse.downY-background.y-translateOffset > maxTextHeight*cTrain && hardware.mouse.downY-background.y-translateOffset < maxTextHeight*cTrain+maxTextHeight && hardware.mouse.moveX-background.x-translateOffset > maxTextWidth && hardware.mouse.moveX-background.x-translateOffset < maxTextWidth*1.5 && hardware.mouse.moveY-background.y-translateOffset > maxTextHeight*cTrain && hardware.mouse.moveY-background.y-translateOffset < maxTextHeight*cTrain+maxTextHeight);
-            if(!collisionCourse(cTrain, false) && (isClick || isHold || (hardware.mouse.rightClickWheelScrolls && hardware.mouse.wheelScrollY != 0 && hardware.mouse.wheelX-background.x-translateOffset > maxTextWidth && hardware.mouse.wheelX-background.x-translateOffset < maxTextWidth*1.5 && hardware.mouse.wheelY-background.y-translateOffset > maxTextHeight*cTrain && hardware.mouse.wheelY-background.y-translateOffset < maxTextHeight*cTrain+maxTextHeight))) {
+            if(noCollisionCTrain && (isClick || isHold || (hardware.mouse.rightClickWheelScrolls && hardware.mouse.wheelScrollY != 0 && hardware.mouse.wheelX-background.x-translateOffset > maxTextWidth && hardware.mouse.wheelX-background.x-translateOffset < maxTextWidth*1.5 && hardware.mouse.wheelY-background.y-translateOffset > maxTextHeight*cTrain && hardware.mouse.wheelY-background.y-translateOffset < maxTextHeight*cTrain+maxTextHeight))) {
             var newSpeed;
             if(isClick || isHold) {
                 newSpeed = Math.round(((isClick ? hardware.mouse.upX : hardware.mouse.moveX)-background.x-translateOffset-maxTextWidth)/maxTextWidth/0.5*100);
@@ -1593,9 +1608,12 @@ function drawObjects() {
             } else if (trains[cTrain].accelerationSpeed < 0 && newSpeed > 0) {
                 actionSync("trains", cTrain, [{"accelerationSpeed":trains[cTrain].accelerationSpeed *= -1},{"speedInPercent":newSpeed}], null);
             }
+            if(newSpeed > 0 && newSpeed < 100) {
+               hardware.mouse.cursor = "grabbing";
+            }
         }
         contextForeground.strokeRect(maxTextWidth,maxTextHeight*cTrain,maxTextWidth*0.5,maxTextHeight);
-        if(!collisionCourse(cTrain, false) && (contextClick && hardware.mouse.upX-background.x-translateOffset > maxTextWidth*1.5 && hardware.mouse.upX-background.x-translateOffset < maxTextWidth*1.75 && hardware.mouse.upY-background.y-translateOffset > maxTextHeight*cTrain && hardware.mouse.upY-background.y-translateOffset < maxTextHeight*cTrain+maxTextHeight)) {
+        if(noCollisionCTrain && (contextClick && hardware.mouse.upX-background.x-translateOffset > maxTextWidth*1.5 && hardware.mouse.upX-background.x-translateOffset < maxTextWidth*1.75 && hardware.mouse.upY-background.y-translateOffset > maxTextHeight*cTrain && hardware.mouse.upY-background.y-translateOffset < maxTextHeight*cTrain+maxTextHeight)) {
             if(trains[cTrain].accelerationSpeed > 0){ 
                 actionSync("trains", cTrain, [{"accelerationSpeed":trains[cTrain].accelerationSpeed *= -1}], null);
             } else if(!trains[cTrain].move) {
@@ -1606,14 +1624,14 @@ function drawObjects() {
         }
         contextForeground.save();
         contextForeground.translate(maxTextWidth*1.625,maxTextHeight/2+maxTextHeight*cTrain);
-        contextForeground.strokeStyle = trains[cTrain].move && trains[cTrain].accelerationSpeed > 0 ? "rgb(255,180,180)" : "rgb(180,255,180)";
+        contextForeground.strokeStyle = noCollisionCTrain ? (trains[cTrain].move && trains[cTrain].accelerationSpeed > 0 ? "rgb(255,180,180)" : "rgb(180,255,180)") : colorDark;
         contextForeground.fillStyle = contextForeground.strokeStyle;
         contextForeground.lineWidth = Math.ceil(maxTextHeight/20);
         contextForeground.beginPath();
         contextForeground.moveTo(0, -maxTextHeight/18);
         contextForeground.lineTo(0, -maxTextHeight/3);
         contextForeground.stroke();
-        contextForeground.strokeStyle = colorLight;
+        contextForeground.strokeStyle = noCollisionCTrain ? colorLight : colorDark;
         contextForeground.beginPath();
         contextForeground.rotate(-Math.PI/2);
         contextForeground.arc(0,0,maxTextHeight/3.5,0.15*Math.PI,1.85*Math.PI);
@@ -1632,6 +1650,9 @@ function drawObjects() {
             contextForeground.strokeStyle = colorDark;    
         } else {
             contextForeground.strokeStyle = colorLight;
+            if(hardware.mouse.moveX > background.x+translateOffset+1.75*maxTextWidth && hardware.mouse.moveY > background.y+translateOffset+maxTextHeight*cTrain && hardware.mouse.moveX < background.x+translateOffset+2*maxTextWidth && hardware.mouse.moveY < background.y+translateOffset+maxTextHeight*cTrain+maxTextHeight) {
+                hardware.mouse.cursor = "pointer";
+            }
         }
         contextForeground.fillStyle = contextForeground.strokeStyle;
         contextForeground.lineWidth = Math.ceil(maxTextHeight/5);
@@ -1705,21 +1726,22 @@ function drawObjects() {
     	context.restore();
     }
     
-    /////CURSOR/2/////
+    /////CURSOR/////
     if(settings.cursorascircle && isHardwareAvailable("cursorascircle") && (hardware.mouse.isMoving || hardware.mouse.isHold) && hardware.mouse.cursor != "none") {
         contextForeground.save();
         contextForeground.translate(hardware.mouse.moveX, hardware.mouse.moveY);
-        contextForeground.fillStyle = hardware.mouse.isHold && hardware.mouse.cursor == "pointer" ? "rgba(65,56,65," + (Math.random() * (0.3) + 0.6) + ")" : hardware.mouse.isHold ? "rgba(144,64,64," + (Math.random() * (0.3) + 0.6) + ")" : hardware.mouse.cursor == "pointer" ? "rgba(127,111,127," + (Math.random() * (0.3) + 0.6) + ")" : "rgba(255,250,240,0.5)";
+        contextForeground.fillStyle = hardware.mouse.cursor == "grabbing" ? "rgba(65,56,65," + (Math.random() * (0.3) + 0.6) + ")" : (hardware.mouse.cursor == "pointer" ? "rgba(99,118,140," + (Math.random() * (0.3) + 0.6) + ")" : (hardware.mouse.isHold ? "rgba(144,64,64," + (Math.random() * (0.3) + 0.6) + ")" : "rgba(255,250,240,0.5)"));
         var rectsize = canvas.width / 75;
         contextForeground.beginPath();
         contextForeground.arc(0,0,rectsize/2,0,2*Math.PI);
         contextForeground.fill();
-        contextForeground.fillStyle = hardware.mouse.isHold && hardware.mouse.cursor == "pointer" ? "rgba(50,45,50,1)" : hardware.mouse.isHold ? "rgba(200,64,64,1)" : hardware.mouse.cursor == "pointer" ? "rgba(100,90,100,1)" : "rgba((255,250,240,0.5)";
+        contextForeground.fillStyle = hardware.mouse.cursor == "grabbing" ? "rgba(50,45,50,1)" : (hardware.mouse.cursor == "pointer" ? "rgba(50,63,95,1)" : (hardware.mouse.isHold ? "rgba(200,64,64,1)" : "rgba((255,250,240,0.5)"));
         contextForeground.beginPath();
         contextForeground.arc(0,0,rectsize/4,0,2*Math.PI);
         contextForeground.fill();
         contextForeground.restore();
     }
+    canvasForeground.style.cursor = (!settings.cursorascircle || !isHardwareAvailable("cursorascircle")) ? hardware.mouse.cursor : "none";
     hardware.mouse.wheelScrolls = false;
     
     /////TRANSFORM/////

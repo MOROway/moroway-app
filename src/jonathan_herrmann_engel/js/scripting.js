@@ -1285,57 +1285,57 @@ function drawObjects() {
     }
 
     /////SWITCHES/////
-    var showDuration = 11;
-    if(((hardware.mouse.isHold && hardware.mouse.cursor == "default" && (clickTimeOut === null || clickTimeOut === undefined)) || frameNo-classicUI.switches.lastStateChange < 3*showDuration)){
-        Object.keys(switches).forEach(function(key) {
-            Object.keys(switches[key]).forEach(function(side) {
+    var wasPointer = hardware.mouse.cursor != "default";
+    Object.keys(switches).forEach(function(key) {
+        Object.keys(switches[key]).forEach(function(side) {
+            contextForeground.save();
+            contextForeground.beginPath();
+            contextForeground.arc(background.x+switches[key][side].x, background.y+switches[key][side].y, classicUI.switches.radius, 0, 2*Math.PI);
+            if (contextForeground.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY)) {
+                hardware.mouse.cursor = "pointer";
+            }
+            contextForeground.closePath();
+            contextForeground.restore();
+        });
+    });
+    Object.keys(switches).forEach(function(key) {
+        Object.keys(switches[key]).forEach(function(side) {
+            contextForeground.save();
+            contextForeground.beginPath();
+            contextForeground.arc(background.x+switches[key][side].x, background.y+switches[key][side].y, classicUI.switches.radius, 0, 2*Math.PI);
+            if (hardware.mouse.isHold && contextForeground.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY)){
+                hardware.mouse.isHold = false;
+                if(onlineGame.enabled){
+                    teamplaySync("action","switches", [key,side], [{"turned":!switches[key][side].turned}], [{getString:["appScreenSwitchTurns", "."]}]);
+                } else {
+                    switches[key][side].turned = !switches[key][side].turned;
+                    switches[key][side].lastStateChange = frameNo;
+                    animateWorker.postMessage({k: "switches", switches: switches});
+                    notify (getString("appScreenSwitchTurns", "."),false, 500,null, null, client.y);
+                }
+                contextForeground.fillStyle = switches[key][side].turned ? "rgba(144, 255, 144,1)" : "rgba(255,0,0,1)";
+                contextForeground.closePath();
+                contextForeground.fill();
+                contextForeground.restore();
+            } else if (!hardware.mouse.isHold && switches[key][side].lastStateChange != undefined && frameNo-switches[key][side].lastStateChange < classicUI.switches.showDuration) {
+                contextForeground.fillStyle = switches[key][side].turned ? "rgba(144, 255, 144,1)" : "rgba(255,0,0,1)";
+                contextForeground.closePath();
+                contextForeground.fill();
+                contextForeground.restore();
+            } else if (!hardware.mouse.isHold && switches[key][side].lastStateChange != undefined && frameNo-switches[key][side].lastStateChange < classicUI.switches.showDurationFade) {
+                contextForeground.closePath();
+                contextForeground.restore();
                 contextForeground.save();
                 contextForeground.beginPath();
-                contextForeground.arc(background.x+switches[key][side].x, background.y+switches[key][side].y, classicUI.switches.radius, 0, 2*Math.PI);
-                if ((contextForeground.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY) && hardware.mouse.isHold) || (frameNo-classicUI.switches.lastStateChange < 3*showDuration && key == classicUI.switches.lastStateChangeKey && side == classicUI.switches.lastStateChangeSide)) {
-                    if(contextForeground.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY) && hardware.mouse.isHold) {
-                        hardware.mouse.isHold = false;
-                        if(onlineGame.enabled){
-                            teamplaySync("action","switches", [key,side], [{"turned":!switches[key][side].turned}], [{getString:["appScreenSwitchTurns", "."]}]);
-                        } else {
-                            switches[key][side].turned = !switches[key][side].turned;
-                            classicUI.switches.lastStateChangeKey = key;
-                            classicUI.switches.lastStateChangeSide = side;
-                            classicUI.switches.lastStateChange = frameNo;
-                            animateWorker.postMessage({k: "switches", switches: switches});
-                            notify (getString("appScreenSwitchTurns", "."),false, 500,null, null, client.y);
-                        }
-                        contextForeground.fillStyle = switches[key][side].turned ? "rgba(144, 255, 144,1)" : "rgba(255,0,0,1)";
-                        contextForeground.closePath();
-                        contextForeground.fill();
-                        contextForeground.restore();
-                    } else if (!hardware.mouse.isHold && frameNo-classicUI.switches.lastStateChange < showDuration) {
-                        contextForeground.fillStyle = switches[key][side].turned ? "rgba(144, 255, 144,1)" : "rgba(255,0,0,1)";
-                        contextForeground.closePath();
-                        contextForeground.fill();
-                        contextForeground.restore();
-                    } else if (!hardware.mouse.isHold) {
-                        contextForeground.closePath();
-                        contextForeground.restore();
-                        contextForeground.save();
-                        contextForeground.beginPath();
-                        var fac = (1-((frameNo-showDuration-classicUI.switches.lastStateChange))/(2*showDuration));
-                        contextForeground.fillStyle = switches[key][side].turned ? "rgba(144, 255, 144," + fac + ")" : "rgba(255,0,0," + fac + ")";
-                        contextForeground.arc(background.x+switches[key][side].x, background.y+switches[key][side].y, fac*classicUI.switches.radius, 0, 2*Math.PI);
-                        contextForeground.closePath();
-                        contextForeground.fill();
-                        contextForeground.restore();
-                    }
-                } else {
-                    contextForeground.closePath();
-                    contextForeground.restore(); 
-                }
-            });
-        });
-    }
-    if(hardware.mouse.isHold && hardware.mouse.cursor == "default" && (clickTimeOut === null || clickTimeOut === undefined)){
-        Object.keys(switches).forEach(function(key) {
-            Object.keys(switches[key]).forEach(function(side) {
+                var fac = (1-((frameNo-classicUI.switches.showDuration-switches[key][side].lastStateChange))/(classicUI.switches.showDurationFade-classicUI.switches.showDuration));
+                contextForeground.fillStyle = switches[key][side].turned ? "rgba(144, 255, 144," + fac + ")" : "rgba(255,0,0," + fac + ")";
+                contextForeground.arc(background.x+switches[key][side].x, background.y+switches[key][side].y, fac*classicUI.switches.radius, 0, 2*Math.PI);
+                contextForeground.closePath();
+                contextForeground.fill();
+                contextForeground.restore();
+            } else if((client.chosenInputMethod == "mouse" && !wasPointer && !hardware.mouse.isHold && (switches[key][side].lastStateChange == undefined || frameNo-switches[key][side].lastStateChange > classicUI.switches.showDurationEnd) && contextForeground.isPointInPath(hardware.mouse.moveX, hardware.mouse.moveY)) || (hardware.mouse.isHold && hardware.mouse.cursor == "default" && (clickTimeOut === null || clickTimeOut === undefined))){
+                contextForeground.closePath();
+                contextForeground.restore(); 
                 contextForeground.save();
                 contextForeground.lineWidth = 5;
                 contextForeground.translate(background.x+switches[key][side].x, background.y+switches[key][side].y);
@@ -1364,10 +1364,13 @@ function drawObjects() {
                     contextForeground.strokeStyle = switches[key][side].turned ? "rgba(144, 238, 144,1)" : "rgba(255,0,0,1)";
                     contextForeground.stroke();
                     contextForeground.restore();
-                }                
-            });
+                }
+            } else {
+                contextForeground.closePath();
+                contextForeground.restore(); 
+            }
         });
-    }
+    });
 
     /////DEBUG/////
     if(debug) {
@@ -1851,7 +1854,7 @@ var carParams = {init: true, wayNo: 7};
 
 var taxOffice = {params: {number: 45, frameNo: 6, frameProbability: 0.6, fire: {x: 0.07, y: 0.06, size: 0.000833, color:{red: {red: 200, green: 0, blue: 0, alpha: 0.4}, yellow: {red: 255, green: 160, blue: 0, alpha: 1}, probability: 0.8}}, smoke: {x: 0.07, y: 0.06, size: 0.02, color: {red: 130, green: 120, blue: 130, alpha: 0.3}}, bluelights: {frameNo: 16, cars: [{frameNo: 0, x: [-0.0105, -0.0026], y: [0.177, 0.0047], size: 0.001},{frameNo: 3, x: [0.0275, -0.00275], y: [0.1472, 0.0092], size: 0.001},{frameNo: 5, x: [0.056, 0.0008], y: [0.18, 0.015], size: 0.001}]}}};
 
-var classicUI = {trainSwitch: {src: 11, selectedTrainDisplay: {}}, transformer: {src:13, asrc: 12, angle:(Math.PI/5),input:{src:14,angle:0,minAngle:minTrainSpeed,maxAngle:1.5*Math.PI},directionInput:{src:15,}}, switches: {}};
+var classicUI = {trainSwitch: {src: 11, selectedTrainDisplay: {}}, transformer: {src:13, asrc: 12, angle:(Math.PI/5),input:{src:14,angle:0,minAngle:minTrainSpeed,maxAngle:1.5*Math.PI},directionInput:{src:15,}}, switches: {showDuration: 11, showDurationFade: 33, showDurationEnd: 44}};
 
 var hardware = {mouse: {moveX:0, moveY:0,downX:0, downY:0, downTime: 0,upX:0, upY:0, upTime: 0, isMoving: false, isHold: false, rightClick: false, cursor: "default"}};
 var client = {devicePixelRatio: 1,realScaleMax:6,realScaleMin:1.2};
@@ -2823,12 +2826,10 @@ window.onload = function() {
                             break;
                             case "switches":
                                 obj = switches[input.index[0]][input.index[1]]
-                                classicUI.switches.lastStateChangeKey = input.index[0];
-                                classicUI.switches.lastStateChangeSide = input.index[1];
-                                classicUI.switches.lastStateChange = frameNo;
                                 input.params.forEach(function(param){
                                     obj[Object.keys(param)[0]] = Object.values(param)[0];
                                 });
+                                obj.lastStateChange = frameNo;
                                 animateWorker.postMessage({k: "switches", switches: switches});
                             break;
                         }

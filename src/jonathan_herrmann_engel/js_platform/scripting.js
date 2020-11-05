@@ -11,7 +11,7 @@ function placeOptions(state){
 			document.querySelector("iframe#" + id).style.display = "none";
 	  }
 		
-	  var menu = {container: document.querySelector("#canvas-options"),containerMargin:client.width/50,items: {team:document.querySelector("#canvas-team"),single:document.querySelector("#canvas-single"),help:document.querySelector("#canvas-help"), settings:document.querySelector("#canvas-settings"), controlCenter: document.querySelector("#canvas-control-center")}};
+	  var menu = {container: document.querySelector("#canvas-options"),containerMargin:client.width/50,items: {team:document.querySelector("#canvas-team"),single:document.querySelector("#canvas-single"),help:document.querySelector("#canvas-help"), settings:document.querySelector("#canvas-settings"), controlCenter: document.querySelector("#canvas-control-center"), carControlCenter: document.querySelector("#canvas-car-control-center")}};
 	if(state == "hide") {
 	  menu.container.style.opacity = "0";
 	} else if (state == "show") {
@@ -35,11 +35,11 @@ function placeOptions(state){
 					}
 					var applySettingsNode = document.querySelector("iframe#" + id).contentWindow.document.createElement("BUTTON");
 					applySettingsNode.innerHTML = getString("platformWebSettingsIframeApplyAndClose","","upper"); applySettingsNode.id = "applySettingsInIframe";
-					applySettingsNode.className = " mdl-button mdl-js-button 	mdl-js-ripple-effect";
+					applySettingsNode.className = " mdl-button mdl-js-button mdl-js-ripple-effect";
 					if(menu.items.help.style.display == "none"){
 						var openHelpNode = document.querySelector("iframe#" + id).contentWindow.document.createElement("BUTTON");
 						openHelpNode.innerHTML = getString("generalTitleHelpScreen","","upper"); openHelpNode.id = "openHelpNodeInSettingsIframe"; 
-						openHelpNode.className = " mdl-button mdl-js-button 	mdl-js-ripple-effect";
+						openHelpNode.className = " mdl-button mdl-js-button mdl-js-ripple-effect";
 						openHelpNode.style = "margin-top: 4%;";
 						document.querySelector("iframe#" + id).contentWindow.document.querySelector("main").appendChild(openHelpNode);
 						document.querySelector("iframe#" + id).contentWindow.document.querySelector("#openHelpNodeInSettingsIframe").addEventListener("click", function(){followLink("./help","_blank",LINK_STATE_INTERNAL_HTML);});
@@ -59,7 +59,8 @@ function placeOptions(state){
 					followLink("settings", "_self", LINK_STATE_INTERNAL_HTML);
 				  }
 				}, false);
-			menu.items.controlCenter.addEventListener("click", function(){hardware.mouse.rightClick = !hardware.mouse.rightClick;}, false);
+			menu.items.controlCenter.addEventListener("click", function(){hardware.mouse.rightClick = !hardware.mouse.rightClick || showCarCenter; showCarCenter = false;}, false);
+			menu.items.carControlCenter.addEventListener("click", function(){hardware.mouse.rightClick = !hardware.mouse.rightClick || !showCarCenter; showCarCenter = true;}, false);
 		  }
 		  for (var item in menu.items) {
 		  	menu.items[item].style.display = "inline";
@@ -87,7 +88,7 @@ function placeOptions(state){
 				menu.items[item].style.color = "";
 				menu.items[item].style.background = "";
 			  }
-			  menu.items.help.style.display = menu.items.controlCenter.style.display = "none";
+			  menu.items.help.style.display = menu.items.controlCenter.style.display = menu.items.carControlCenter.style.display = "none";
 			  menu.container.style.bottom = "";
 			  menu.container.style.right = client.x + menu.containerMargin + "px";
 			  menu.container.style.top = client.y + menu.containerMargin + "px";

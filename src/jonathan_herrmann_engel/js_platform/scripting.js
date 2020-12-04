@@ -18,6 +18,7 @@ function placeOptions(state){
 	  menu.container.style.opacity = "1";
 	} else {
 		  if(state == "load") {
+			showServerNote();
 			menu.items.help.addEventListener("click", function(){followLink("help", "_blank", LINK_STATE_INTERNAL_HTML);}, false);
 			menu.items.team.addEventListener("click", function(){followLink("?mode=multiplay", "_self", LINK_STATE_INTERNAL_HTML);}, false);
 			menu.items.single.addEventListener("click", function(){followLink("?", "_self", LINK_STATE_INTERNAL_HTML);}, false);

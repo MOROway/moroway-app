@@ -23,42 +23,34 @@ function placeOptions(state){
 			menu.items.team.addEventListener("click", function(){followLink("?mode=multiplay", "_self", LINK_STATE_INTERNAL_HTML);}, false);
 			menu.items.single.addEventListener("click", function(){followLink("?", "_self", LINK_STATE_INTERNAL_HTML);}, false);
 			menu.items.settings.addEventListener("click", function(){
-				  var id = "settingsimport";
-				  if(window.innerWidth > 500 + parseInt(window.getComputedStyle(document.querySelector("#" + id)).getPropertyValue("width"), 10)){
-					menu.container.style.display = "none";
-					openIframe(id);
-					var elems = document.querySelector("iframe#" + id).contentWindow.document.querySelectorAll(".internal-link");
-					for(var i = 0; i < elems.length; i++) {
-						elems[i].style.display = "none";
-					}
-					document.querySelector("iframe#" + id).contentWindow.followLink = function(input1,input2, input3){
-							window.open(input1, "_blank");
-					}
-					var applySettingsNode = document.querySelector("iframe#" + id).contentWindow.document.createElement("BUTTON");
-					applySettingsNode.innerHTML = getString("platformWebSettingsIframeApplyAndClose","","upper"); applySettingsNode.id = "applySettingsInIframe";
-					applySettingsNode.className = " mdl-button mdl-js-button mdl-js-ripple-effect";
-					if(menu.items.help.style.display == "none"){
-						var openHelpNode = document.querySelector("iframe#" + id).contentWindow.document.createElement("BUTTON");
-						openHelpNode.innerHTML = getString("generalTitleHelpScreen","","upper"); openHelpNode.id = "openHelpNodeInSettingsIframe"; 
-						openHelpNode.className = " mdl-button mdl-js-button mdl-js-ripple-effect";
-						openHelpNode.style = "margin-top: 4%;";
-						document.querySelector("iframe#" + id).contentWindow.document.querySelector("main").appendChild(openHelpNode);
-						document.querySelector("iframe#" + id).contentWindow.document.querySelector("#openHelpNodeInSettingsIframe").addEventListener("click", function(){followLink("./help","_blank",LINK_STATE_INTERNAL_HTML);});
-						var brNode = document.querySelector("iframe#" + id).contentWindow.document.createElement("BR");
-						document.querySelector("iframe#" + id).contentWindow.document.querySelector("main").appendChild(brNode);
-					} else {
-						applySettingsNode.style = "margin-top: 4%;";
-					}
-					document.querySelector("iframe#" + id).contentWindow.document.querySelector("main").appendChild(applySettingsNode);
-					document.querySelector("iframe#" + id).contentWindow.document.querySelector("#applySettingsInIframe").addEventListener("click", function(){settings = getSettings(); closeIframe(id); menu.container.style.display = ""; });
-					document.querySelector("iframe#" + id).contentWindow.followLink = function(input1,input2, input3){
-							window.open(input1, "_blank");
-					}
-				  } else if (onlineGame.enabled) {
-					followLink("settings", "_blank", LINK_STATE_INTERNAL_HTML);
-				  } else {
-					followLink("settings", "_self", LINK_STATE_INTERNAL_HTML);
-				  }
+				var id = "settingsimport";
+				menu.container.style.visibility = "hidden";
+				openIframe(id);
+				var elems = document.querySelector("iframe#" + id).contentWindow.document.querySelectorAll(".internal-link");
+				for(var i = 0; i < elems.length; i++) {
+					elems[i].style.display = "none";
+				}
+				document.querySelector("iframe#" + id).contentWindow.followLink = function(input1,input2, input3){
+						window.open(input1, "_blank");
+				}
+				var applySettingsNode = document.querySelector("iframe#" + id).contentWindow.document.createElement("BUTTON");
+				applySettingsNode.innerHTML = getString("platformWebSettingsIframeApplyAndClose","","upper");
+				applySettingsNode.id = "applySettingsInIframe";
+				applySettingsNode.className = " mdl-button mdl-js-button mdl-js-ripple-effect";
+				if(menu.items.help.style.display == "none"){
+					var openHelpNode = document.querySelector("iframe#" + id).contentWindow.document.createElement("BUTTON");
+					openHelpNode.innerHTML = getString("generalTitleHelpScreen","","upper"); openHelpNode.id = "openHelpNodeInSettingsIframe"; 
+					openHelpNode.className = " mdl-button mdl-js-button mdl-js-ripple-effect";
+					openHelpNode.style = "margin-top: 4%;";
+					document.querySelector("iframe#" + id).contentWindow.document.querySelector("main").appendChild(openHelpNode);
+					document.querySelector("iframe#" + id).contentWindow.document.querySelector("#openHelpNodeInSettingsIframe").addEventListener("click", function(){followLink("./help","_blank",LINK_STATE_INTERNAL_HTML);});
+					var brNode = document.querySelector("iframe#" + id).contentWindow.document.createElement("BR");
+					document.querySelector("iframe#" + id).contentWindow.document.querySelector("main").appendChild(brNode);
+				} else {
+					applySettingsNode.style = "margin-top: 4%;";
+				}
+				document.querySelector("iframe#" + id).contentWindow.document.querySelector("main").appendChild(applySettingsNode);
+				document.querySelector("iframe#" + id).contentWindow.document.querySelector("#applySettingsInIframe").addEventListener("click", function(){settings = getSettings(); closeIframe(id); menu.container.style.visibility = ""; });
 				}, false);
 			menu.items.controlCenter.addEventListener("click", function(){hardware.mouse.rightClick = !hardware.mouse.rightClick || controlCenter.showCarCenter; controlCenter.showCarCenter = false;}, false);
 			menu.items.carControlCenter.addEventListener("click", function(){hardware.mouse.rightClick = !hardware.mouse.rightClick || !controlCenter.showCarCenter; controlCenter.showCarCenter = true;}, false);

@@ -791,7 +791,7 @@ function drawObjects() {
     function collisionCourse(input1, input2){
         for(var i = 0; i < trains.length; i++){
             if(input1 != i){
-                if((trainCollisions[input1][i] >= trainParams.innerCollisionFac) || (trainCollisions[input1][i] > trainCollisions[i][input1])) {
+                if((trainCollisions[input1][i] >= trainParams.innerCollisionFac) || (trainCollisions[input1][i] > trainCollisions[i][input1]) || (trains[input1].endOfTrack && trains[input1].endOfTrackStandardDirection == trains[input1].standardDirection)) {
                     if(trains[input1].move){
                         var note = (input2) ? [{getString:["appScreenObjectHasCrashed", "."]}, {getString:[["appScreenTrainNames",input1]]}, {getString:[["appScreenTrainNames",i]]}] : null;
                         actionSync("trains",input1, [{move:false},{accelerationSpeed:0},{accelerationSpeedCustom:1}],note);
@@ -804,82 +804,7 @@ function drawObjects() {
                 }
             }
         }
-        return false;/*
-        context.save();
-        context.fillStyle = "black"; 
-        context.setTransform(1, 0, 0, 1, 0, 0);
-        var collision = false;
-        var currentObjects = [{}];
-        var innerFac = 0.7;
-        currentObjects[0] = copyJSObject(trains[input1]);
-        if(trains[input1].cars.length == 0 && trains[input1].standardDirection) {
-            currentObjects[0].facs = [{x: 0.5, y: innerFac/2},{x: 1, y: 1}];
-        } else if (trains[input1].cars.length == 0) {
-            currentObjects[0].facs = [{x: -0.5, y: innerFac/2},{x: -1, y: 1}];
-        } else if(trains[input1].standardDirection) {
-            currentObjects[0].facs = [{x: -1, y: innerFac},{x: -0.5, y: innerFac},{x: 0, y: innerFac},{x: 0.5, y: innerFac},{x: 1, y: 1}];
-        } else {
-            currentObjects[0].facs = [{x: -0.5, y: innerFac/2},{x: -1, y: innerFac}];
-        }
-        for(var i = 0; i < trains[input1].cars.length; i++) {
-             currentObjects[i+1] = copyJSObject(trains[input1].cars[i]);
-            if(i == trains[input1].cars.length-1 && !trains[input1].standardDirection) {
-                currentObjects[i+1].facs = [{x: -1, y: 1},{x: -0.5, y: innerFac},{x: 0, y: innerFac},{x: 0.5, y: innerFac},{x: 1, y: innerFac}];
-            } else if (i == trains[input1].cars.length-1) {
-                currentObjects[i+1].facs = [{x: 0.5, y: innerFac/2},{x: 1, y: innerFac}];
-            } else {
-                currentObjects[i+1].facs = [{x: -1, y: innerFac},{x: -0.5, y: innerFac},{x: 0, y: innerFac},{x: 0.5, y: innerFac},{x: 1, y: innerFac}];
-            }
-        }
-        currentObjects.forEach(function(currentObject) {
-            currentObject.points = [];
-            currentObject.pointNo = 0;
-            currentObject.facs.forEach(function(fac){
-                currentObject.points[currentObject.pointNo] = {};
-                currentObject.points[currentObject.pointNo+1] = {};
-                currentObject.points[currentObject.pointNo+2] = {};
-                currentObject.points[currentObject.pointNo].x = currentObject.x+fac.x*Math.sin(Math.PI/2-currentObject.displayAngle)*currentObject.width/2+fac.y*Math.cos(-Math.PI/2-currentObject.displayAngle)*currentObject.height/2;
-                currentObject.points[currentObject.pointNo+1].x = currentObject.x+fac.x*Math.sin(Math.PI/2-currentObject.displayAngle)*currentObject.width/2-fac.y*Math.cos(-Math.PI/2-currentObject.displayAngle)*currentObject.height/2;
-                currentObject.points[currentObject.pointNo+2].x = currentObject.x+fac.x*Math.sin(Math.PI/2-currentObject.displayAngle)*currentObject.width/2;
-                currentObject.points[currentObject.pointNo].y = currentObject.y+fac.x*Math.cos(Math.PI/2-currentObject.displayAngle)*currentObject.width/2-fac.y*Math.sin(-Math.PI/2-currentObject.displayAngle)*currentObject.height/2;
-                currentObject.points[currentObject.pointNo+1].y = currentObject.y+fac.x*Math.cos(Math.PI/2-currentObject.displayAngle)*currentObject.width/2+fac.y*Math.sin(-Math.PI/2-currentObject.displayAngle)*currentObject.height/2;
-                currentObject.points[currentObject.pointNo+2].y = currentObject.y+fac.x*Math.cos(Math.PI/2-currentObject.displayAngle)*currentObject.width/2;
-                currentObject.pointNo+=3;
-                if(debug) {
-                    currentObject.points.forEach(function(point) {
-                        context.fillRect(point.x-3,point.y-3,6,6);
-                    });
-                }
-            });
-            for(var i = 0; i < trains.length; i++){
-                if(input1 != i && (trains[input1].circleFamily === null || trains[i].circleFamily === null || trains[input1].circleFamily == trains[i].circleFamily)){
-                    for(var j = -1; j < trains[i].cars.length; j++){
-                        var currentObject2 = j >= 0 ? trains[i].cars[j] : trains[i];
-                        context.save();
-                        context.translate(currentObject2.x, currentObject2.y); 
-                        context.rotate(currentObject2.displayAngle);
-                        context.beginPath();
-                        context.rect(-currentObject2.width/2, -currentObject2.height/2, currentObject2.width, currentObject2.height);
-                        currentObject.points.forEach(function(point) {
-                            if (context.isPointInPath(point.x, point.y)){
-                                collision = true;
-                                if(trains[input1].move){
-                                    var note = (input2) ? [{getString:["appScreenObjectHasCrashed", "."]}, {getString:[["appScreenTrainNames",input1]]}, {getString:[["appScreenTrainNames",i]]}] : null;
-                                    actionSync("trains",input1, [{move:false},{accelerationSpeed:0},{accelerationSpeedCustom:1}],note);
-                                    actionSync("train-crash",input1,[{move:false},{accelerationSpeed:0},{accelerationSpeedCustom:1}]);
-                                    trains[input1].move = false;
-                                    trains[input1].accelerationSpeed = 0;
-                                    trains[input1].accelerationSpeedCustom = 1;
-                                }
-                            }
-                        });
-                        context.restore();
-                  }
-                }
-            }
-        });
-        context.restore();
-        return(collision);*///TODO
+        return false;
     }
     
     function drawCars(input1){
@@ -2476,7 +2401,7 @@ var controlCenter = {showCarCenter: null, fontFamily: "sans-serif"};
 
 var hardware = {mouse: {moveX:0, moveY:0,downX:0, downY:0, downTime: 0,upX:0, upY:0, upTime: 0, isMoving: false, isHold: false, rightClick: false, cursor: "default"}};
 var client = {devicePixelRatio: 1,realScaleMax:6,realScaleMin:1.2};
-var onlineGame = {animateInterval: 40, syncInterval: 20000, excludeFromSync: {"t": ["src", "fac", "speedFac", "accelerationSpeedStartFac", "accelerationSpeedFac", "bogieDistance", "width", "height", "speed", "cars"], "tc": ["src", "fac", "bogieDistance", "width", "height"]}};
+var onlineGame = {animateInterval: 40, syncInterval: 10000, excludeFromSync: {"t": ["src", "assetFlip", "fac", "speedFac", "accelerationSpeedStartFac", "accelerationSpeedFac", "lastDirectionChange", "bogieDistance", "width", "height", "speed", "endOfTrack", "endOfTrackStandardDirection", "flickerFacBack", "flickerFacBackOffset", "flickerFacFront", "flickerFacFrontOffset", "margin", "cars"], "tc": ["src", "assetFlip", "fac", "bogieDistance", "width", "height", "konamiUseTrainIcon"]}};
 var onlineConnection = {serverURI: getServerLink("wss:") + "/multiplay"};
 
 var resizeTimeout;
@@ -3051,6 +2976,8 @@ window.onload = function() {
                     trains[i].accelerationSpeed = train.accelerationSpeed;
                     trains[i].accelerationSpeedCustom = train.accelerationSpeedCustom;
                     trains[i].standardDirection = train.standardDirection;
+                    trains[i].endOfTrack = train.endOfTrack;
+                    trains[i].endOfTrackStandardDirection = train.endOfTrackStandardDirection;
                     train.cars.forEach(function(car,j){
                         trains[i].cars[j].x = car.x;
                         trains[i].cars[j].y = car.y;
@@ -3331,6 +3258,7 @@ window.onload = function() {
             }
             onlineConnection.socket = new WebSocket(host);
             onlineConnection.socket.onopen = function () {
+                window.addEventListener("error", function() {onlineConnection.socket.close();});
                 onlineConnection.send({mode:"hello", message: APP_DATA.version.major+APP_DATA.version.minor/10});
             };
             onlineConnection.socket.onclose = function () {
@@ -3477,6 +3405,15 @@ window.onload = function() {
                         var obj;
                         switch (input.objname){
                             case "trains":
+                                if(onlineGame.sessionId != json.sessionId){
+                                    onlineGame.excludeFromSync["t"].forEach(function(key){
+                                        input.params.forEach(function(param, paramNo){
+                                            if(Object.keys(param)[0] == key) {
+                                                delete input.params[paramNo];
+                                            }
+                                        });
+                                    });
+                                }
                                 animateWorker.postMessage({k: "train", i: input.index, params: input.params});
                             break;
                             case "train-crash":
@@ -3503,7 +3440,7 @@ window.onload = function() {
                         onlineGame.syncingTimeout = window.setTimeout(function(){
                             onlineGame.syncing = false;
                             onlineConnection.send({mode: "sync-cancel"});
-                        },1000);
+                        },3000);
                         onlineGame.syncingCounter = 0;
                         onlineGame.syncingCounterFinal = parseInt(json_message.number,10);
                         onlineGame.syncing = true;

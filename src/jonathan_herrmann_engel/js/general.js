@@ -52,7 +52,7 @@ function notify (elem, message, prio, timeout, actionHandler, actionText, minHei
     }
     if(prio > NOTIFICATION_PRIO_LOW || (notificationContainer.queue.length == 0 && !notificationContainer.active)) {
         var obj = {message: message, timeout: timeout, prio: prio, channel: channel, actionHandler: actionHandler, actionText: actionText};
-        if(prio === NOTIFICATION_PRIO_HIGH || (minHeight >= notificationContainer.offsetHeight && settings.showNotifications)) {
+        if(prio === NOTIFICATION_PRIO_HIGH || (minHeight >= notificationContainer.offsetHeight - 15 && settings.showNotifications)) {
             var chNo = notificationContainer.sameChannelNo(notificationContainer,channel,prio);
             if(channel != NOTIFICATION_CHANNEL_DEFAULT && chNo !== false){
                 notificationContainer.queue[chNo] = obj;

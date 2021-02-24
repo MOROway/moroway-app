@@ -12,9 +12,6 @@
         <!-- Hubspot: Pace.js -->
         <script src="src/others/open_source/open_code/hubspot/pace.js/pace.min.js"></script>
         <link rel="stylesheet" type="text/css" href="src/others/open_source/open_code/hubspot/pace.js/pace-theme-center-simple.tmpl.css">
-        <!-- Google: Material Design Lite -->
-        <script src="src/others/open_source/open_code/google/mdl/material.min.js"></script>
-        <link rel="stylesheet" type="text/css" href="src/others/open_source/open_code/google/mdl/material.min.css">
         <!-- Fonts -->
         <link rel="stylesheet" type="text/css" href="src/others/open_source/open_fonts/google/MaterialIcons/font.css">
         <link rel="stylesheet" type="text/css" href="src/others/open_source/open_fonts/google/Roboto/font.css">
@@ -94,23 +91,23 @@
                     <canvas id="game-gameplay-main" data-stringid-content="appScreenNoCanvas">JavaScript required</canvas>
                     <canvas id="game-gameplay-sfg" data-stringid-content="appScreenNoCanvas">JavaScript required</canvas>
                     <canvas id="game-gameplay-fg" data-stringid-content="appScreenNoCanvas">JavaScript required</canvas>
-                    <div id="canvas-options" style="position: fixed;">
-                        <button id="canvas-team" style="display: none;" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored" data-stringid-title="appScreenTeamplayTitle">
+                    <div id="canvas-options">
+                        <button id="canvas-team" class="canvas-options-button" data-stringid-title="appScreenTeamplayTitle">
                             <i class="material-icons">people</i>
                         </button>
-                        <button id="canvas-single" style="display: none;" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored" data-stringid-title="appScreenTeamplayUnsetTitle">
+                        <button id="canvas-single" class="canvas-options-button" data-stringid-title="appScreenTeamplayUnsetTitle">
                             <i class="material-icons">person</i>
                         </button>
-                        <button id="canvas-settings" style="display: none;" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored" data-stringid-title="generalTitleSettingsScreen">
+                        <button id="canvas-settings" class="canvas-options-button" data-stringid-title="generalTitleSettingsScreen">
                             <i class="material-icons">settings</i>
                         </button>
-                        <button id="canvas-help" style="display: none;" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored" data-stringid-title="generalTitleHelpScreen">
+                        <button id="canvas-help" class="canvas-options-button" data-stringid-title="generalTitleHelpScreen">
                             <i class="material-icons">help</i>
                         </button>
-                        <button id="canvas-control-center" style="display: none;" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored" data-stringid-title="appScreenControlCenterTitle">
+                        <button id="canvas-control-center" class="canvas-options-button" data-stringid-title="appScreenControlCenterTitle">
                             <i class="material-icons">train</i>
                         </button>
-                        <button id="canvas-car-control-center" style="display: none;" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored" data-stringid-title="appScreenCarControlCenterTitle">
+                        <button id="canvas-car-control-center" class="canvas-options-button" data-stringid-title="appScreenCarControlCenterTitle">
                             <i class="material-icons">directions_car</i>
                         </button>
                     </div>
@@ -128,13 +125,20 @@
         </div>
 
         <!-- notify -->
-        <div id="canvas-notifier" class="mdl-js-snackbar mdl-snackbar">
-            <div class="mdl-snackbar__text"></div>
-            <button class="mdl-snackbar__action" type="button"></button>
+        <div id="canvas-notifier" class="notify">
+            <span></span>
+            <button></button>
         </div>
 
-        <!-- settings sidebar -->
-        <iframe id="settingsimport" src="settings/index.html"></iframe>
+        <!-- settings -->
+        <div id="settings">
+            <div id="settings-inner"></div>
+            <div class="nav-wrapper">
+                <button id="settings-apply" class="nav-button" data-stringid-content="appScreenSettingsApplyAndClose"></button>
+                <br>
+                <button id="settings-help" class="internal-link nav-button" data-stringid-content="generalTitleHelpScreen"></button>
+            </div>
+        </div>
 
         <!-- load strings -->
         <script>

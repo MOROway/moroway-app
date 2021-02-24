@@ -12,21 +12,10 @@ function followLink(input1,input2, input3){
 //Enable offline functionality
 if ("serviceWorker" in navigator && window.location.href.indexOf("https://") == 0) {
     window.addEventListener("load", function() {
-        var url = "sw.js";
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", url);
-        xhr.send();
-        xhr.addEventListener("load", goOnSW);
-        xhr.addEventListener("error", goOnSW);
-        function goOnSW() {
-            if(xhr.status == 404) {
-                url = "../sw.js";
-            }
-            navigator.serviceWorker.register(url).then(function(registration) {
-                console.log("ServiceWorker registration successful with scope: ", registration.scope);
-            }, function(err) {
-                console.log("ServiceWorker registration failed: ", err);
-            });
-        }
+        navigator.serviceWorker.register(document.baseURI + "sw.js").then(function(registration) {
+            console.log("ServiceWorker registration successful with scope: ", registration.scope);
+        }, function(err) {
+            console.log("ServiceWorker registration failed: ", err);
+        });
     });
 }

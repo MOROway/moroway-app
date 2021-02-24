@@ -186,11 +186,11 @@ function onMouseRight(event) {
     event.preventDefault();
     if(controlCenter.showCarCenter === null && hardware.mouse.rightClick && client.realScale == 1) {
         controlCenter.showCarCenter = true;
-        notify(getString("appScreenCarControlCenterTitle"), false, 1000,null,null, client.y, false);
+        notify("#canvas-notifier", getString("appScreenCarControlCenterTitle"), NOTIFICATION_PRIO_LOW, 1000,null,null, client.y, false);
     } else {
         hardware.mouse.rightClick = !hardware.mouse.rightClick;
         if(hardware.mouse.rightClick && client.realScale == 1) {
-            notify(getString("appScreenControlCenterTitle"), false, 1000,null,null, client.y, false);
+            notify("#canvas-notifier", getString("appScreenControlCenterTitle"), NOTIFICATION_PRIO_LOW, 1000,null,null, client.y, false);
         }
         hardware.mouse.rightClickEvent = false;
         hardware.mouse.rightClickWheelScrolls = false;
@@ -262,12 +262,12 @@ function getTouchEnd(event) {
     if(hardware.mouse.rightClickPrepare != undefined && hardware.mouse.rightClickPrepare) {
         if(controlCenter.showCarCenter === null && hardware.mouse.rightClick) {
             controlCenter.showCarCenter = true;
-            notify(getString("appScreenCarControlCenterTitle"), false, 1000,null,null, client.y, false);
+            notify("#canvas-notifier", getString("appScreenCarControlCenterTitle"), NOTIFICATION_PRIO_LOW, 1000,null,null, client.y, false);
             hardware.mouse.rightClickPrepare = false;
         } else {
             hardware.mouse.rightClick = !hardware.mouse.rightClick;
             if(hardware.mouse.rightClick) {
-                notify(getString("appScreenControlCenterTitle"), false, 1000,null,null, client.y, false);
+                notify("#canvas-notifier", getString("appScreenControlCenterTitle"), NOTIFICATION_PRIO_LOW, 1000,null,null, client.y, false);
             }
             hardware.mouse.rightClickEvent = hardware.mouse.rightClickHold = hardware.mouse.rightClickPrepare = false;
         }
@@ -826,13 +826,13 @@ function drawObjects() {
                         carParams.autoModeOff = false;
                         carParams.autoModeRuns = true;
                         carParams.autoModeInit = true;
-                        notify(formatJSString(getString("appScreenCarAutoModeChange", "."), getString("appScreenCarAutoModeInit")),  false, 500,null, null, client.y);
+                        notify("#canvas-notifier", formatJSString(getString("appScreenCarAutoModeChange", "."), getString("appScreenCarAutoModeInit")), NOTIFICATION_PRIO_DEFAULT, 500,null, null, client.y);
                     } else if(carParams.autoModeOff && !currentObject.move && currentObject.backwardsState === 0) {
                         currentObject.lastDirectionChange = frameNo;
                         currentObject.backwardsState = 1;
                         currentObject.backToInit = false;
                         currentObject.move = !carCollisionCourse(input1,false);
-                        notify(formatJSString(getString("appScreenCarStepsBack","."), getString(["appScreenCarNames",input1])), false, 750,null,null, client.y);
+                        notify("#canvas-notifier", formatJSString(getString("appScreenCarStepsBack","."), getString(["appScreenCarNames",input1])), NOTIFICATION_PRIO_DEFAULT, 750,null,null, client.y);
                     }
                 } else {
                     if(typeof clickTimeOut !== "undefined"){
@@ -846,23 +846,23 @@ function drawObjects() {
                         }
                         if(!carCollisionCourse(input1,false)) {
                             if(carParams.autoModeRuns) {
-                                notify(formatJSString(getString("appScreenCarAutoModeChange", "."), getString("appScreenCarAutoModePause")),  false, 500,null, null, client.y);
+                                notify("#canvas-notifier", formatJSString(getString("appScreenCarAutoModeChange", "."), getString("appScreenCarAutoModePause")), NOTIFICATION_PRIO_DEFAULT, 500,null, null, client.y);
                                 carParams.autoModeRuns = false;
                             } else if(carParams.init || carParams.autoModeOff) {
                                 currentObject.parking = false;
                                 if (currentObject.move){
                                     currentObject.move = false;
-                                    notify(formatJSString(getString("appScreenObjectStops", "."), getString(["appScreenCarNames",input1])),  false, 500 ,null,  null, client.y);
+                                    notify("#canvas-notifier", formatJSString(getString("appScreenObjectStops", "."), getString(["appScreenCarNames",input1])), NOTIFICATION_PRIO_DEFAULT, 500 ,null,  null, client.y);
                                 } else {
                                     currentObject.move = !carCollisionCourse(input1,false);
-                                    notify(formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenCarNames",input1])),  false, 500,null, null, client.y);
+                                    notify("#canvas-notifier", formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenCarNames",input1])), NOTIFICATION_PRIO_DEFAULT, 500,null, null, client.y);
                                 }
                                 currentObject.backwardsState = 0;
                                 currentObject.backToInit = false;
                                 carParams.init = false;
                                 carParams.autoModeOff = true;
                             } else {
-                                notify(formatJSString(getString("appScreenCarAutoModeChange", "."), getString("appScreenCarAutoModeInit")),  false, 500,null, null, client.y);
+                                notify("#canvas-notifier", formatJSString(getString("appScreenCarAutoModeChange", "."), getString("appScreenCarAutoModeInit")), NOTIFICATION_PRIO_DEFAULT, 500,null, null, client.y);
                                 carParams.autoModeRuns = true;
                                 carParams.autoModeInit = true;
                             }
@@ -886,11 +886,11 @@ function drawObjects() {
                         if(carParams.autoModeOff) {
                             currentObject.move = true;
                             currentObject.backToInit = true;
-                            notify(formatJSString(getString("appScreenCarParking", "."), getString(["appScreenCarNames",input1])),  false, 500 ,null,  null, client.y);
+                            notify("#canvas-notifier", formatJSString(getString("appScreenCarParking", "."), getString(["appScreenCarNames",input1])), NOTIFICATION_PRIO_DEFAULT, 500 ,null,  null, client.y);
                         } else {
                             carParams.autoModeRuns = true;
                             carParams.isBackToRoot = true;
-                            notify(getString("appScreenCarAutoModeParking", "."),  false, 750 ,null,  null, client.y);
+                            notify("#canvas-notifier", getString("appScreenCarAutoModeParking", "."), NOTIFICATION_PRIO_DEFAULT, 750 ,null,  null, client.y);
                         }
                     }
                 }
@@ -1022,7 +1022,7 @@ function drawObjects() {
                 context.rect(-currentObject.width/2, -currentObject.height/2, currentObject.width, currentObject.height);
                 if (context.isPointInPath(x1, y1) || context.isPointInPath(x2, y2) || context.isPointInPath(x3, y3)){
                     if(input2 && cars[input1].move){
-                        notify(formatJSString(getString("appScreenObjectHasCrashed", "."), getString(["appScreenCarNames",input1]), getString(["appScreenCarNames",i])), false, 2000,null,null, client.y);
+                        notify("#canvas-notifier", formatJSString(getString("appScreenObjectHasCrashed", "."), getString(["appScreenCarNames",input1]), getString(["appScreenCarNames",i])), NOTIFICATION_PRIO_DEFAULT, 2000,null,null, client.y);
                     }
                     collision = true;
                     cars[input1].move = cars[input1].backToInit = false;
@@ -1114,7 +1114,7 @@ function drawObjects() {
     contextForeground.setTransform(client.realScale,0,0,client.realScale,-(client.realScale-1)*canvas.width/2+client.touchScaleX,-(client.realScale-1)*canvas.height/2+client.touchScaleY);
     frameNo++;
     if(frameNo % 1000000 === 0){
-        notify(formatJSString(getString("appScreenAMillionFrames","."),frameNo/1000000), false, 500, null, null, client.y);
+        notify("#canvas-notifier", formatJSString(getString("appScreenAMillionFrames","."),frameNo/1000000), NOTIFICATION_PRIO_DEFAULT, 500, null, null, client.y);
     }
     if(hardware.mouse.cursor != "none") {
         hardware.mouse.cursor = "default";
@@ -1414,13 +1414,7 @@ function drawObjects() {
                     trainParams.selected = trains.length-1;
                 }
                 if (!settings.alwaysShowSelectedTrain) {
-                    var timeNotify = 1250;
-                    if(classicUI.trainSwitch.notifyTimeout !== undefined && classicUI.trainSwitch.notifyTimeout !== null) {
-                        clearTimeout(classicUI.trainSwitch.notifyTimeout);
-                    }
-                    classicUI.trainSwitch.notifyTimeout = setTimeout(function() {
-                        notify(formatJSString(getString("appScreenTrainSelected", "."), getString(["appScreenTrainNames",trainParams.selected])), true, timeNotify, null, null, client.y);
-                    },timeNotify/4);
+                    notify("#canvas-notifier", formatJSString(getString("appScreenTrainSelected", "."), getString(["appScreenTrainNames",trainParams.selected])), NOTIFICATION_PRIO_HIGH, 1250, null, null, window.innerHeight, NOTIFICATION_CHANNEL_CLASSIC_UI_TRAIN_SWITCH);
                 }
             }
         }
@@ -1613,7 +1607,7 @@ function drawObjects() {
                     switches[key][side].turned = !switches[key][side].turned;
                     switches[key][side].lastStateChange = frameNo;
                     animateWorker.postMessage({k: "switches", switches: switches});
-                    notify (getString("appScreenSwitchTurns", "."),false, 500,null, null, client.y);
+                    notify("#canvas-notifier", getString("appScreenSwitchTurns", "."), NOTIFICATION_PRIO_DEFAULT, 500,null, null, client.y,NOTIFICATION_CHANNEL_TRAIN_SWITCHES);
                 }
                 contextForeground.fillStyle = switches[key][side].turned ? "rgba(144, 255, 144,1)" : "rgba(255,0,0,1)";
                 contextForeground.closePath();
@@ -1919,7 +1913,7 @@ function drawObjects() {
                             carParams.autoModeOff = false;
                             carParams.autoModeRuns = true;
                             carParams.autoModeInit = true;
-                            notify(formatJSString(getString("appScreenCarAutoModeChange", "."), getString("appScreenCarAutoModeInit")),  false, 500,null, null, client.y);
+                            notify("#canvas-notifier", formatJSString(getString("appScreenCarAutoModeChange", "."), getString("appScreenCarAutoModeInit")), NOTIFICATION_PRIO_DEFAULT, 500,null, null, client.y);
 
                         } else if(contextClick) {
                             cars[cCar].move = !carCollisionCourse(cCar,false);
@@ -1928,7 +1922,7 @@ function drawObjects() {
                             cars[cCar].backToInit = false;
                             carParams.init = false;
                             carParams.autoModeOff = true;
-                            notify(formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenCarNames",cCar])),  false, 500,null, null, client.y);
+                            notify("#canvas-notifier", formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenCarNames",cCar])), NOTIFICATION_PRIO_DEFAULT, 500,null, null, client.y);
                         }
                     }
                 }
@@ -1969,10 +1963,10 @@ function drawObjects() {
                                 cars[cCar].backToInit = false;
                                 if (cars[cCar].move){
                                     cars[cCar].move = false;
-                                    notify(formatJSString(getString("appScreenObjectStops", "."), getString(["appScreenCarNames",cCar])),  false, 500 ,null,  null, client.y);
+                                    notify("#canvas-notifier", formatJSString(getString("appScreenObjectStops", "."), getString(["appScreenCarNames",cCar])), NOTIFICATION_PRIO_DEFAULT, 500 ,null,  null, client.y);
                                 } else {
                                     cars[cCar].move = noCollisionCCar;
-                                    notify(formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenCarNames",cCar])),  false, 500,null, null, client.y);
+                                    notify("#canvas-notifier", formatJSString(getString("appScreenObjectStarts", "."), getString(["appScreenCarNames",cCar])), NOTIFICATION_PRIO_DEFAULT, 500,null, null, client.y);
                                 }
                             }
                         }
@@ -2004,7 +1998,7 @@ function drawObjects() {
                                 cars[cCar].backwardsState = 1;
                                 cars[cCar].backToInit = false;
                                 cars[cCar].move = !carCollisionCourse(cCar,false);
-                                notify(formatJSString(getString("appScreenCarStepsBack","."), getString(["appScreenCarNames",cCar])), false, 750,null,null, client.y);
+                                notify("#canvas-notifier", formatJSString(getString("appScreenCarStepsBack","."), getString(["appScreenCarNames",cCar])), NOTIFICATION_PRIO_DEFAULT, 750,null,null, client.y);
                             }
                         }
                     }
@@ -2041,7 +2035,7 @@ function drawObjects() {
                             if(contextClick) {
                                 cars[cCar].move = true;
                                 cars[cCar].backToInit = true;
-                                notify(formatJSString(getString("appScreenCarParking", "."), getString(["appScreenCarNames",cCar])),  false, 500 ,null,  null, client.y);
+                                notify("#canvas-notifier", formatJSString(getString("appScreenCarParking", "."), getString(["appScreenCarNames",cCar])), NOTIFICATION_PRIO_DEFAULT, 500 ,null,  null, client.y);
                             }
                         }
                     }
@@ -2069,10 +2063,10 @@ function drawObjects() {
                         if(cCar == 0) {
                             hardware.mouse.cursor = "pointer";
                             if(contextClick && carParams.autoModeRuns) {
-                                notify(formatJSString(getString("appScreenCarAutoModeChange", "."), getString("appScreenCarAutoModePause")),  false, 500,null, null, client.y);
+                                notify("#canvas-notifier", formatJSString(getString("appScreenCarAutoModeChange", "."), getString("appScreenCarAutoModePause")), NOTIFICATION_PRIO_DEFAULT, 500,null, null, client.y);
                                 carParams.autoModeRuns = false;
                             } else if(contextClick) {
-                                notify(formatJSString(getString("appScreenCarAutoModeChange", "."), getString("appScreenCarAutoModeInit")),  false, 500,null, null, client.y);
+                                notify("#canvas-notifier", formatJSString(getString("appScreenCarAutoModeChange", "."), getString("appScreenCarAutoModeInit")), NOTIFICATION_PRIO_DEFAULT, 500,null, null, client.y);
                                 carParams.autoModeRuns = true;
                                 carParams.autoModeInit = true;
                             }
@@ -2082,7 +2076,7 @@ function drawObjects() {
                                 if(contextClick) {
                                     carParams.autoModeRuns = true;
                                     carParams.isBackToRoot = true;
-                                    notify(getString("appScreenCarAutoModeParking", "."),  false, 750 ,null,  null, client.y);
+                                    notify("#canvas-notifier", getString("appScreenCarAutoModeParking", "."), NOTIFICATION_PRIO_DEFAULT, 750 ,null,  null, client.y);
                                 }
                             }
                         }
@@ -2312,7 +2306,7 @@ function actionSync (objname, index, params, notification) {
                     notifyArr.push(getString( ...elem.getString ));
                 });
                 var notifyStr = formatJSString( ...notifyArr );
-                notify(notifyStr, false, 1000, null,null,client.y);
+                notify("#canvas-notifier", notifyStr, NOTIFICATION_PRIO_DEFAULT, 1000, null,null,client.y);
             }
             break;
         }
@@ -2879,7 +2873,7 @@ window.onload = function() {
         }
 
         animateWorker.onerror = function() {
-            notify(getString("appScreenIsFail", "!", "upper"), true, 60000, function(){followLink("error#animate", "_blank", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
+            notify("#canvas-notifier", getString("appScreenIsFail", "!", "upper"), NOTIFICATION_PRIO_HIGH, 60000, function(){followLink("error#animate", "_blank", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
         };
         animateWorker.onmessage = function(message) {
             if(message.data.k == "getTrainPics") {
@@ -2931,7 +2925,7 @@ window.onload = function() {
                         setTimeout(function(){
                             var localAppData = getLocalAppDataCopy();
                             if(settings.classicUI && !settings.alwaysShowSelectedTrain){
-                                notify(formatJSString(getString("appScreenTrainSelected", "."), getString(["appScreenTrainNames",trainParams.selected]), getString("appScreenTrainSelectedAuto", " ")), true,3000,null,null, client.y);
+                                notify("#canvas-notifier", formatJSString(getString("appScreenTrainSelected", "."), getString(["appScreenTrainNames",trainParams.selected]), getString("appScreenTrainSelectedAuto", " ")), NOTIFICATION_PRIO_HIGH,3000,null,null, client.y);
                             } else if(localAppData !== null && (localAppData.version.major < APP_DATA.version.major || localAppData.version.minor < APP_DATA.version.minor) && typeof appUpdateNotification == "function") {
                                 appUpdateNotification();
                             } else if (typeof appReadyNotification == "function") {
@@ -3082,7 +3076,7 @@ window.onload = function() {
             onlineGame.enabled = true;
         } else {
             onlineGame.enabled = false;
-            notify(getString("appScreenTeamplayNoWebsocket", "!", "upper"), true, 6000, null, null, client.y);
+            notify("#canvas-notifier", getString("appScreenTeamplayNoWebsocket", "!", "upper"), NOTIFICATION_PRIO_HIGH, 6000, null, null, client.y);
         }
     } else {
         onlineGame.enabled = false;
@@ -3248,7 +3242,7 @@ window.onload = function() {
             };
             onlineConnection.socket.onclose = function () {
                 showNewGameLink();
-                notify(getString("appScreenTeamplayConnectionError", "."), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
+                notify("#canvas-notifier", getString("appScreenTeamplayConnectionError", "."), NOTIFICATION_PRIO_HIGH, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
             };
             onlineConnection.socket.onmessage = function (message) {
                 var json = JSON.parse(message.data);
@@ -3259,7 +3253,7 @@ window.onload = function() {
                 case "hello":
                     if(json.errorLevel < 2) {
                         if(json.errorLevel == 1){
-                            notify(getString("appScreenTeamplayUpdateNote", "!"), false, 900, null,null,client.y);
+                            notify("#canvas-notifier", getString("appScreenTeamplayUpdateNote", "!"), NOTIFICATION_PRIO_DEFAULT, 900, null,null,client.y);
                         }
                         var parent = document.querySelector("#content");
                         var elem = parent.querySelector("#setup");
@@ -3289,7 +3283,7 @@ window.onload = function() {
                     } else {
                         document.querySelector("#content").style.display = "none";
                         window.setTimeout(function(){followLink("error#tp-update", "_self", LINK_STATE_INTERNAL_HTML);},1000);
-                        notify(getString("appScreenTeamplayUpdateError", "!"), true, 6000, null,null,client.y);
+                        notify("#canvas-notifier", getString("appScreenTeamplayUpdateError", "!"), NOTIFICATION_PRIO_HIGH, 6000, null,null,client.y);
                     }
                     break;
                 case "init":
@@ -3302,7 +3296,7 @@ window.onload = function() {
                         }
                     } else {
                         showNewGameLink();
-                        notify(getString("appScreenTeamplayConnectionError", "."), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
+                        notify("#canvas-notifier", getString("appScreenTeamplayConnectionError", "."), NOTIFICATION_PRIO_HIGH, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
                     }
                     break;
                 case "connect":
@@ -3318,7 +3312,7 @@ window.onload = function() {
                         elem.querySelector("#setup-start-button").onclick = function(){copy("#setup #setup-start #setup-start-gamelink");};
                     } else {
                         showNewGameLink();
-                        notify(getString("appScreenTeamplayCreateError", "!"), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
+                        notify("#canvas-notifier", getString("appScreenTeamplayCreateError", "!"), NOTIFICATION_PRIO_HIGH, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
                     }
                     break;
                 case "join":
@@ -3328,14 +3322,14 @@ window.onload = function() {
                             showStartGame();
                         } else {
                             showNewGameLink();
-                            notify(getString("appScreenTeamplayJoinError", "!"), true, 6000, function(){followLink("error#tp-join", "_self", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
+                            notify("#canvas-notifier", getString("appScreenTeamplayJoinError", "!"), NOTIFICATION_PRIO_HIGH, 6000, function(){followLink("error#tp-join", "_self", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
                         }
                     } else {
                         if(json.errorLevel === 0){
                             showStartGame();
                         } else {
                             showNewGameLink();
-                            notify(getString("appScreenTeamplayJoinTeammateError", "!"), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
+                            notify("#canvas-notifier", getString("appScreenTeamplayJoinTeammateError", "!"), NOTIFICATION_PRIO_HIGH, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
                         }
                     }
                     break;
@@ -3348,7 +3342,7 @@ window.onload = function() {
                                 var elem = parent.querySelector("#game-wait");
                                 resetForElem(parent, elem);
                             } else {
-                                notify(getString("appScreenTeamplayTeammateReady", "?"), false, 1000, null,null,client.y);
+                                notify("#canvas-notifier", getString("appScreenTeamplayTeammateReady", "?"), NOTIFICATION_PRIO_DEFAULT, 1000, null,null,client.y);
                             }
                             break;
                         case "run":
@@ -3366,7 +3360,7 @@ window.onload = function() {
                         }
                     } else {
                         showNewGameLink();
-                        notify(getString("appScreenTeamplayStartError", "!"), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
+                        notify("#canvas-notifier", getString("appScreenTeamplayStartError", "!"), NOTIFICATION_PRIO_HIGH, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
                     }
                     break;
                 case "action":
@@ -3385,7 +3379,7 @@ window.onload = function() {
                         if(onlineGame.sessionId != json.sessionId){
                             notifyStr = json.sessionName + ": " + notifyStr;
                         }
-                        notify(notifyStr, false, 1000, null,null,client.y);
+                        notify("#canvas-notifier", notifyStr, NOTIFICATION_PRIO_DEFAULT, 1000, null,null,client.y);
                     }
                     var obj;
                     switch (input.objname){
@@ -3481,7 +3475,7 @@ window.onload = function() {
                     }
                     onlineGame.stop = true;
                     animateWorker.postMessage({k: "pause"});
-                    notify(getString("appScreenTeamplayGamePaused", "."), true, 900, null, null, client.y);
+                    notify("#canvas-notifier", getString("appScreenTeamplayGamePaused", "."), NOTIFICATION_PRIO_HIGH, 900, null, null, client.y);
                     break;
                 case "resume":
                     if(onlineGame.stop){
@@ -3492,26 +3486,26 @@ window.onload = function() {
                             onlineGame.syncRequest = window.setTimeout(sendSyncRequest, onlineGame.syncInterval);
                         }
                         onlineGame.stop = false;
-                        notify(getString("appScreenTeamplayGameResumed", "."), true, 900, null, null, client.y);
+                        notify("#canvas-notifier", getString("appScreenTeamplayGameResumed", "."), NOTIFICATION_PRIO_HIGH, 900, null, null, client.y);
                         animateWorker.postMessage({k: "resume"});
                     }
                     break;
                 case "leave":
                     if(json.errorLevel == 2){
                         showNewGameLink();
-                        notify(getString("appScreenTeamplayTeammateLeft", "."), true, 900, null, null, client.y);
+                        notify("#canvas-notifier", getString("appScreenTeamplayTeammateLeft", "."), NOTIFICATION_PRIO_HIGH, 900, null, null, client.y);
                     } else {
-                        notify(json.sessionName + ": " + getString("appScreenTeamplaySomebodyLeft", "."), true, 900, null, null, client.y);
+                        notify("#canvas-notifier", json.sessionName + ": " + getString("appScreenTeamplaySomebodyLeft", "."), NOTIFICATION_PRIO_HIGH, 900, null, null, client.y);
                     }
                     break;
                 case "unknown":
-                    notify(getString("appScreenTeamplayUnknownRequest", "."), true, 2000, null, null, client.y);
+                    notify("#canvas-notifier", getString("appScreenTeamplayUnknownRequest", "."), NOTIFICATION_PRIO_HIGH, 2000, null, null, client.y);
                     break;
                 }
             };
             onlineConnection.socket.onerror = function () {
                 showNewGameLink();
-                notify(getString("appScreenTeamplayConnectionError", "!"), true, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
+                notify("#canvas-notifier", getString("appScreenTeamplayConnectionError", "!"), NOTIFICATION_PRIO_HIGH, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
             };
         });
         onlineConnection.send = (function(obj) {
@@ -3573,7 +3567,7 @@ window.onload = function() {
             }
         };
         pics[pic.id].onerror = function() {
-            notify(getString("appScreenIsFail", "!", "upper"), true, 60000, function(){followLink("error#pic", "_blank", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
+            notify("#canvas-notifier", getString("appScreenIsFail", "!", "upper"), NOTIFICATION_PRIO_HIGH, 60000, function(){followLink("error#pic", "_blank", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
         };
     });
 };

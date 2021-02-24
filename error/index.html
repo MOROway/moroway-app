@@ -10,9 +10,6 @@
         <link rel="icon" type="image/x-icon" sizes="32x32" href="favicon.ico">
 
         <!-- Open Source Libraries And Fonts -->
-        <!-- Google: Material Design Lite -->
-        <script src="src/others/open_source/open_code/google/mdl/material.min.js"></script>
-        <link rel="stylesheet" type="text/css" href="src/others/open_source/open_code/google/mdl/material.min.css">
         <!-- Fonts -->
         <link rel="stylesheet" type="text/css" href="src/others/open_source/open_fonts/google/MaterialIcons/font.css">
         <link rel="stylesheet" type="text/css" href="src/others/open_source/open_fonts/google/Roboto/font.css">
@@ -37,70 +34,71 @@
     </head>
 
     <body>
-        <div class="mdl-layout mdl-js-layout">
 
-            <header style="background-color: black;" class="mdl-layout__header">
-                <div class="mdl-layout__header-row">
-                    <span class="mdl-layout__title" data-stringid-content="generalTitleErrorScreen"></span>
-                </div>
-            </header>
+        <header class="page-header">
+            <i id="backOption" class="internal-link material-icons">arrow_back</i>
+            <h1 data-stringid-content="generalTitleErrorScreen"></h1>
+        </header>
 
-            <main class="mdl-layout__content">
-                <article>
-                    <h2 data-stringid-content="errorScreenErrorAnimate"></h2>
-                    <div class="mdl-card mdl-shadow--2dp" id="animate">
-                        <div class="mdl-card__title">
-                            <h2 class="mdl-card__title-text" data-stringid-content="errorScreenErrorAnimateGeneral"></h2>
+        <main>
+            <article>
+                <h2 data-stringid-content="errorScreenErrorAnimate"></h2>
+                <div class="card-container card-container-highlightable">
+                    <div class="card" id="animate">
+                        <div class="card-title">
+                            <h2 data-stringid-content="errorScreenErrorAnimateGeneral"></h2>
                         </div>
-                        <div class="mdl-card__supporting-text">
+                        <div class="card-content">
                             <p data-stringid-content="errorScreenErrorAnimateGeneralP1"></p>
                         </div>
                     </div>
-                </article>
-                <article>
-                    <h2 data-stringid-content="errorScreenErrorMissing"></h2>
-                    <div class="mdl-card mdl-shadow--2dp" id="pic">
-                        <div class="mdl-card__title">
-                            <h2 class="mdl-card__title-text" data-stringid-content="errorScreenErrorMissingPics"></h2>
+                </div>
+            </article>
+            <article>
+                <h2 data-stringid-content="errorScreenErrorMissing"></h2>
+                <div class="card-container card-container-highlightable">
+                    <div class="card" id="pic">
+                        <div class="card-title">
+                            <h2 data-stringid-content="errorScreenErrorMissingPics"></h2>
                         </div>
-                        <div class="mdl-card__supporting-text">
+                        <div class="card-content">
                             <p data-stringid-content="errorScreenErrorMissingPicsP1"></p>
                             <p data-stringid-content="errorScreenErrorMissingPicsP2"></p>
                         </div>
                     </div>
-                </article>
-                <article>
-                    <h2 data-stringid-content="errorScreenErrorTeamplay"></h2>
-                    <div class="mdl-card mdl-shadow--2dp" id="tp-join">
-                        <div class="mdl-card__title">
-                            <h2 class="mdl-card__title-text" data-stringid-content="errorScreenErrorTeamplayJoin"></h2>
+                </div>
+            </article>
+            <article>
+                <h2 data-stringid-content="errorScreenErrorTeamplay"></h2>
+                <div class="card-container card-container-highlightable">
+                    <div class="card" id="tp-join">
+                        <div class="card-title">
+                            <h2 data-stringid-content="errorScreenErrorTeamplayJoin"></h2>
                         </div>
-                        <div class="mdl-card__supporting-text">
+                        <div class="card-content">
                             <p data-stringid-content="errorScreenErrorTeamplayJoinP1"></p>
                         </div>
                     </div>
-                    <div class="mdl-card mdl-shadow--2dp" id="tp-connection">
-                        <div class="mdl-card__title">
-                            <h2 class="mdl-card__title-text" data-stringid-content="errorScreenErrorTeamplayConnection"></h2>
+                    <div class="card" id="tp-connection">
+                        <div class="card-title">
+                            <h2 data-stringid-content="errorScreenErrorTeamplayConnection"></h2>
                         </div>
-                        <div class="mdl-card__supporting-text">
+                        <div class="card-content">
                             <p data-stringid-content="errorScreenErrorTeamplayConnectionP1"></p>
                             <p data-stringid-content="errorScreenErrorTeamplayConnectionP2"></p>
                         </div>
                     </div>
-                    <div class="mdl-card mdl-shadow--2dp" id="tp-update">
-                        <div class="mdl-card__title">
-                            <h2 class="mdl-card__title-text" data-stringid-content="errorScreenErrorTeamplayUpdate"></h2>
+                    <div class="card" id="tp-update">
+                        <div class="card-title">
+                            <h2 data-stringid-content="errorScreenErrorTeamplayUpdate"></h2>
                         </div>
-                        <div class="mdl-card__supporting-text">
+                        <div class="card-content">
                             <p data-stringid-content="errorScreenErrorTeamplayUpdateP1"></p>
                         </div>
                     </div>
-                </article>
-                <button id="backOption" class="internal-link mdl-button mdl-js-button mdl-js-ripple-effect" data-stringid-content="generalBack"></button>
-            </main>
-
-        </div>
+                </div>
+            </article>
+        </main>
 
         <!-- load strings -->
         <script>

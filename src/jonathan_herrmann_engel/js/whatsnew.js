@@ -1,6 +1,6 @@
 function init(){
 		
-    document.querySelector("#backOption").addEventListener("click", function(){try {window.close();}catch(err) {} followLink("./","_self", LINK_STATE_INTERNAL_HTML);}, false);
+    document.querySelector("#backOption").addEventListener("click", function(){try {window.close();}catch(err) {} followLink("./help","_self", LINK_STATE_INTERNAL_HTML);}, false);
 	
     var i = 0;
     var versions = [];
@@ -12,20 +12,21 @@ function init(){
             var elem1 = document.createElement("h2");
             elem1.textContent=formatJSString(getString("whatsNewScreenVersionNumber"), i+1);
             elem.appendChild(elem1);
+            elem1 = document.createElement("div");
+            elem1.className = "card-container card-container-highlightable";
             do {
                 if(getString("whatsNewScreenByVersionMa"+(i+1)+"Mi"+j) != "undefined") {
                     var selem = document.createElement("div");
-                    selem.className = "mdl-card mdl-shadow--2dp version";
+                    selem.className = "card";
                     var selem1 = document.createElement("div");
-                    selem1.className = "mdl-card__title";
+                    selem1.className = "card-title";
                     var selem2 = document.createElement("h2");
-                    selem2.className = "mdl-card__title-text";
                     selem2.textContent=formatJSString(getString("whatsNewScreenVersionNumberMinor"), i+1, j);
                     selem1.appendChild(selem2);
                     selem.appendChild(selem1);
                     elem.appendChild(selem);
                     selem1 = document.createElement("div");
-                    selem1.className = "mdl-card__supporting-text";
+                    selem1.className = "card-content";
                     selem2 = document.createElement("p");
                     selem3 = document.createElement("i");
                     selem3.textContent = formatJSString(getString(["whatsNewScreenByVersionMa"+(i+1)+"Mi"+j,0]));
@@ -49,12 +50,13 @@ function init(){
                     } while (k > 1);
                     selem1.appendChild(selem2);
                     selem.appendChild(selem1);
-                    elem.appendChild(selem);
+                    elem1.appendChild(selem);
                     j++;
                 } else {
                     j = 0;
                 }
             } while (j > 0);
+            elem.appendChild(elem1);
             versions[i] = elem;
             i++;
         } else {
@@ -67,22 +69,10 @@ function init(){
             newestFamily = versions[i].id;
         }
         document.querySelector("main").appendChild(versions[i]);
-        document.querySelector("#" + newestFamily).lastChild.id = "newest";
     }
+    document.querySelector("#" + newestFamily).querySelector(".card-container").lastChild.id = "newest";
+
 		
     setHTMLStrings();
 	
 }
-
-window.addEventListener("load", function(){
-	
-    // Workaround for https://github.com/google/material-design-lite/issues/4140 && Required for select current version
-    var hash = window.location.hash.replace(/[^a-zA-Z0-9\-_]/i, "");
-    if(hash){
-        var elem = document.querySelector("#"+hash);
-        if(elem){
-            elem.scrollIntoView();
-        }
-    }
-
-});

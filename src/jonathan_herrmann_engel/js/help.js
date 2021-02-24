@@ -9,8 +9,6 @@ function init(){
     document.querySelector("#general-version").appendChild(elem);
     document.querySelector("#general-whatsnew").addEventListener("click", function(){followLink("whatsnew/#newest","_self", LINK_STATE_INTERNAL_HTML);}, false);
 	
-    document.querySelector("#legal-mdl-copyright").addEventListener("click", function(){followLink("src/others/open_source/open_code/google/mdl/COPYRIGHT","_self", LINK_STATE_INTERNAL_LICENSE_FILE);}, false);
-    document.querySelector("#legal-mdl-license").addEventListener("click", function(){followLink("src/others/open_source/open_code/google/mdl/LICENSE","_self", LINK_STATE_INTERNAL_LICENSE_FILE);}, false);
     document.querySelector("#legal-pace-license").addEventListener("click", function(){followLink("src/others/open_source/open_code/hubspot/pace.js/LICENSE","_self", LINK_STATE_INTERNAL_LICENSE_FILE);}, false);
     document.querySelector("#legal-fonts-roboto-copyright").addEventListener("click", function(){followLink("src/others/open_source/open_fonts/google/Roboto/COPYRIGHT","_self", LINK_STATE_INTERNAL_LICENSE_FILE);}, false);
     document.querySelector("#legal-fonts-roboto-license").addEventListener("click", function(){followLink("src/others/open_source/open_fonts/google/Roboto/LICENSE","_self", LINK_STATE_INTERNAL_LICENSE_FILE);}, false);
@@ -18,7 +16,7 @@ function init(){
     document.querySelector("#legal-self-code-license").addEventListener("click", function(){followLink("LICENSE","_self", LINK_STATE_INTERNAL_LICENSE_FILE);}, false);
     document.querySelector("#legal-self-assets-license").addEventListener("click", function(){followLink("LICENSE_ASSETS","_self", LINK_STATE_INTERNAL_LICENSE_FILE);}, false);	
 	
-    document.querySelector("#contact-imprintlink").addEventListener("click", function(){notify(getString("helpScreenContactBackupLinkNotification", "."), false, 900, null, null, window.innerHeight); followLink( getServerHTMLLink("imprint"),"_blank", LINK_STATE_NORMAL);}, false);
+    document.querySelector("#contact-imprintlink").addEventListener("click", function(){notify("#help-notifier", getString("helpScreenContactBackupLinkNotification", "."), NOTIFICATION_PRIO_DEFAULT, 900, null, null, window.innerHeight); followLink( getServerHTMLLink("imprint"),"_blank", LINK_STATE_NORMAL);}, false);
     handleServerJSONValues("imprint", function(res){
         var imprint = document.querySelector("#contact-imprint");
         imprint.innerHTML = "<b>"+getString("helpScreenContactImprintTitle")+"</b>";
@@ -29,7 +27,7 @@ function init(){
             imprint.appendChild(span);
         });
     });
-    document.querySelector("#contact-feedbacklink").addEventListener("click", function(){notify(getString("helpScreenContactFeedbackSendNotification", "."), false, 900, null, null, window.innerHeight); followLink( getServerHTMLLink("feedback") ,"_blank", LINK_STATE_NORMAL);}, false);
+    document.querySelector("#contact-feedbacklink").addEventListener("click", function(){notify("#help-notifier", getString("helpScreenContactFeedbackSendNotification", "."), NOTIFICATION_PRIO_DEFAULT, 900, null, null, window.innerHeight); followLink( getServerHTMLLink("feedback") ,"_blank", LINK_STATE_NORMAL);}, false);
 	
     document.querySelector("#download-sourcelink").addEventListener("click", function(){followLink(getServerRedirectLink("source_code"),"_blank", LINK_STATE_NORMAL);}, false);
 	
@@ -56,14 +54,3 @@ function init(){
     }
     setHTMLStrings();	
 }
-
-window.addEventListener("load", function(){
-    // Workaround for https://github.com/google/material-design-lite/issues/4140
-    var hash = window.location.hash.replace(/[^a-zA-Z0-9\-_]/i, "");
-    if(hash){
-        var elem = document.querySelector("#"+hash);
-        if(elem){
-            elem.scrollIntoView();
-        }
-    }
-});

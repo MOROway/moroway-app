@@ -10,9 +10,6 @@
         <link rel="icon" type="image/x-icon" sizes="32x32" href="favicon.ico">
 
         <!-- Open Source Libraries And Fonts -->
-        <!-- Google: Material Design Lite -->
-        <script src="src/others/open_source/open_code/google/mdl/material.min.js"></script>
-        <link rel="stylesheet" type="text/css" href="src/others/open_source/open_code/google/mdl/material.min.css">
         <!-- Fonts -->
         <link rel="stylesheet" type="text/css" href="src/others/open_source/open_fonts/google/MaterialIcons/font.css">
         <link rel="stylesheet" type="text/css" href="src/others/open_source/open_fonts/google/Roboto/font.css">
@@ -37,98 +34,18 @@
     </head>
 
     <body>
-        <div class="mdl-layout mdl-js-layout">
 
-            <div id="canvas-notifier" class="mdl-js-snackbar mdl-snackbar">
-                <div class="mdl-snackbar__text"></div>
-                <button class="mdl-snackbar__action" type="button"></button>
-            </div>
+        <header class="page-header">
+            <i id="backOption" class="internal-link material-icons">arrow_back</i>
+            <h1 data-stringid-content="generalTitleSettingsScreen"></h1>
+        </header>
 
-            <header style="background-color: black;" class="mdl-layout__header">
-                <div class="mdl-layout__header-row">
-                    <span class="mdl-layout__title" data-stringid-content="generalTitleSettingsScreen"></span>
-                </div>
-            </header>
+        <main></main>
 
-            <main class="mdl-layout__content">
-
-                <ul class="mdl-list">
-
-                    <li id="showNotifications" class="mdl-list__item mdl-list__item--three-line">
-                        <span class="mdl-list__item-primary-content">
-                            <i class="material-icons mdl-list__item-avatar leftButton">settings</i>
-                            <span class="textButton" data-stringid-content="settingsScreenOptNotificationsTitle"></span>
-                            <span class="mdl-list__item-text-body">
-                                <br><span data-stringid-content="settingsScreenOptNotificationsDesc"></span>
-                                <br><i data-stringid-content="settingsScreenOptNotificationsInfo"></i>
-                            </span>
-                        </span>
-                    </li>
-
-                    <li id="classicUI" class="mdl-list__item mdl-list__item--three-line">
-                        <span class="mdl-list__item-primary-content">
-                            <i class="material-icons mdl-list__item-avatar leftButton">settings</i>
-                            <span class="textButton" data-stringid-content="settingsScreenOptClassicUITitle"></span>
-                            <span class="mdl-list__item-text-body">
-                                <br><span data-stringid-content="settingsScreenOptClassicUIDesc"></span>
-                            </span>
-                        </span>
-                    </li>
-
-                    <li id="alwaysShowSelectedTrain" class="mdl-list__item mdl-list__item--three-line">
-                        <span class="mdl-list__item-primary-content">
-                            <i class="material-icons mdl-list__item-avatar leftButton">settings</i>
-                            <span class="textButton" data-stringid-content="settingsScreenOptSelectedTrainTitle"></span>
-                            <span class="mdl-list__item-text-body">
-                                <br><span data-stringid-content="settingsScreenOptSelectedTrainDesc"></span>
-                                <br><i data-stringid-content="settingsScreenOptSelectedTrainInfo"></i>
-                            </span>
-                        </span>
-                    </li>
-
-                    <li id="cursorascircle" class="mdl-list__item mdl-list__item--three-line">
-                        <span class="mdl-list__item-primary-content">
-                            <i class="material-icons mdl-list__item-avatar leftButton">settings</i>
-                            <span class="textButton" data-stringid-content="settingsScreenOptCursorTitle"></span>
-                            <span class="mdl-list__item-text-body">
-                                <br><span data-stringid-content="settingsScreenOptCursorDesc"></span>
-                                <br><i data-stringid-content="settingsScreenOptCursorInfo"></i>
-                            </span>
-                        </span>
-                    </li>
-
-                    <li id="burnTheTaxOffice" class="mdl-list__item mdl-list__item--three-line">
-                        <span class="mdl-list__item-primary-content">
-                            <i class="material-icons mdl-list__item-avatar leftButton">settings</i>
-                            <span class="textButton" data-stringid-content="settingsScreenOptTaxOfficeTitle"></span>
-                            <span class="mdl-list__item-text-body">
-                                <br><span data-stringid-content="settingsScreenOptTaxOfficeDesc"></span>
-                            </span>
-                        </span>
-                    </li>
-
-                    <li id="saveGame" class="mdl-list__item mdl-list__item--three-line">
-                        <span class="mdl-list__item-primary-content">
-                            <i class="material-icons mdl-list__item-avatar leftButton">settings</i>
-                            <span class="textButton" data-stringid-content="settingsScreenOptSaveGameTitle"></span>
-                            <span class="mdl-list__item-text-body">
-                                <br><span data-stringid-content="settingsScreenOptSaveGameDesc"></span>
-                                <br><i data-stringid-content="settingsScreenOptSaveGameInfo"></i>
-                            </span>
-                        </span>
-                        <div class="settings-buttons-wrapper">
-                            <button id="saveGameDeleteGame" class="settings-button" data-stringid-content="settingsScreenOptSaveGameButtonDelete"></button>
-                        </div>
-                    </li>
-                </ul>
-
-                <div id="langoption"><div id="langoptioninfo" data-stringid-content="settingsScreenLangSelectInfo" data-stringid-content-punctuation=":"></div></div>
-
-                <button id="helpOption" class="internal-link mdl-button mdl-js-button mdl-js-ripple-effect" data-stringid-content="generalTitleHelpScreen"></button>
-                <button id="backOption" class="internal-link mdl-button mdl-js-button mdl-js-ripple-effect" data-stringid-content="generalBack"></button>
-
-            </main>
-
+        <!-- notify -->
+        <div id="settings-notifier" class="notify">
+            <span></span>
+            <button></button>
         </div>
 
         <!-- load strings -->

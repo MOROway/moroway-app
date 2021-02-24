@@ -96,20 +96,71 @@ canvas {
 }
 
 #canvas-options {
-    opacity: 0;
-    transition: opacity 0.8s;
+    z-index: 1;
+    position: absolute;
+    display: none;
 }
 
-#settingsimport {
+.canvas-options-button {
+    display: none;
+    height: 32px;
+    width: 32px;
+    padding: 4px;
+    margin: 3px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    color: rgb(210, 120, 27);
+    background: transparent;
+}
+.canvas-options-button.small {
+    height: 30px;
+    width: 30px;
+    padding: 3px;
+    margin: 0px;
+    color: rgb(48, 48, 48);
+    background: rgb(210, 120, 27);
+}
+.canvas-options-button i {
+    vertical-align: middle;
+    font-size: 24px;
+}
+
+#settings {
+    text-align: left;
     display: none;
     position: fixed;
-    background: white;
+    background: floralWhite;
+    color: black;
     top: 0;
     right: 0;
     height: 100vh;
     height: -webkit-fill-available;
+    height: stretch;
     width: 450px;
-    max-width: 100vw;
+    max-width: calc(100vw - 5px);
+    border-left: 5px solid black;
+    overflow-y: auto;
+}
+.settings {
+    background: transparent;
+}
+.settings-inner {
+    margin-bottom: 4%;
+}
+#settings .nav-wrapper {
+    margin: 10px;
+    padding-bottom: 100px;
+}
+#settings .nav-button {
+    border: 1px solid black;
+    border-radius: 6px;
+    padding: 6px;
+    margin: 3px;
+    font-weight: bold;
+    text-transform: uppercase;
+    background: transparent;
+    cursor: pointer;
 }
 
 #content > * {

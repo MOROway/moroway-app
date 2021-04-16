@@ -1250,7 +1250,7 @@ function drawObjects() {
         for(var i = 0; i < cCars.length; i++) {
             for(var k = 0; k < cCars.length; k++) {
                 if(i!= k && carCollisionCourse(i,false) && carCollisionCourse(k,false)){
-                    notify (getString("appScreenCarAutoModeCrash", "."), true, 5000 ,null, null, client.y);
+                    notify("#canvas-notifier", getString("appScreenCarAutoModeCrash", "."), NOTIFICATION_PRIO_HIGH, 5000, null, null, window.innerHeight);
                     carParams.autoModeOff = true;
                     carParams.autoModeRuns = false;
                 }
@@ -1263,7 +1263,7 @@ function drawObjects() {
             }
         });
         if(collStopQuantity == cars.length){
-            notify (getString("appScreenCarAutoModeCrash", "."), true, 5000 ,null, null, client.y);
+            notify("#canvas-notifier", getString("appScreenCarAutoModeCrash", "."), NOTIFICATION_PRIO_HIGH, 5000, null, null, window.innerHeight);
             carParams.autoModeOff = true;
             carParams.autoModeRuns = false;
         }
@@ -3046,6 +3046,20 @@ window.onload = function() {
         }
     }
 
+    function hidePace() {
+        try{
+            document.styleSheets[0].insertRule(".pace, .pace-progress {display: none !important;}",0);
+        } catch (e){
+            if(debug){
+                console.log(e);
+            }
+            var elem = document.querySelector("head");
+            var elemStyle = document.createElement("style");
+            elemStyle.textContent = ".pace, .pace-progress {display: none !important;}";
+            elem.appendChild(elemStyle);
+        }
+    }
+
     function destroy(toDestroyElems) {
         if(typeof toDestroyElems == "object") {
             if(!Array.isArray(toDestroyElems)){
@@ -3097,17 +3111,7 @@ window.onload = function() {
         resetForElem(parent, elem);
         onlineConnection.connect = (function(host) {
             function hideLoadingAnimation(){
-                try{
-                    document.styleSheets[0].insertRule(".pace, .pace-progress {display: none !important;}");
-                } catch (e){
-                    if(debug){
-                        console.log(e);
-                    }
-                    var elem = document.querySelector("head");
-                    var elemStyle = document.createElement("style");
-                    elemStyle.textContent = ".pace, .pace-progress {display: none !important;}";
-                    elem.appendChild(elemStyle);
-                }
+                hidePace();
                 window.clearInterval(loadingAnimElemChangingFilter);
                 destroy(document.querySelector("#branding"));
             }
@@ -3308,7 +3312,11 @@ window.onload = function() {
                         var elem = parent.querySelector("#setup-start");
                         resetForElem(parent, elem);
                         elem.querySelector("#setup-start-gamelink").textContent = getShareLink(onlineGame.gameId, onlineGame.gameKey);
-                        elem.querySelector("#setup-start-button").onclick = function(){copy("#setup #setup-start #setup-start-gamelink");};
+                        elem.querySelector("#setup-start-button").onclick = function(){
+                            if(!copy("#setup #setup-start #setup-start-gamelink")) {
+                                notify("#canvas-notifier", getString("appScreenTeamplaySetupStartButtonError", "!"), NOTIFICATION_PRIO_HIGH, 6000, null, null, client.y);
+                            }
+                        };
                     } else {
                         showNewGameLink();
                         notify("#canvas-notifier", getString("appScreenTeamplayCreateError", "!"), NOTIFICATION_PRIO_HIGH, 6000, function(){followLink("error#tp-connection", "_self", LINK_STATE_INTERNAL_HTML);}, getString("appScreenFurtherInformation"), client.y);
@@ -3531,6 +3539,7 @@ window.onload = function() {
             elems[i].style.display = "block";
         }
         Pace.on("hide", function(){
+            hidePace();
             destroy(document.querySelector("body > .pace"));
             setTimeout(function() {
                 var toShowElems = [document.querySelector("#snake"),document.querySelector("#percent")];
@@ -3562,6 +3571,7 @@ window.onload = function() {
             document.querySelector("#percent #percent-progress").style.left = -100+cPercent + "%";
             if (loadNo == finalPicNo) {
                 Pace.stop();
+                hidePace();
                 destroy(document.querySelector("body > .pace"));
                 setTimeout(function(){destroy(document.querySelector("#percent"));},1000);
                 initialDisplay();

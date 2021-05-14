@@ -3446,8 +3446,10 @@ window.onload = function() {
         pics[pic.id].onload = function() {
             loadNo++;
             var cPercent = Math.round(100 * (loadNo / finalPicNo));
-            document.querySelector("#percent #percent-text").textContent = cPercent + "%";
-            document.querySelector("#percent #percent-progress").style.left = -100+cPercent + "%";
+            if(document.querySelector("#percent #percent-text") != null && document.querySelector("#percent #percent-progress") != null) {
+                document.querySelector("#percent #percent-text").textContent = cPercent + "%";
+                document.querySelector("#percent #percent-progress").style.left = -100+cPercent + "%";
+            }
             if (loadNo == finalPicNo) {
                 initialDisplay();
             }

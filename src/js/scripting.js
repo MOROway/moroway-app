@@ -2227,7 +2227,7 @@ function teamplaySync (mode, objname, index, params, notification) {
 /**************
 Variablen-Namen
 **************/
-var animateWorker = new Worker("./src/jonathan_herrmann_engel/js/scripting_worker_animate.js");
+var animateWorker = new Worker("./src/js/scripting_worker_animate.js");
 var settings = {};
 
 var frameNo = 0;

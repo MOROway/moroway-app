@@ -5,4 +5,4 @@ All MOROway App files are subject to the "Apache License Version 2.0" (file: 'LI
 In addition all MOROway App media files like images are also subject to the "Creative Commons Attribution 4.0 International" License (file: 'LICENSE_ASSETS').
 For these media files you may choose between these two licenses.
 
-For included open source files (e.g. /src/others/) the copyright and license files are located in the specific directory.
+For included open source files (e.g. [App-Root]/src/lib/) the copyright and license files are located in the specific directory.

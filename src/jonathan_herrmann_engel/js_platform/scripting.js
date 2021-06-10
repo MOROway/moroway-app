@@ -3,11 +3,15 @@
 ////Optional code (app works without it)
 function placeOptions(state){
 
-    var menu = {container: document.querySelector("#canvas-options"),containerMargin:client.width/50,items: {team:document.querySelector("#canvas-team"),single:document.querySelector("#canvas-single"),help:document.querySelector("#canvas-help"), settings:document.querySelector("#canvas-settings"), controlCenter: document.querySelector("#canvas-control-center"), carControlCenter: document.querySelector("#canvas-car-control-center")}};
+    var menu = {container: document.querySelector("#canvas-options"),containerMargin:client.width/50,items: {team:document.querySelector("#canvas-team"),single:document.querySelector("#canvas-single"),help:document.querySelector("#canvas-help"), settings:document.querySelector("#canvas-settings"), controlCenter: document.querySelector("#canvas-control-center"), carControlCenter: document.querySelector("#canvas-car-control-center"), chat: document.querySelector("#canvas-chat-open")}};
     if(state == "hide") {
         menu.container.style.display = "";
     } else if (state == "show") {
         menu.container.style.display = "block";
+    } else if (state == "invisible") {
+        menu.container.style.visibility = "hidden";
+    } else if (state == "visible") {
+        menu.container.style.visibility = "";
     } else {
         if(state == "load") {
             menu.container.style.display = "block";
@@ -17,7 +21,7 @@ function placeOptions(state){
             setSettingsHTML(document.querySelector("#settings-inner"),false);
             menu.items.help.addEventListener("click", function(){followLink("help", "_blank", LINK_STATE_INTERNAL_HTML);}, false);
             menu.items.team.addEventListener("click", function(){followLink("?mode=multiplay", "_self", LINK_STATE_INTERNAL_HTML);}, false);
-            menu.items.single.addEventListener("click", function(){followLink("?", "_self", LINK_STATE_INTERNAL_HTML);}, false);
+            menu.items.single.addEventListener("click", showConfirmLeaveMultiplayerMode, false);
             var settingsElem = document.querySelector("#settings");
             menu.items.settings.addEventListener("click", function(){
                 menu.container.style.visibility = "hidden";
@@ -35,6 +39,9 @@ function placeOptions(state){
             };
             menu.items.controlCenter.addEventListener("click", function(){hardware.mouse.rightClick = !hardware.mouse.rightClick || controlCenter.showCarCenter; controlCenter.showCarCenter = false;}, false);
             menu.items.carControlCenter.addEventListener("click", function(){hardware.mouse.rightClick = !hardware.mouse.rightClick || !controlCenter.showCarCenter; controlCenter.showCarCenter = true;}, false);
+            menu.items.chat.addEventListener("click", function(){
+                document.querySelector("#chat").openChat();
+            }, false);
         }
         for (var item in menu.items) {
             menu.items[item].style.display = "inline";
@@ -42,6 +49,7 @@ function placeOptions(state){
         }
         menu.items.team.style.display = onlineGame.enabled ? "none" : "inline";
         menu.items.single.style.display = onlineGame.enabled ? "inline" : "none";
+        menu.items.chat.style.display = onlineGame.enabled ? "inline" : "none";
         if(menu.container.offsetHeight < client.y && 2*background.y > background.height) {
             menu.containerMargin = (client.y-menu.container.offsetHeight)/2;
             menu.container.style.top = "";

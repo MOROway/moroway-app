@@ -1,4 +1,4 @@
-var updatedSW = 93; //TO BE INCREASED ON EACH NEW VERSION
+var updatedSW = 70200;
 
 //generate cache-name from branch and sw-version
 var locationstr = location.pathname;
@@ -86,7 +86,6 @@ var urlsToCache = [
 ];
 
 //service worker code to let them do their service work
-
 self.addEventListener("install", function(event) {
     event.waitUntil(
         caches.open(CACHE_NAME)
@@ -127,4 +126,3 @@ self.addEventListener("activate", function (event) {
         })
     );
 });
-

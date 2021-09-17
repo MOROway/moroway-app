@@ -3,12 +3,14 @@ const APP_DATA = {
     "version": {
         "major": 7,
         "minor": 2,
-        "patch": 2,
+        "patch": 3,
+        "beta": 0,
         "date": {
             "year": 2021,
-            "month": 7,
-            "day": 31
+            "month": 9,
+            "day": 17
         }
     },
-    "platform": "web"
+    "platform": "web",
+    "debug": false
 };

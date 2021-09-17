@@ -259,13 +259,13 @@ function getTouchEnd(event) {
     hardware.mouse.isHold = hardware.mouse.rightClickHold = false;
     hardware.mouse.rightClickEvent = hardware.mouse.rightClick;
     if(hardware.mouse.rightClickPrepare != undefined && hardware.mouse.rightClickPrepare) {
-        if(controlCenter.showCarCenter === null && hardware.mouse.rightClick) {
+        if(controlCenter.showCarCenter === null && hardware.mouse.rightClick && client.realScale == 1) {
             controlCenter.showCarCenter = true;
             notify("#canvas-notifier", getString("appScreenCarControlCenterTitle"), NOTIFICATION_PRIO_LOW, 1000,null,null, client.y, false);
             hardware.mouse.rightClickPrepare = false;
         } else {
             hardware.mouse.rightClick = !hardware.mouse.rightClick;
-            if(hardware.mouse.rightClick) {
+            if(hardware.mouse.rightClick && client.realScale == 1) {
                 notify("#canvas-notifier", getString("appScreenControlCenterTitle"), NOTIFICATION_PRIO_LOW, 1000,null,null, client.y, false);
             }
             hardware.mouse.rightClickEvent = hardware.mouse.rightClickHold = hardware.mouse.rightClickPrepare = false;
@@ -2284,7 +2284,7 @@ var controlCenter = {showCarCenter: null, fontFamily: "sans-serif"};
 var hardware = {mouse: {moveX:0, moveY:0,downX:0, downY:0, downTime: 0,upX:0, upY:0, upTime: 0, isMoving: false, isHold: false, rightClick: false, cursor: "default"}};
 var client = {devicePixelRatio: 1,realScaleMax:6,realScaleMin:1.2};
 var onlineGame = {animateInterval: 40, syncInterval: 10000, excludeFromSync: {"t": ["src", "assetFlip", "fac", "speedFac", "accelerationSpeedStartFac", "accelerationSpeedFac", "lastDirectionChange", "bogieDistance", "width", "height", "speed", "crash", "flickerFacBack", "flickerFacBackOffset", "flickerFacFront", "flickerFacFrontOffset", "margin", "cars"], "tc": ["src", "assetFlip", "fac", "bogieDistance", "width", "height", "konamiUseTrainIcon"]}, chatSticker: 7, resized: false};
-var onlineConnection = {serverURI: getServerLink("wss:") + "/multiplay"};
+var onlineConnection = {serverURI: getServerLink(PROTOCOL_WS) + "/multiplay"};
 
 var resizeTimeout;
 var resized = false;
@@ -2374,16 +2374,16 @@ window.onload = function() {
         var type = event.type;
         canvasForeground.removeEventListener("touchstart",chooseInputMethod);
         canvasForeground.removeEventListener("mousemove",chooseInputMethod);
-        canvasForeground.addEventListener("touchmove", getTouchMove, false);
-        canvasForeground.addEventListener("touchstart", getTouchStart, false);
-        canvasForeground.addEventListener("touchleave", getTouchLeave, false);
-        canvasForeground.addEventListener("touchend", getTouchEnd, false);
-        canvasForeground.addEventListener("mousemove", onMouseMove, false);
-        canvasForeground.addEventListener("mousedown", onMouseDown, false);
-        canvasForeground.addEventListener("mouseup", onMouseUp, false);
-        canvasForeground.addEventListener("mouseout", onMouseOut, false);
-        canvasForeground.addEventListener("wheel", onMouseWheel, false);
-        canvasForeground.addEventListener("contextmenu", onMouseRight, false);
+        canvasForeground.addEventListener("touchmove", getTouchMove);
+        canvasForeground.addEventListener("touchstart", getTouchStart);
+        canvasForeground.addEventListener("touchleave", getTouchLeave);
+        canvasForeground.addEventListener("touchend", getTouchEnd);
+        canvasForeground.addEventListener("mousemove", onMouseMove);
+        canvasForeground.addEventListener("mousedown", onMouseDown);
+        canvasForeground.addEventListener("mouseup", onMouseUp);
+        canvasForeground.addEventListener("mouseout", onMouseOut);
+        canvasForeground.addEventListener("wheel", onMouseWheel);
+        canvasForeground.addEventListener("contextmenu", onMouseRight);
         if(type == "touchstart"){
             client.chosenInputMethod = "touch";
             getTouchStart(event);
@@ -2914,7 +2914,7 @@ window.onload = function() {
                         onlineGame.resized = false;
                     }, 3000);
                 }
-                if(debug){
+                if(debug || APP_DATA.debug){
                     animateWorker.postMessage({k:"debug"});
                 }
             } else if(message.data.k == "switches") {
@@ -3084,7 +3084,7 @@ window.onload = function() {
                     var chatClear = document.querySelector("#chat #chat-clear");
                     chatScrollToBottom.toggleDisplay = function() {
                         if(chatInner.lastChild != null) {
-                            chatScrollToBottom.style.display = chatInnerContainer.scrollHeight > chatInnerContainer.offsetHeight && 
+                            chatScrollToBottom.style.display = chatInnerContainer.scrollHeight > chatInnerContainer.offsetHeight &&
     chatInnerContainer.scrollHeight - chatInnerContainer.scrollTop > chatInnerContainer.offsetHeight + chatInner.lastChild.offsetHeight ? "flex" : "";
                             chatScrollToBottom.style.top = Math.max(0,(chatInnerContainer.offsetHeight - chatScrollToBottom.offsetHeight - 50)) + "px";
                         } else {

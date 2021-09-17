@@ -15,13 +15,13 @@ function chooseInputMethod (event){
 window.addEventListener("load", function(){
 
     if(typeof(window.localStorage) != "undefined") {
-        
+
         setSettingsHTML(document.querySelector("main"),true);
 
         document.querySelector("body").addEventListener("touchstart",chooseInputMethod);
         document.querySelector("body").addEventListener("mousemove",chooseInputMethod);
-        
-        document.querySelector("#backOption").addEventListener("click", function(){try {window.close();}catch(err) {} followLink("./","_self", LINK_STATE_INTERNAL_HTML);}, false);
+
+        document.querySelector("#backOption").addEventListener("click", function(){try {window.close();}catch(err) {} followLink("./","_self", LINK_STATE_INTERNAL_HTML);});
 
     } else {
         document.querySelector("body").innerHTML = getString("generalNoDOMStorageSupport");

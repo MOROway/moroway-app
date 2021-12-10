@@ -3,12 +3,12 @@ const APP_DATA = {
     "version": {
         "major": 7,
         "minor": 3,
-        "patch": 2,
+        "patch": 3,
         "beta": 0,
         "date": {
             "year": 2021,
-            "month": 10,
-            "day": 28
+            "month": 12,
+            "day": 10
         }
     },
     "platform": "web",

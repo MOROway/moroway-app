@@ -1,16 +1,16 @@
 //APP-DATA OBJECT
 const APP_DATA = {
-    "version": {
-        "major": 7,
-        "minor": 4,
-        "patch": 7,
-        "beta": 0,
-        "date": {
-            "year": 2022,
-            "month": 3,
-            "day": 11
+    version: {
+        major: 7,
+        minor: 4,
+        patch: 8,
+        beta: 0,
+        date: {
+            year: 2022,
+            month: 3,
+            day: 18
         }
     },
-    "platform": "web",
-    "debug": false
+    platform: "web",
+    debug: false
 };

@@ -5,7 +5,7 @@
         <meta charset="UTF-8" />
         <meta name="theme-color" content="#000" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title data-stringid-content="generalTitleSettingsScreen"></title>
+        <title data-stringid-content="generalLicense"></title>
         <link rel="icon" type="image/x-icon" sizes="32x32" href="favicon.ico" />
         <link rel="manifest" href="manifest.webmanifest">
 
@@ -17,27 +17,34 @@
         <!-- General Scripts -->
         <script src="src/js/error_handler.js"></script>
         <script src="src/jsm_platform/general.js" type="module"></script>
-        <!-- Settings Scripts -->
-        <script src="src/jsm/settings.js" type="module"></script>
+        <!-- License Scripts -->
+        <script src="src/jsm/license.js" type="module"></script>
 
         <!-- General Styles -->
         <link rel="stylesheet" type="text/css" href="src/css/general.css" />
-        <!-- Settings Styles -->
-        <link rel="stylesheet" type="text/css" href="src/css/settings.css" />
+        <!-- License Styles -->
     </head>
 
     <body>
         <header class="page-header">
             <i id="backOption" data-stringid-tooltip="generalBack" class="internal-link material-icons">arrow_back</i>
-            <h1 data-stringid-content="generalTitleSettingsScreen"></h1>
+            <h1 data-stringid-content="generalLicense"></h1>
         </header>
 
-        <main></main>
-
-        <!-- notify -->
-        <div id="settings-notifier" class="notify">
-            <span></span>
-            <button></button>
-        </div>
+        <main>
+            <article>
+                <h2 data-stringid-content="generalLicense"></h2>
+                <div class="card-container">
+                    <div class="card card-big">
+                        <div class="card-title">
+                            <h2 id="license-title"></h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="content" id="license-content"></div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </main>
     </body>
 </html>

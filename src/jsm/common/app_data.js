@@ -5,12 +5,12 @@ var APP_DATA = {
     version: {
         major: 9,
         minor: 1,
-        patch: 3,
+        patch: 4,
         beta: 0,
         date: {
             year: 2024,
-            month: 1,
-            day: 28
+            month: 3,
+            day: 12
         }
     },
     platform: "web",

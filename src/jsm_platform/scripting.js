@@ -1,5 +1,6 @@
 "use strict";
 import { followLink, LINK_STATE_INTERNAL_HTML } from "./common/follow_links.js";
+import { APP_DATA } from "../jsm/common/app_data.js";
 import { showServerNote } from "../jsm/common/web_tools.js";
 import { getString } from "../jsm/common/string_tools.js";
 import { setSettingsHTML } from "../jsm/common/settings.js";
@@ -30,4 +31,22 @@ document.addEventListener("moroway-app-update-notification", function (event) {
     notify("#canvas-notifier", getString("generalNewVersion", "!", "upper"), NOTIFICATION_PRIO_DEFAULT, 7000, function () {
         followLink("whatsnew/#newest", "_blank", LINK_STATE_INTERNAL_HTML);
     }, getString("appScreenFurtherInformation", "", "upper"), minHeight);
+});
+document.addEventListener("moroway-app-keep-screen-alive", function (event) {
+    var mode = getMode();
+    if (mode == "online" || mode == "demo") {
+        var eventCustom = event;
+        if (eventCustom.detail) {
+            if (eventCustom.detail.acquire) {
+                try {
+                    navigator.wakeLock.request("screen");
+                }
+                catch (error) {
+                    if (APP_DATA.debug) {
+                        console.log("Wake-Lock-Error:", error);
+                    }
+                }
+            }
+        }
+    }
 });

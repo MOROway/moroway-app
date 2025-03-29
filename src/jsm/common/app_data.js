@@ -9,7 +9,7 @@ var APP_DATA = {
     version: {
         major: 10,
         minor: 3,
-        patch: 0,
+        patch: 1,
         beta: 0,
         date: {
             year: 2025,

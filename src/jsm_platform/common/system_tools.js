@@ -19,6 +19,12 @@ export var SYSTEM_TOOLS = {
             }
         }
     },
+    forceModeSwitchHandling: function () {
+        if (window.matchMedia("(display-mode: browser)").matches) {
+            return false;
+        }
+        return "historyReplace";
+    },
     keepAlive: function (acquire) {
         if (acquire) {
             try {

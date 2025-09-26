@@ -12,16 +12,16 @@ var APP_DATA = {
         // @ts-ignore
         minor: 3,
         // @ts-ignore
-        patch: 6,
+        patch: 7,
         // @ts-ignore
         beta: 0,
         date: {
             // @ts-ignore
             year: 2025,
             // @ts-ignore
-            month: 8,
+            month: 9,
             // @ts-ignore
-            day: 1
+            day: 26
         }
     },
     platform: "web",

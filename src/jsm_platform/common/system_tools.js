@@ -6,6 +6,7 @@
 import { APP_DATA } from "../../jsm/common/app_data.js";
 import { followLink, LinkStates } from "../../jsm/common/web_tools.js";
 export var SYSTEM_TOOLS = {
+    canAutoplayMedia: function () { return false; },
     canExitApp: function () {
         return !window.matchMedia("(display-mode: browser)").matches && window.history.length === 1;
     },

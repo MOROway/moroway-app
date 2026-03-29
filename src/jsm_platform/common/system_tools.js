@@ -5,12 +5,12 @@
 "use strict";
 import { APP_DATA } from "../../jsm/common/app_data.js";
 import { followLink, LinkStates } from "../../jsm/common/web_tools.js";
-export var SYSTEM_TOOLS = {
-    canAutoplayMedia: function () { return false; },
-    canExitApp: function () {
+export const SYSTEM_TOOLS = {
+    canAutoplayMedia: () => false,
+    canExitApp() {
         return !window.matchMedia("(display-mode: browser)").matches && window.history.length === 1;
     },
-    exitApp: function () {
+    exitApp() {
         try {
             window.close();
         }
@@ -20,13 +20,13 @@ export var SYSTEM_TOOLS = {
             }
         }
     },
-    forceModeSwitchHandling: function () {
+    forceModeSwitchHandling() {
         if (window.matchMedia("(display-mode: browser)").matches) {
             return false;
         }
         return "historyReplace";
     },
-    keepAlive: function (acquire) {
+    keepAlive(acquire) {
         if (acquire) {
             try {
                 navigator.wakeLock.request("screen");
@@ -38,7 +38,7 @@ export var SYSTEM_TOOLS = {
             }
         }
     },
-    navigateBack: function () {
+    navigateBack() {
         if (document.referrer.startsWith(document.baseURI) && document.referrer !== document.baseURI && window.history.length > 1) {
             window.history.back();
         }

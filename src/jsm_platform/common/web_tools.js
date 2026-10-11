@@ -25,9 +25,6 @@ export function followLink(input1, input2, input3) {
     if (input3 === LinkStates.InternalLicense) {
         input1 = "license/?license-file=" + input1;
     }
-    if (typeof input2 !== "string") {
-        input2 = "";
-    }
     input2 = input2.replace(/\s/g, "");
     if (input2 === "") {
         window.open(input1);
